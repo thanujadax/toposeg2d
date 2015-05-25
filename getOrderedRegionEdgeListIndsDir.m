@@ -73,12 +73,12 @@ nextCwEdgeLId_inRegion = intersect...
             
 % debug code start 20141224
 if(numel(nextCwEdgeLId_inRegion)>1)
-    disp('getOrderedRegionEdgeListIndsDir. numEdges >1.. running tie breaker...');
-    nextCwEdgeLId_inRegion = nextCwEdgeTieBreaker(...
-    nodeInd,prevEdgeLID,nextEdgeLIDsList,edgepixels,...
-    connectedJunctionIDs,sizeR,sizeC);
-    disp('tie broken');
-    % error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges >1')
+%     disp('getOrderedRegionEdgeListIndsDir. numEdges >1.. running tie breaker...');
+%     nextCwEdgeLId_inRegion = nextCwEdgeTieBreaker(...
+%     nodeInd,prevEdgeLID,nextEdgeLIDsList,edgepixels,...
+%     connectedJunctionIDs,sizeR,sizeC);
+%     disp('tie broken');
+    error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges >1')
 elseif(numel(nextCwEdgeLId_inRegion)<1)
     error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
     

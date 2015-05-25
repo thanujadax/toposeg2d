@@ -8,7 +8,7 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 %% Settings
 
 produceBMRMfiles = 0;  % set label file below if 1
-showIntermediate = 0;
+showIntermediate = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
@@ -198,9 +198,12 @@ end
 %% watershed segmentation
 ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
+% randomize WS region IDs
+ws = assignRandomIndicesToWatershedTransform(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet,...
+    ws,ws_original,removedWsIDs,newRemovedEdgeLIDs] ...
     = getGraphFromWS(ws,output,showIntermediate);
 clear adjacencyMat
 clear output
@@ -232,8 +235,10 @@ end
 numEdges = size(edges2nodes,1);
 
 % boundary edges
-boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
-    nodeEdges,edgeListInds,showIntermediate);
+% boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
+%     nodeEdges,edgeListInds,showIntermediate);
+
+boundaryEdgeIDs = getBoundaryEdgeIDs(ws,edges2pixels);
 numBoundaryEdges = numel(boundaryEdgeIDs);
 
 [~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeIDs); 
@@ -287,7 +292,7 @@ jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
 
 % get the angles for the edges based on its position in the graph
 jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes);
+    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs);
 
 % angle costs
 nodeAngleCosts = cell(1,numJtypes);
@@ -453,16 +458,24 @@ end
 %             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
 %             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
 
-[c_edgeLIDsForRegions_dir_cw,setOfRegions_edgeLIDs,edgeLIDs2nodes_directional] ...
-        = getOrderedRegionEdgeListIndsDir...
-        (setOfRegions,edges2nodes,jAnglesAll_alpha,...
-        junctionTypeListInds,nodeEdges,edgeListInds,edges2pixels,sizeR,sizeC);
-
-dirEdges2regionsOnOff = getRegionsForDirectedEdges...
-            (c_edgeLIDsForRegions_dir_cw,edgeLIDs2nodes_directional,...
-            setOfRegions_edgeLIDs,numEdges);
+% commenting out the following two methods : 20150518
+% [c_edgeLIDsForRegions_dir_cw,setOfRegions_edgeLIDs,edgeLIDs2nodes_directional] ...
+%         = getOrderedRegionEdgeListIndsDir...
+%         (setOfRegions,edges2nodes,jAnglesAll_alpha,...
+%         junctionTypeListInds,nodeEdges,edgeListInds,edges2pixels,sizeR,sizeC);
+% 
+% dirEdges2regionsOnOff = getRegionsForDirectedEdges...
+%             (c_edgeLIDsForRegions_dir_cw,edgeLIDs2nodes_directional,...
+%             setOfRegions_edgeLIDs,numEdges);
 % dEdges2regionsOnOff = edgeListInd_dir (=rowID) | onRegion | offRegion  : dir N1->N2
 %   regionID = 0 is for the image border.
+
+% TODO : unfinished implementation 20150518
+dirEdges2regionsOnOff ...
+        = getDirectedEdgeOnOffRegions...
+        (setOfRegions,edges2nodes,jAnglesAll_alpha,...
+        junctionTypeListInds,nodeEdgeIDs,edgeListIndsAll,...
+        edges2pixels,sizeR,sizeC);
 
 if(produceBMRMfiles)
     [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);

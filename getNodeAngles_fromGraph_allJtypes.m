@@ -1,5 +1,5 @@
 function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC,edges2nodes)
+    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs)
 % returns a cell array.
 % jAnglesAll{i} - each row corresponds to the set of angles for each
 % junction of type i (type 1 = J2)
@@ -9,7 +9,7 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 %   jEdgesAll - cell array with jEdgesAll{i} corresponding the edgeSet of
 %   junction type i. each row in the edge set corresponds to a junction
 %   instance of that type
-MAX_NUM_PIXELS = 5;  % maximum number of pixels away from the node used to calculate alpha
+MAX_NUM_PIXELS = 10;  % maximum number of pixels away from the node used to calculate alpha
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 
@@ -42,8 +42,12 @@ for dim=1:numJtypes
             % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
+            
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
+            % TODO: If the node is a cluster node determine the angle based on
+            % the neares pixel of the clusternode to the edge in concern
+            
                 % for each edge of this node
                 edgeID = edges_i(j);
                 if(edgeID~=0)
@@ -65,8 +69,9 @@ for dim=1:numJtypes
                     [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
 %                     orientations = zeros(numEdgePix,1);
-                    if(numEdgePix<4)
-                        %
+                    if(numEdgePix<8)
+                        % if the edge is not very long, only look at the pixels
+                        % close to this node to determine the direction
                         % get the 2 junction nodes
                         edgeNodes = edges2nodes(edgeListInd,:);
                         if(edgeNodes(1)==nodeListInd)
@@ -79,10 +84,21 @@ for dim=1:numJtypes
                         % calculate alpha based on these 2
                         nodeInd2 = nodeInds(node2ListInd); 
                         [rNode2,cNode2] = ind2sub([sizeR sizeC],nodeInd2);
+                        if(isClusterNode(nodeInd,connectedJunctionIDs))
+                            % is cluster node. pick the closest cluster
+                            % pixel
+                            % get all cluster pixels
+                            clusterPixInds = getClusterPixInds(nodeInd,connectedJunctionIDs);
+                            closestPixelInd = getClosestPixel(nodeInd2,clusterPixInds,sizeR,sizeC);
+                            [rNode,cNode] = ind2sub([sizeR sizeC],closestPixelInd);
+                        end
+                        
                         y = rNode2 - rNode;
                         x = cNode2 - cNode;
                     else
                         % get alpha wrt the end edge pixels
+                        % edge is too long. Take the direction wrt pixel at
+                        % MAX_NUM_PIXELS away from current node which is set above
                         rp1 = rP(1);
                         rp2 = rP(end);
                         cp1 = cP(1);

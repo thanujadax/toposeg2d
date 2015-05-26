@@ -203,8 +203,13 @@ ws = assignRandomIndicesToWatershedTransform(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet,...
-    ws,ws_original,removedWsIDs,newRemovedEdgeLIDs] ...
+    ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes] ...
     = getGraphFromWS(ws,output,showIntermediate);
+
+% edges2nodes is already appended with psuedoEdges2nodes
+% edges2pixels is already appended with psuedoEdgeIDs, with zeros as
+% pixInds.
+
 clear adjacencyMat
 clear output
 % nodeEdges - contain edgeIDs for each node
@@ -286,7 +291,7 @@ jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % junction of type i (type1 = J2). A row of a cell corresponds to a node of
 % that type of junction.
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,OFR,sizeR,sizeC,orientationStepSize);
+    nodeInds,jEdges,edges2pixels,OFR,sizeR,sizeC,orientationStepSize,psuedoEdges2nodes);
 % jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
 % edge at each junction of type 1 (= J2)
 

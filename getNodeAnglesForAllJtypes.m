@@ -1,5 +1,6 @@
 function jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-    nodeInds,jEdgesAll,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep)
+    nodeInds,jEdgesAll,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep,...
+    psuedoEdges2nodes)
 % returns a cell array.
 % jAnglesAll{i} - each row corresponds to the set of angles for each
 % junction of type i (type 1 = J2)
@@ -52,12 +53,20 @@ for dim=1:numJtypes
                     edgePixelInds0 = edgepixels(edgeListInd,:);
                     %edgePixelInds = edgePixelInds(edgePixelInds>0);
                     [r1,c1] = find(edgePixelInds0>0);
-                    rmax = max(r1);
-                    cmax = max(c1);
-                    edgePixelInds = zeros(rmax,cmax);
-                    edgePixelInds(r1,c1) = edgePixelInds0(r1,c1);
+                    if(~isempty(1))
+                        rmax = max(r1);
+                        cmax = max(c1);
+                        edgePixelInds = zeros(rmax,cmax);
+                        edgePixelInds(r1,c1) = edgePixelInds0(r1,c1);
+                        nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
+                    else
+                        % pseudoEdge
+                        % get the other node and treat is as the node pix
+                        nodePixels = getOtherNodeForPsuedoEdge...
+                            (nodeInd,psuedoEdges2nodes);
+                    end
                     % get the edge pixels(3) which are closest to the node i
-                    nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
+                    
                     % get their orientation
                     [r,c] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);

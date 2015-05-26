@@ -59,6 +59,15 @@ for i=1:numNodesCombined
             edgeId = edgePixLabels(neighborListInd,2);
             nodeEdges(i,k) = edgeId;
         end
+        % if neighbor is in the psuedoEdges2nodes list, add the
+        % psuedoEdgeID
+        psuedoEdgeIDs = getPsuedoEdgeLID(thisNodeIndex,psuedoEdgeIDs,psuedoEdges2nodes);
+        if ~(psuedoEdgeIDs(1)==0)
+            % add the psuedoEIDs to nodeEdges
+            k = k+1;
+            numPEs = numel(psuedoEdgeIDs);
+            nodeEdges(i,k:(k+numPEs-1)) = psuedoEdgeIDs;
+        end
     end
     % check if it has directly neighboring nodes
     connectedJInd = find(connectedJunctionIDs(:,1)==thisNodeIndex);
@@ -91,9 +100,6 @@ for i=1:numNodesCombined
             end                        
         end
     end
-    % add psuedoEdges
-    % Caution: the nodeInds in psuedoEdges might be not there due to the
-    % replacement of clusNodes with a single ID. Look for this 
     
     % sort edgeIDs in ascending order
     if(k>1)

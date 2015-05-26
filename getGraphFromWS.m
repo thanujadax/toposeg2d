@@ -1,5 +1,6 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
-    selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs]...
+    selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,...
+    psuedoEdgeIDs,psuedoEdges2nodes]...
     = getGraphFromWS(ws,hsvOutput,displayImg)
 
 % Outputs:
@@ -109,14 +110,18 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 % edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
 
-numPsuedoEdges = size(pEdges2Nodes,1);
+numPsuedoEdges = size(psuedoEdges2nodes,1);
 maxEdgeID = size(edges2pixels,1);
 psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
+% append psuedoEdgeIDs to edges2pixels
+edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
             psuedoEdgeIDs,psuedoEdges2nodes);
 
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
+
+edges2nodes = [edges2nodes, psuedoEdges2nodes];
 
 % calculate new ws by merging those ws regions that were initially separated
 ws_original = ws;
@@ -145,6 +150,8 @@ if(selfEdgeIDs(1)~=0)
     edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
     % nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
     % the zeros
+    % the above operation also removes the psuedoEdges. Reinsert them:
+    edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
     numNodes = size(nodeEdges,1);
     for i=1:numNodes
        nodeEdgesList_i = nodeEdges(i,(nodeEdges(i,:)>0)); 

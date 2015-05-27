@@ -1,4 +1,5 @@
-function edgeUnary = getEdgeUnaryAbs(edgepixels,absOFR)
+function edgeUnary = getEdgeUnaryAbs(edgepixels,absOFR,...
+                psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds)
 % unary value recalculation
 
 % for each edge, get the absolute max OFR value of its each pixel and take the average
@@ -10,7 +11,11 @@ edgeUnary = zeros(numEdges,1);
 for i=1:numEdges
 	edgepix_i = edgepixels(i,:);
 	edgepix_i = edgepix_i(edgepix_i>0);
-	meanAbsOFR_i = mean(absOFR(edgepix_i));
-	edgeUnary(i) = meanAbsOFR_i;		
-
+    if(isempty(edgepix_i))
+        pEID = edgeListInds(i);
+        edgepix_i = psuedoEdges2nodes(psuedoEdgeIDs==pEID,:);
+    end
+    meanAbsOFR_i = mean(absOFR(edgepix_i));
+    edgeUnary(i) = meanAbsOFR_i;
+    
 end

@@ -39,6 +39,9 @@ for i = 1:numel(edgeListIndToExamine)
     edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
                 % this edge, padded with zero entries
     edgePixels_i = edgePixels_i(edgePixels_i>0); % remove the zero padding
+    if(isempty(edgePixels_i))
+        continue
+    end
     pixelOrientations = orientationScoresMax(edgePixels_i).*360; % orientation values for the pixels
     % check if the edge contains a unacceptable set of orientations
     % if yes, add it to the list of offEdgeIDs    

@@ -61,12 +61,12 @@ for i=1:numNodesCombined
         end
         % if neighbor is in the psuedoEdges2nodes list, add the
         % psuedoEdgeID
-        psuedoEdgeIDs = getPsuedoEdgeLID(thisNodeIndex,psuedoEdgeIDs,psuedoEdges2nodes);
-        if ~(psuedoEdgeIDs(1)==0)
+        psuedoEdgeIDs_i = getPsuedoEdgeLID(thisNodeIndex,psuedoEdgeIDs,psuedoEdges2nodes);
+        if ~(psuedoEdgeIDs_i(1)==0)
             % add the psuedoEIDs to nodeEdges
             k = k+1;
-            numPEs = numel(psuedoEdgeIDs);
-            nodeEdges(i,k:(k+numPEs-1)) = psuedoEdgeIDs;
+            numPEs = numel(psuedoEdgeIDs_i);
+            nodeEdges(i,k:(k+numPEs-1)) = psuedoEdgeIDs_i;
         end
     end
     % check if it has directly neighboring nodes

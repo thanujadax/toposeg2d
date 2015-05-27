@@ -251,7 +251,8 @@ numBoundaryEdges = numel(boundaryEdgeIDs);
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
 % edge priors - from orientation filters
-edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
+edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag,...
+    psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
 
 % get edge activation probabilities from RFC
 
@@ -271,7 +272,7 @@ else
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
                 (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
-                boundaryEdgeIDs,edgeListInds,numTrees);
+                boundaryEdgeIDs,edgeListInds,numTrees,psuedoEdgeIDs,psuedoEdges2nodes);
 end
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
@@ -291,13 +292,15 @@ jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % junction of type i (type1 = J2). A row of a cell corresponds to a node of
 % that type of junction.
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,OFR,sizeR,sizeC,orientationStepSize,psuedoEdges2nodes);
+    nodeInds,jEdges,edges2pixels,OFR,sizeR,sizeC,orientationStepSize,...
+    psuedoEdges2nodes,psuedoEdgeIDs);
 % jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
 % edge at each junction of type 1 (= J2)
 
 % get the angles for the edges based on its position in the graph
 jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs);
+    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs,...
+    psuedoEdges2nodes,psuedoEdgeIDs);
 
 % angle costs
 nodeAngleCosts = cell(1,numJtypes);

@@ -1,6 +1,6 @@
 function repNodeInd = getRepresentativeClusNodeInd(nodeInd,clusteredJunctionIDs)
 
-nodeLID = find(clusteredJunctionIDs(:,1));
+nodeLID = find(clusteredJunctionIDs(:,1)== nodeInd);
 
 if(~isempty(nodeLID))
     clusID = clusteredJunctionIDs(nodeLID,2);

@@ -1,16 +1,17 @@
 function edgePixelInds = getOtherNodeForPsuedoEdge...
-                (nodeInd,psuedoEdges2nodes)
+                (nodeInd,psuedoEdges2nodes,edgeID,psuedoEdgeIDs)
             
 % returns the other end of the psuedoEdge 
 
-[r,c] = find(psuedoEdges2nodes==nodeInd);
+pEdgeLID = find(edgeID==psuedoEdgeIDs);
 
-if(isempty(r))
+if(isempty(pEdgeLID))
     error('nodeInd not found in psuedoEdges2nodes!!')
 else
-    if(c==1)
-        edgePixelInds = psuedoEdges2nodes(r,2);
+    nodes2 = psuedoEdges2nodes(pEdgeLID);
+    if(nodes2(1)==nodeInd)
+        edgePixelInds = psuedoEdges2nodes(pEdgeLID,2);
     else
-        edgePixelInds = psuedoEdges2nodes(r,1);
+        edgePixelInds = psuedoEdges2nodes(pEdgeLID,1);
     end
 end

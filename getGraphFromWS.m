@@ -121,7 +121,7 @@ edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
 
-edges2nodes = [edges2nodes, psuedoEdges2nodes];
+edges2nodes = [edges2nodes; psuedoEdges2nodes];
 
 % calculate new ws by merging those ws regions that were initially separated
 ws_original = ws;

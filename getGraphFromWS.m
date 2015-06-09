@@ -128,7 +128,7 @@ ws_original = ws;
 [ws,removedWsIDs, newRemovedEdgeLIDs] = getCorrectedWSregions(ws,selfEdgeIDs,edges2pixels,displayImg);
 
 % initialize output
-selfEdgePixelSet = zeros(numel(selfEdgeIDs),1);
+selfEdgePixelSet = [];
 
 if(selfEdgeIDs(1)~=0)
     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
@@ -140,11 +140,17 @@ if(selfEdgeIDs(1)~=0)
     for i=1:numSelfEdges
         % nodeEdges
         [rx,cx] = find(nodeEdges(:,2:nodeEdgeCols)==selfEdgeIDs(i));
+        % debug begin
+        if (sum(rx==300)>0)
+            aa = 55;
+        end
+        % debug end
         cx = cx + 1;
         nodeEdges(rx,cx)=0;    
         % edges2pixels
-        selfEdgePixelSet(i) = edges2pixels(selfEdgeIDs(i),2); 
-        edges2pixels(selfEdgeIDs(i),2) = 0;  % set the self edge 'pixel' to zero
+        [~,selfEdgeLID_i] = intersect(edges2pixels(:,1),selfEdgeIDs(i)); 
+        selfEdgePixelSet = [selfEdgePixelSet; edges2pixels(selfEdgeLID_i,:)]; 
+        edges2pixels(selfEdgeLID_i,2:(size(edges2pixels,2))) = 0;  % set the self edge 'pixel' to zero
     end
     % from edges2pixels, remove the rows who's second column has a zero
     edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);

@@ -186,14 +186,14 @@ if(numEdges_region>1)
             edges2pixels,sizeR,sizeC);
         
         elseif(numel(nodeEdgeLIDpair)<2)
-           disp('ERROR: getOrderedRegionEdgeListIndsDir.m: no next edge!')  
+           error('getOrderedRegionEdgeListIndsDir.m: no next edge!')  
             
         else            
             nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID); 
         end
         nextNodePair = edges2nodes(nextEdgeLID,:);     
         if(numel(nextNodePair)==0)
-           disp('ERROR: getOrderedRegionEdgeListIndsDir.m: no next node pair!!') 
+           error('getOrderedRegionEdgeListIndsDir.m: no next node pair!!') 
         end
         
         if(nextNodePair(1)==nextNodeLID)

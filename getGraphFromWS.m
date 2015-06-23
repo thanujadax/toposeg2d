@@ -16,7 +16,7 @@ saveMatrices = 0;  % to save some of the generated matrices
 % extract those
 ind0 = find(ws==0);
 % [r0,c0] = ind2sub([sizeR sizeC],ind0);
-wsBoundaries = zeros(sizeR,sizeC);
+wsBoundaries = int8(zeros(sizeR,sizeC));
 wsBoundaries(ind0) = 1;
 % figure;imshow(wsBoundaries);
 % title('watershed boundaries')
@@ -25,9 +25,9 @@ wsBoundaries(ind0) = 1;
 % look at the 4 neighborhood of each pixel
 fourNH = zeros(size(ws));
 numEdgePixels = numel(ind0);  % watershed edge pixels
-fourNHcount = zeros(numEdgePixels);
+% fourNHcount = int8(zeros(numEdgePixels));
 disp('Extracting junctions from WS')
-parfor i=1:numEdgePixels
+for i=1:numEdgePixels
     % calculate n.o. 4 neighbors
     ind = ind0(i);
     [r c] = ind2sub([sizeR sizeC],ind);
@@ -46,20 +46,21 @@ parfor i=1:numEdgePixels
         nh(4) = wsBoundaries(r,c+1);
     end
     
-    %fourNH(ind) = sum(nh);
-    fourNHcount(i) = sum(nh);
+    fourNH(ind) = sum(nh);
+    % fourNHcount(i) = sum(nh);
 end
 
 % get the pixels which are having a 4NH > 2
-%ind4J = find(fourNH>2);         % indices of junctions wrt to ws segmentation
-ind4J = find(fourNHcount>2);
+ind4J = find(fourNH>2);         % indices of junctions wrt to ws segmentation
+% ind4J = find(fourNHcount>2);
+clear fourNHcount
 disp('Junctions extracted!')
 % visualize junctions
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
-wsVis = zeros(sizeR,sizeC,3);
-wsVis(:,:,3) = wsBoundaries;
-wsVis(:,:,1) = wsJ;
+% wsVis = zeros(sizeR,sizeC,3);
+% wsVis(:,:,3) = wsBoundaries;
+% wsVis(:,:,1) = wsJ;
 % figure;imshow(wsVis);
 % title('Junctions from WS')
 % ws edges with OFR color code
@@ -99,23 +100,27 @@ for i=1:numel(pixList)
 end
 disp('done!')
 %% visualization
-% assign random colors to edges
-% TODO: assign colors from the OFR to each edge
-edgePixColors = edgePixLabels;
-edgePixColors(:,2) = mod(edgePixColors(:,2),100);
-wsEdges2 = wsBoundaries;
-wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
-% figure;imshow(wsEdges2);title('edges between junctions labeled separately')
+% % assign random colors to edges
+% % TODO: assign colors from the OFR to each edge
+% edgePixColors = edgePixLabels;
+% edgePixColors(:,2) = mod(edgePixColors(:,2),100);
+% wsEdges2 = wsBoundaries;
+% wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
+% % figure;imshow(wsEdges2);title('edges between junctions labeled separately')
 %% extract edges with zero pixel length
 % connectedJunctionIDs = getClusteredJunctions(wsJ);
+disp('Extracting psuedo edges ..')
 [connectedJunctionIDs,psuedoEdges2nodes] = getClusterNodesAndPsEdges(wsJ);
+disp('done!')
 % connectedJunctionIDs contain the same ID for each node that is connected
 % together with zero length edges, in the 4 neighborhood.
 % pEdges2nodes - each row will give 2 nodes connected by a zero length edge
 
 %% Build the adjacency matrix of the junction nodes
 % edge to pixel correspondence
+disp('get edges2pixels ..')
 edges2pixels = getEdges2Pixels(edgePixLabels);
+disp('done!')
 % edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
 
@@ -125,20 +130,27 @@ psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
 % append psuedoEdgeIDs to edges2pixels
 edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
+disp('get nodeEdges ..')
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
             psuedoEdgeIDs,psuedoEdges2nodes);
+disp('done!')
 
+disp('get adjacencyMat')
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
+disp('done!')
 
 edges2nodes = [edges2nodes; psuedoEdges2nodes];
 
 % calculate new ws by merging those ws regions that were initially separated
 ws_original = ws;
+disp('getCorrectedWSregions ..')
 [ws,removedWsIDs, newRemovedEdgeLIDs] = getCorrectedWSregions(ws,selfEdgeIDs,edges2pixels,displayImg);
+disp('done!')
 
 % initialize output
 selfEdgePixelSet = [];
 
+disp('remove selfedges ..')
 if(selfEdgeIDs(1)~=0)
 %     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
 %     % edges2nodes
@@ -186,13 +198,15 @@ if(selfEdgeIDs(1)~=0)
     
 end
 
+disp('done!')
+
 if(saveMatrices)
     save('edges2pixels.mat','edges2pixels')
 end
 
 
 %% visualize graph
-if(displayImg)
+if(0)
     [r,c] = ind2sub([sizeR sizeC],nodeInds);
     xy = [c r];
     % figure;gplot(adjacencyMat,xy,'-*');
@@ -211,9 +225,28 @@ function nodeEdges = removeSelfEdgesFromNodeEdges(nodeEdges,selfEdgeIDs)
 nodeInds = nodeEdges(:,1);
 nodeEdges_wo_nIDs = nodeEdges;
 nodeEdges_wo_nIDs(:,1) = []; % removed first col which contains the nodeIDs
-selfEdgeIndInNodeEdges = ismember(nodeEdges_wo_nIDs,selfEdgeIDs);
+selfEdgeIndInNodeEdges_logical = ismember(nodeEdges_wo_nIDs,selfEdgeIDs);
+% selfEdgeIndInNodeEdges = find(selfEdgeIndInNodeEdges_logical);
+% get which rows are affected
+%[numR,numC] = size(nodeEdges_wo_nIDs);
+%[affectedRows,~] = ind2sub([numR numC],selfEdgeIndInNodeEdges_logical);
+[affectedRows,~] = find(selfEdgeIndInNodeEdges_logical);
+affectedRows = unique(affectedRows);
+
 % set selfEdges to zero
-nodeEdges_wo_nIDs(selfEdgeIndInNodeEdges) = 0;
+nodeEdges_wo_nIDs(selfEdgeIndInNodeEdges_logical) = 0;
+% some edgeIDs are set to zero and there are nonZero edgeIDs after them in
+% the same row. Shift the edgeIDs appropriately so that there are no zeros
+% in the middle of a row.
+if(numel(affectedRows)>0)
+    for i=1:numel(affectedRows)
+        rowID = affectedRows(i);
+        nzEdgeIDs = nodeEdges_wo_nIDs(rowID,:);
+        nzEdgeIDs = nzEdgeIDs(nzEdgeIDs>0);
+        nodeEdges_wo_nIDs(rowID,1:numel(nzEdgeIDs)) = nzEdgeIDs;
+    end
+end
+
 
 nodeEdges = [nodeInds nodeEdges_wo_nIDs];
 

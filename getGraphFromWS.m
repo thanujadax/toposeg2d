@@ -131,47 +131,50 @@ ws_original = ws;
 selfEdgePixelSet = [];
 
 if(selfEdgeIDs(1)~=0)
-    % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
-    % edges2nodes
-    edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
-
-    [nodeEdgeRows,nodeEdgeCols] = size(nodeEdges);
-    numSelfEdges = numel(selfEdgeIDs);
-    for i=1:numSelfEdges
-        % nodeEdges
-        [rx,cx] = find(nodeEdges(:,2:nodeEdgeCols)==selfEdgeIDs(i));
-        % debug begin
-        if (sum(rx==300)>0)
-            aa = 55;
-        end
-        % debug end
-        cx = cx + 1;
-        nodeEdges(rx,cx)=0;    
-        % edges2pixels
-        [~,selfEdgeLID_i] = intersect(edges2pixels(:,1),selfEdgeIDs(i)); 
-        selfEdgePixelSet = [selfEdgePixelSet; edges2pixels(selfEdgeLID_i,:)]; 
-        edges2pixels(selfEdgeLID_i,2:(size(edges2pixels,2))) = 0;  % set the self edge 'pixel' to zero
-    end
-    % from edges2pixels, remove the rows who's second column has a zero
-    edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
-    % nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
-    % the zeros
-    % the above operation also removes the psuedoEdges. Reinsert them:
-    edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
-    numNodes = size(nodeEdges,1);
-    for i=1:numNodes
-       nodeEdgesList_i = nodeEdges(i,(nodeEdges(i,:)>0)); 
-       numEdges = numel(nodeEdgesList_i);
-       for j=1:numEdges
-          nodeEdges2(i,j) = nodeEdgesList_i(j); 
-       end
-    end
-    nodeEdges = nodeEdges2;
-    clear nodeEdges2;
+%     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
+%     % edges2nodes
+%     edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
+% 
+%     [nodeEdgeRows,nodeEdgeCols] = size(nodeEdges);
+%     numSelfEdges = numel(selfEdgeIDs);
+%     for i=1:numSelfEdges
+%         % nodeEdges
+%         [rx,cx] = find(nodeEdges(:,2:nodeEdgeCols)==selfEdgeIDs(i));
+%         cx = cx + 1; 
+%         nodeEdges(rx,cx)=0;    
+%         % edges2pixels
+%         [~,selfEdgeLID_i] = intersect(edges2pixels(:,1),selfEdgeIDs(i)); 
+%         selfEdgePixelSet = [selfEdgePixelSet; edges2pixels(selfEdgeLID_i,:)]; 
+%         edges2pixels(selfEdgeLID_i,2:(size(edges2pixels,2))) = 0;  % set the self edge 'pixel' to zero
+%     end
+%     % from edges2pixels, remove the rows who's second column has a zero
+%     edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
+%     % nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
+%     % the zeros
+%     % the above operation also removes the psuedoEdges. Reinsert them:
+%     edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
+%     numNodes = size(nodeEdges,1);
+%     for i=1:numNodes
+%        nodeEdgesList_i = nodeEdges(i,(nodeEdges(i,:)>0)); 
+%        numEdges = numel(nodeEdgesList_i);
+%        for j=1:numEdges
+%           nodeEdges2(i,j) = nodeEdgesList_i(j); 
+%        end
+%     end
+%     nodeEdges = nodeEdges2;
+%     clear nodeEdges2;
+    
+    nodeEdges = removeSelfEdgesFromNodeEdges(nodeEdges,selfEdgeIDs);
+    
+    [edges2pixels,edges2nodes,selfEdgePixelSet] = removeSelfEdgesFromEdges2Pixels2Nodes...
+            (edges2pixels,edges2nodes,selfEdgeIDs,psuedoEdgeIDs);
+    
     % Now, after removing the self edges, the graph contains some junctions
     % with only two edges connecting to them. i.e. they are not junctions
     % anymore but just edges. At the moment we just keep them. and treat them
     % as 2 edge junctions.
+    
+    
 end
 
 if(saveMatrices)
@@ -194,3 +197,32 @@ end
 % set(gca,'YDir','reverse');
 % axis square
 
+function nodeEdges = removeSelfEdgesFromNodeEdges(nodeEdges,selfEdgeIDs)
+
+nodeInds = nodeEdges(:,1);
+nodeEdges_wo_nIDs = nodeEdges;
+nodeEdges_wo_nIDs(:,1) = []; % removed first col which contains the nodeIDs
+selfEdgeIndInNodeEdges = ismember(nodeEdges_wo_nIDs,selfEdgeIDs);
+% set selfEdges to zero
+nodeEdges_wo_nIDs(selfEdgeIndInNodeEdges) = 0;
+
+nodeEdges = [nodeInds nodeEdges_wo_nIDs];
+
+function [edges2pixels,edges2nodes,selfEdgePixelSet] = removeSelfEdgesFromEdges2Pixels2Nodes...
+            (edges2pixels,edges2nodes,selfEdgeIDs,psuedoEdgeIDs)
+edgeLIDsAll = edges2pixels(:,1);
+[~,selfEdgeLIDs] = intersect(edgeLIDsAll,selfEdgeIDs);
+selfEdgePixelSet = edges2pixels(selfEdgeLIDs,:);
+selfEdgePixelSet(:,1) = [];
+edges2pixels(selfEdgeLIDs,:) = 0;
+
+% from edges2pixels, remove the rows who's second column has a zero
+edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
+% nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
+% the zeros
+% the above operation also removes the psuedoEdges. Reinsert them:
+edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
+
+% remove selfEdges from nodeEdges, edges2nodes and edges2pixels
+% edges2nodes
+edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);

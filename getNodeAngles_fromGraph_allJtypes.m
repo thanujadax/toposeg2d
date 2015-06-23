@@ -13,7 +13,7 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 %   edges2pixels - appended with psuedo edges with zeros for pixes
 %   edges2nodes - appended with psuedo edges
 
-MAX_NUM_PIXELS = 10;  % maximum number of pixels away from the node used to calculate alpha
+MAX_NUM_PIXELS = 5;  % maximum number of pixels away from the node used to calculate alpha
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 
@@ -27,23 +27,12 @@ for dim=1:numJtypes
     if(jEdgesAll{dim}==0)
         jAnglesAll_alpha{dim} = 0;
     else
-        jEdges = jEdgesAll{dim};
-        % jEdges = jEdges0(jEdges0>0);
-        % [r,c] = find(jEdges0>0);
-        % rmax = max(r);
-        % cmax = max(c);
-        % jEdges = zeros(rmax,cmax);
-        % jEdges(r,c) = jEdges0(r,c);       
+        jEdges = jEdgesAll{dim};      
         [numJ,degree] = size(jEdges);
         jAngles = zeros(numJ,degree);
         for i=1:numJ
             % for each node
             edges_i = jEdges(i,:);
-            % start debug
-%             if(i==42)
-%                 aa = 99;
-%             end
-            % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
             

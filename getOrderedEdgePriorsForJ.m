@@ -16,11 +16,6 @@ for i=1:numNodes
     % edgeInds = zeros(numEdges,1);       % to store their edgeListInds
     for j=1:numEdges
         edgeListInd_j = find(edgeListInds==nodeEdgeSet(j));
-        % debug start
-        if(numel(edgeListInd_j)~=1)
-            a = 99;
-        end
-        % debug stop
         edgePriors_i(i,j) = edgePriors(edgeListInd_j);
     end
     

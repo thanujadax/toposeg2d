@@ -200,6 +200,11 @@ end
 
 disp('done!')
 
+disp('remove middle zeros from nodeEdges')
+nodeEdges = removeMiddleZeros(nodeEdges);
+disp('done!')
+
+
 if(saveMatrices)
     save('edges2pixels.mat','edges2pixels')
 end
@@ -228,26 +233,23 @@ nodeEdges_wo_nIDs(:,1) = []; % removed first col which contains the nodeIDs
 selfEdgeIndInNodeEdges_logical = ismember(nodeEdges_wo_nIDs,selfEdgeIDs);
 % selfEdgeIndInNodeEdges = find(selfEdgeIndInNodeEdges_logical);
 % get which rows are affected
-%[numR,numC] = size(nodeEdges_wo_nIDs);
-%[affectedRows,~] = ind2sub([numR numC],selfEdgeIndInNodeEdges_logical);
-[affectedRows,~] = find(selfEdgeIndInNodeEdges_logical);
-affectedRows = unique(affectedRows);
+% [affectedRows,~] = find(selfEdgeIndInNodeEdges_logical);
+% affectedRows = unique(affectedRows);
 
 % set selfEdges to zero
 nodeEdges_wo_nIDs(selfEdgeIndInNodeEdges_logical) = 0;
 % some edgeIDs are set to zero and there are nonZero edgeIDs after them in
 % the same row. Shift the edgeIDs appropriately so that there are no zeros
 % in the middle of a row.
-if(numel(affectedRows)>0)
-    for i=1:numel(affectedRows)
-        rowID = affectedRows(i);
-        nzEdgeIDs = nodeEdges_wo_nIDs(rowID,:);
-        nzEdgeIDs = nzEdgeIDs(nzEdgeIDs>0);
-        nodeEdges_wo_nIDs(rowID,1:numel(nzEdgeIDs)) = nzEdgeIDs;
-    end
-end
-
-
+% if(numel(affectedRows)>0)
+%     for i=1:numel(affectedRows)
+%         rowID = affectedRows(i);
+%         nzEdgeIDs = nodeEdges_wo_nIDs(rowID,:);
+%         nzEdgeIDs = nzEdgeIDs(nzEdgeIDs>0);
+%         nodeEdges_wo_nIDs(rowID,:) = 0;
+%         nodeEdges_wo_nIDs(rowID,1:numel(nzEdgeIDs)) = nzEdgeIDs;
+%     end
+% end
 nodeEdges = [nodeInds nodeEdges_wo_nIDs];
 
 function [edges2pixels,edges2nodes,selfEdgePixelSet] = removeSelfEdgesFromEdges2Pixels2Nodes...
@@ -268,3 +270,17 @@ edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
 % edges2nodes
 edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
+
+
+function nodeEdges = removeMiddleZeros(nodeEdges)
+nodeInds = nodeEdges(:,1);
+nodeEdgesWoNIDs = nodeEdges;
+nodeEdgesWoNIDs(:,1) = [];
+numNodes = size(nodeEdges,1);
+for i=1:numNodes
+    nzEdges = nodeEdgesWoNIDs(i,:);
+    nzEdges = nzEdges(nzEdges>0);
+    nodeEdgesWoNIDs(i,:) = 0;
+    nodeEdgesWoNIDs(i,1:numel(nzEdges)) = nzEdges;
+end
+nodeEdges = [nodeInds nodeEdgesWoNIDs] ;

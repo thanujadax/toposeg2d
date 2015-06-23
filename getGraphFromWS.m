@@ -24,8 +24,10 @@ wsBoundaries(ind0) = 1;
 %% extracting junctions
 % look at the 4 neighborhood of each pixel
 fourNH = zeros(size(ws));
-numBoundaryPixels = numel(ind0);  % watershed edge pixels
-for i=1:numBoundaryPixels
+numEdgePixels = numel(ind0);  % watershed edge pixels
+fourNHcount = zeros(numEdgePixels);
+disp('Extracting junctions from WS')
+parfor i=1:numEdgePixels
     % calculate n.o. 4 neighbors
     ind = ind0(i);
     [r c] = ind2sub([sizeR sizeC],ind);
@@ -44,10 +46,14 @@ for i=1:numBoundaryPixels
         nh(4) = wsBoundaries(r,c+1);
     end
     
-    fourNH(ind) = sum(nh);
+    %fourNH(ind) = sum(nh);
+    fourNHcount(i) = sum(nh);
 end
+
 % get the pixels which are having a 4NH > 2
-ind4J = find(fourNH>2);         % indices of junctions wrt to ws segmentation
+%ind4J = find(fourNH>2);         % indices of junctions wrt to ws segmentation
+ind4J = find(fourNHcount>2);
+disp('Junctions extracted!')
 % visualize junctions
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
@@ -73,6 +79,8 @@ end
 %% extracting edges connecting junctions
 % assign unique labels for edges
 % all the pixels in each edge should have the same label
+
+disp('Extracting edges connecting junctions in WS')
 wsEdges = wsBoundaries;
 wsEdges(ind4J) = 0;         % setting junctions to zero. only edges are 1
 pixList = find(wsEdges);    % edge pixels without junctions.
@@ -89,6 +97,7 @@ for i=1:numel(pixList)
         continue
     end
 end
+disp('done!')
 %% visualization
 % assign random colors to edges
 % TODO: assign colors from the OFR to each edge

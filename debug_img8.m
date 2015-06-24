@@ -15,7 +15,7 @@ allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
 % for each file
 numFiles = length(allRawFiles);
 %for i=1:numFiles
-i = 9;
+i = 10;
     disp(i);
     imageFileName = allRawFiles(i).name;
     segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...

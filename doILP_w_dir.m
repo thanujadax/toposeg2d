@@ -268,7 +268,8 @@ else
         disp('RF for edge classification. Training new classifier...')
         forestEdgeProb = trainRF_edgeProb();
     else
-        load forestEdgeProb.mat
+        % load forestEdgeProb.mat
+        forestEdgeProb = importdata(forestEdgeProbFileName);
         disp('loaded pre-trained RF for edge activation probability inference.')
     end
 

@@ -16,6 +16,8 @@ usePrecomputedProbabilityMaps = 1;
 useMitochondriaDetection = 0;
 
 %% File names and paths
+% trained RFC for edge probability
+forestEdgeProbFileName = 'forestEdgeProb.mat'; 
 
 % inputPath = '/home/thanuja/Dropbox/data2';
 
@@ -262,7 +264,7 @@ if(0) % not using precomputed probability maps for graph edges - doesn't make se
         membraneProbabilityImage,edgepixels,marginSize,(1-marginPixVal));
 else
     
-    if ~exist('forestEdgeProb.mat','file')
+    if ~exist(forestEdgeProbFileName,'file')
         disp('RF for edge classification. Training new classifier...')
         forestEdgeProb = trainRF_edgeProb();
     else

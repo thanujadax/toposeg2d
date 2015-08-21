@@ -1,5 +1,6 @@
 function regionScores = regionScoreCalculator(forest,imIn,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,wsIndsForCells,ws,showImg)
+    nodeInds,edges2nodes,K,wsIndsForCells,ws,showImg,saveIntermediateImages,...
+    saveIntermediateImagesPath,rawImageID)
 
 % Inputs:
 %   imgIn - normalized image. 1 -> bright
@@ -57,6 +58,7 @@ if(showImg)
     title('pixel probability map')
 end
 regionScores = getCellPriors_probability(pixelProbabilities,setOfCells,...
-    sizeR,sizeC,wsIndsForCells,ws,showImg);
+    sizeR,sizeC,wsIndsForCells,ws,showImg,saveIntermediateImages,...
+    saveIntermediateImagesPath,rawImageID);
 
 

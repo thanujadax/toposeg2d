@@ -6,8 +6,13 @@ membraneProbabilityType = 'tiff';
 mitoProbabilityType = 'png';
 
 inputPath = '/home/thanuja/projects/data/toyData/set8/';
-outputPath = '/home/thanuja/projects/tests/contours/20150514';
-outputPathPNG = '/home/thanuja/projects/tests/contours/20150514png';
+outputPath = '/home/thanuja/projects/tests/contours/20150820/im8';
+outputPathPNG = '/home/thanuja/projects/tests/contours/20150820/im8';
+
+saveIntermediateImages = 1;
+saveIntermediateImagesPath = '/home/thanuja/projects/tests/contours/20150820/im8';
+showIntermediateImages = 0;
+
 % read all images in the raw images file path
 rawImagePath = fullfile(inputPath,'raw');
 allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
@@ -15,11 +20,12 @@ allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
 % for each file
 numFiles = length(allRawFiles);
 %for i=1:numFiles
-i = 10;
+i = 9;
     disp(i);
     imageFileName = allRawFiles(i).name;
     segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...
-        rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType);
+        rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
+        saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages);
     % save segmentation output
     writeFileName = fullfile(outputPath,imageFileName);
     imwrite(segmentationOut,writeFileName,'tif');

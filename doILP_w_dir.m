@@ -1,5 +1,6 @@
 function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
-    rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType)
+    rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
+    saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages)
 
 % version 3. 2014.01.06
 
@@ -8,7 +9,8 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 %% Settings
 
 produceBMRMfiles = 0;  % set label file below if 1
-showIntermediate = 1;
+labelImageFileName = '00.png'; % for sbmrm. TODO: parameterize
+% showIntermediateImages = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
@@ -82,7 +84,6 @@ end
 % for sbmrm
 if(produceBMRMfiles)
     labelImagePath = '/home/thanuja/Dropbox/data2/results';
-    labelImageFileName = '00.png';
     labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
 end
 
@@ -163,6 +164,9 @@ end
 %% read inputimage and get orientedScoreSpace and max_abs value of OFR
 disp('using image file:')
 disp(rawImageFullFile);
+rawImageID = strsplit(rawImageFullFile,filesep);
+rawImageID = rawImageID{end};
+rawImageID = strtok(rawImageID,'.');
 imgIn0 = double(imread(rawImageFullFile));
 [a,b,c] = size(imgIn0);
 if(c==3)
@@ -178,6 +182,12 @@ end
 % add thick border
 if(b_imWithBorder)
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    if(saveIntermediateImages)
+        intermediateImgDescription = 'rawImage';
+        imgInNormal = imgIn./max(max(imgIn));
+        saveIntermediateImage(imgInNormal,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
+    end
     if(produceBMRMfiles)
         labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
     end
@@ -193,8 +203,14 @@ OFR_hue = output(:,:,1);
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
 
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imshow(rgbimg)
+end
+if(saveIntermediateImages)
+    intermediateImgDescription = 'orientationFiltering';
+%     rgbimg = rgbimg./(max(max(max(rgbimg))));
+    saveIntermediateImage(rgbimg,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
 end
 
 %% watershed segmentation
@@ -202,11 +218,26 @@ ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 % randomize WS region IDs
 ws = assignRandomIndicesToWatershedTransform(ws);
+
+if(saveIntermediateImages)
+    intermediateImgDescription = 'regionsWS';
+%     saveIntermediateImage(ind2rgb(ws,'default'),rawImageID,intermediateImgDescription,...
+% saveIntermediateImagesPath);
+watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws)
+% figure;imagesc(ws);colormap('jet')
+set(gca,'position',[0 0 1 1],'units','normalized')
+outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
+outputFileName = fullfile(saveIntermediateImagesPath,outputFileName);
+% print(outputFileName)
+saveas(gcf,outputFileName)
+end
+
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet,...
     ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes] ...
-    = getGraphFromWS(ws,output,showIntermediate);
+    = getGraphFromWS(ws,output,showIntermediateImages,saveIntermediateImages,...
+      saveIntermediateImagesPath,rawImageID);
 
 % edges2nodes is already appended with psuedoEdges2nodes
 % edges2pixels is already appended with psuedoEdgeIDs, with zeros as
@@ -235,8 +266,13 @@ end
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
+end
+if(saveIntermediateImages)
+    intermediateImgDescription = 'wsRegions2';
+    saveIntermediateImage(wsRegionBoundariesFromGraph,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
 end
 
 numEdges = size(edges2nodes,1);
@@ -284,9 +320,20 @@ end
 
 % visualize edge unaries
 edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgeUnary,sizeR,sizeC);
-if(showIntermediate)
-    figure;imagesc(edgeUnaryMat);title('abs-max-OFR')
+if(showIntermediateImages)
+    figure;imagesc(edgeUnaryMat);title('edge unary score')
 end
+if(saveIntermediateImages)
+    intermediateImgDescription = 'edgeUnary';
+    saveIntermediateImage(edgeUnaryMat,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
+% h = overlayLabelOnImage(imgInNormal,edgeUnaryMat);
+% set(gca,'position',[0 0 1 1],'units','normalized');
+% outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
+% outputFileName = fullfile(saveIntermediateImagesPath,outputFileName);
+% saveas(gcf,outputFileName);
+end
+
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 
@@ -329,7 +376,7 @@ clear OFR
 edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 
 % normalize input image
-normalizedInputImage = imgIn./(max(max(imgIn)));
+% normalizedInputImage = imgIn./(max(max(imgIn)));
 
 %% get region unaries
 if(usePrecomputedProbabilityMaps)
@@ -337,7 +384,9 @@ if(usePrecomputedProbabilityMaps)
     regionUnary = getRegionScoreFromProbImage(...
     neuronProbabilityImage,mitochondriaProbabilityImage,...
     useMitochondriaDetection,marginSize,marginPixVal,...
-    setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediate);
+    setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
+    saveIntermediateImages,...
+    saveIntermediateImagesPath,rawImageID);
     
 else
     
@@ -349,7 +398,8 @@ else
         disp('loaded pre-trained RF for membrane vs cell-interior classification')
     end
     regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
-        nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediate);   
+        nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediateImages,...
+        saveIntermediateImages,saveIntermediateImagesPath,rawImageID);   
     
 end
 
@@ -387,7 +437,7 @@ offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
 edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imshow(imgOffEdges); title('visualization of edges turned off')
 end
 %% Backbone
@@ -401,12 +451,12 @@ bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
 bbNodePixInds = nodeInds(bbNodeListInds);
 bbnodesVis = wsRegionBoundariesFromGraph;
 bbnodesVis(bbNodePixInds) = 0.2;
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imagesc(bbnodesVis);
 end
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imshow(imgBBEdges); title('visualization of backbone 1')
 end
 edgePriors(onEdgeListIDs) = bbEdgeReward;
@@ -416,7 +466,7 @@ onEdgeListIDs = [];
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediate)
+if(showIntermediateImages)
     figure;imshow(imgBBEdges); title('visualization of backbone 2')
 end
     % onEdgeListIDs = 2024;
@@ -607,4 +657,9 @@ end
 segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize,showIntermediate,fillSpaces);
+            marginSize,showIntermediateImages,fillSpaces);
+if(saveIntermediateImages)
+    intermediateImgDescription = 'segmentationOutput';
+    saveIntermediateImage(segmentationOut,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
+end

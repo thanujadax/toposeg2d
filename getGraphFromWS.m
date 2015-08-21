@@ -1,7 +1,8 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
     selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,...
     psuedoEdgeIDs,psuedoEdges2nodes]...
-    = getGraphFromWS(ws,hsvOutput,displayImg)
+    = getGraphFromWS(ws,hsvOutput,displayImg,saveIntermediateImages,...
+      saveIntermediateImagesPath,rawImageID)
 
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd
@@ -76,6 +77,12 @@ hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
 if(displayImg)
     figure;imshow(RGBimg);
+end
+
+if(saveIntermediateImages)
+    intermediateImgDescription = 'orientationFiltering_WS';
+    saveIntermediateImage(RGBimg,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
 end
 %% extracting edges connecting junctions
 % assign unique labels for edges
@@ -219,6 +226,8 @@ if(0)
     set(gca,'YDir','reverse');
     axis square
 end
+
+
 % n = size(adjacencyMat,1);
 % k = 1:n;
 % figure;gplot(adjacencyMat(k,k),xy(k,:),'-*')

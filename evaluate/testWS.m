@@ -4,6 +4,7 @@ inputImage = readTiffStackToArray(inputFileName);
 figure;imagesc(inputImage)
 % ws
 ws_input = watershed(inputImage);
+ws_rgb_0 = indexImg2rgbImg(ws_input);
 figure;imagesc(ws_input);
 % gaussian filter
 sigma = 0.5;
@@ -16,4 +17,4 @@ ws_smooth_r = assignRandomIndicesToWatershedTransform(ws_smooth);
 ws_rgb = indexImg2rgbImg(ws_smooth_r);
 figure;imagesc(ws_rgb);
 
-imwrite(ws_rgb,'watershedSegments.png','png');
+imwrite(ws_rgb_0,'watershedSegments_0.png','png');

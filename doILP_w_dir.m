@@ -90,7 +90,7 @@ end
 %% Parameters
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
-
+gsigma = 4.5; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
@@ -362,8 +362,9 @@ for i=1:numJtypes
     else
         edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
                     nodeEdges,edgeUnary,edgeListInds);
-        nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
-                                edgePriors_i,w_on_n);
+        %nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
+        %                        edgePriors_i,w_on_n);
+        nodeAngleCosts{i} = getNodeAngleCost_smooth(alpha_i,gsigma);
     end
 end
 %% Faces of wsgraph -> region types (between pairs of regions)

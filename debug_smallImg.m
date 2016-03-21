@@ -6,10 +6,10 @@ membraneProbabilityType = 'png';
 mitoProbabilityType = 'png';
 
 inputPath = '/home/thanuja/projects/data/toyData/set5/';
-outputPath = '/home/thanuja/projects/tests/contours/20150514';
-outputPathPNG = '/home/thanuja/projects/tests/contours/20150514png';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160321';
+outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160321/png';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/tests/contours/20150820/smallimg';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160321/intermediate';
 showIntermediateImages = 0;
 
 % read all images in the raw images file path
@@ -27,7 +27,7 @@ i = 1;
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages);
     % save segmentation output
     writeFileName = fullfile(outputPath,imageFileName);
-    imwrite(segmentationOut,writeFileName,'tif');
+    imwrite(segmentationOut,writeFileName,'tif');git
     pngFileName = sprintf('%d.png',(i-1));
     pngFileName = fullfile(outputPathPNG,pngFileName);
     imwrite(segmentationOut,pngFileName,'png');

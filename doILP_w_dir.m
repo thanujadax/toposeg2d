@@ -1,6 +1,7 @@
 function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
     rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
-    saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages)
+    saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
+    labelImageFileName)
 
 % version 3. 2014.01.06
 
@@ -8,13 +9,13 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 
 %% Settings
 
-produceBMRMfiles = 0;  % set label file below if 1
-labelImageFileName = '00.png'; % for sbmrm. TODO: parameterize
+produceBMRMfiles = 1;  % set label file below if 1
+% labelImageFileName = '00.tiff'; % for sbmrm. TODO: parameterize
 % showIntermediateImages = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
-usePrecomputedProbabilityMaps = 1;
+usePrecomputedProbabilityMaps = 0;
 useMitochondriaDetection = 0;
 
 %% File names and paths
@@ -82,10 +83,10 @@ else
     end
 end
 % for sbmrm
-if(produceBMRMfiles)
-    labelImagePath = '/home/thanuja/Dropbox/data2/results';
-    labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
-end
+% if(produceBMRMfiles)
+%     labelImagePath = '/home/thanuja/Dropbox/data2/results';
+%     labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
+% end
 
 %% Parameters
 orientationStepSize = 10;

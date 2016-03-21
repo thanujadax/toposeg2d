@@ -27,7 +27,7 @@ i = 1;
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages);
     % save segmentation output
     writeFileName = fullfile(outputPath,imageFileName);
-    imwrite(segmentationOut,writeFileName,'tif');git
+    imwrite(segmentationOut,writeFileName,'tif');
     pngFileName = sprintf('%d.png',(i-1));
     pngFileName = fullfile(outputPathPNG,pngFileName);
     imwrite(segmentationOut,pngFileName,'png');

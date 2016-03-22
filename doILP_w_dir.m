@@ -1,11 +1,11 @@
 function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
     rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    labelImageFileName)
+    labelImagePath,labelImageFileName)
 
 % version 3. 2014.01.06
-
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
+% 20160321 - updated with new node angle cost function
 
 %% Settings
 
@@ -15,7 +15,7 @@ produceBMRMfiles = 1;  % set label file below if 1
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
-usePrecomputedProbabilityMaps = 0;
+usePrecomputedProbabilityMaps = 1;
 useMitochondriaDetection = 0;
 
 %% File names and paths
@@ -33,7 +33,6 @@ if(~isempty(imageID))
     imgFileString = strcat('*.',rawType);
     rawImageFilesAll = dir(fullfile(rawImagePath,imgFileString));
     rawImageFileName = rawImageFilesAll(imageID).name;
-
 else
     rawImageFileName = imageFileName;
 end
@@ -43,11 +42,9 @@ rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 % probabilityMapPath = '/home/thanuja/Dropbox/data2/probabilities';
 % probabilityMapPath = fullfile(inputPath,'probabilities');
 probabilityMapPath = inputPath;
-
 dir_membraneProb = 'membranes';
 dir_mitochondriaProb = 'mitochondria';
 dir_neuronProb = 'neurons';
-
 
 if(~isempty(imageID))
     imgFileString = strcat('*.',membraneProbabilityType);
@@ -55,6 +52,8 @@ if(~isempty(imageID))
     membraneProbabilityImageFilesAll = dir(fullfile(...
         probabilityMapPath,dir_membraneProb,imgFileString));
     membraneProbabilityImage = membraneProbabilityImageFilesAll(imageID).name;
+    membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,...
+        membraneProbabilityImage);
   
     imgFileString = strcat('*.',neuronProbabilityType);
     neuronProbabilityImageFilesAll = dir(fullfile(...
@@ -83,10 +82,9 @@ else
     end
 end
 % for sbmrm
-% if(produceBMRMfiles)
-%     labelImagePath = '/home/thanuja/Dropbox/data2/results';
-%     labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
-% end
+if(produceBMRMfiles)
+    labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
+end
 
 %% Parameters
 orientationStepSize = 10;
@@ -224,7 +222,7 @@ if(saveIntermediateImages)
     intermediateImgDescription = 'regionsWS';
 %     saveIntermediateImage(ind2rgb(ws,'default'),rawImageID,intermediateImgDescription,...
 % saveIntermediateImagesPath);
-watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws)
+watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws);
 % figure;imagesc(ws);colormap('jet')
 set(gca,'position',[0 0 1 1],'units','normalized')
 outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
@@ -384,7 +382,7 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 if(usePrecomputedProbabilityMaps)
     
     regionUnary = getRegionScoreFromProbImage(...
-    neuronProbabilityImage,mitochondriaProbabilityImage,...
+    membraneProbabilityImage,mitochondriaProbabilityImage,...
     useMitochondriaDetection,marginSize,marginPixVal,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...
@@ -393,6 +391,9 @@ if(usePrecomputedProbabilityMaps)
 else
     
     if ~exist('forest.mat','file')
+        disp('RF for membrane classification not found');
+        prompt = 'Enter file name to be used for training: ';
+        
         disp('RF for membrane classification not found. Training new classifier...')
         forest = trainRandomForest_pixelProb();
     else

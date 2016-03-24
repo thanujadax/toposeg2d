@@ -1,7 +1,7 @@
 function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
     rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    labelImagePath,labelImageFileName)
+    labelImagePath,labelImageFileName,produceBMRMfiles)
 
 % version 3. 2014.01.06
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
@@ -9,7 +9,7 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 
 %% Settings
 
-produceBMRMfiles = 1;  % set label file below if 1
+% produceBMRMfiles = 1;  % set label file below if 1
 % labelImageFileName = '00.tiff'; % for sbmrm. TODO: parameterize
 % showIntermediateImages = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
@@ -55,12 +55,12 @@ if(~isempty(imageID))
     membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,...
         membraneProbabilityImage);
   
-    imgFileString = strcat('*.',neuronProbabilityType);
-    neuronProbabilityImageFilesAll = dir(fullfile(...
-        probabilityMapPath,dir_neuronProb,imgFileString));
-    neuronProbabilityImage = neuronProbabilityImageFilesAll(imageID).name;
-    neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,neuronProbabilityImage);
-    disp(neuronProbabilityImage);
+%     imgFileString = strcat('*.',neuronProbabilityType);
+%     neuronProbabilityImageFilesAll = dir(fullfile(...
+%         probabilityMapPath,dir_neuronProb,imgFileString));
+%     neuronProbabilityImage = neuronProbabilityImageFilesAll(imageID).name;
+%     neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,neuronProbabilityImage);
+%     disp(neuronProbabilityImage);
     
     if(useMitochondriaDetection)
     imgFileString = strcat('*.',mitoProbabilityType);
@@ -76,7 +76,7 @@ if(~isempty(imageID))
     
 else
     membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
-    neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
+    % neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
     if(useMitochondriaDetection)
         mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
     end
@@ -89,6 +89,7 @@ end
 %% Parameters
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
+wsgsigma = 1.5;
 gsigma = 4.5; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
 barWidth = 4; %

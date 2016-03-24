@@ -81,9 +81,7 @@ if(numel(nextCwEdgeLId_inRegion)>1)
     error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges >1')
 elseif(numel(nextCwEdgeLId_inRegion)<1)
     error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
-    
 else
-
     % debug code stop
 
     % % debug code start (???): important to make sure the outputs are assigned

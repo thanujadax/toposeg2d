@@ -1,16 +1,19 @@
 % script_sbmrm data generation
 
+produceBMRMfiles = 0;
+
 rawType = 'tif';
 neuronProbabilityType = 'tiff';
 membraneProbabilityType = 'tif';
 mitoProbabilityType = 'png';
 
-inputPath = '/home/thanuja/Dropbox/data/em_2013january/';
-inputFileName = '00.tiff';
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160321_sbmrm';
-outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160321_sbmrm/png';
+% inputPath = '/home/thanuja/Dropbox/data/em_2013january/';
+inputPath = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/isbiSegmentations/';
+inputFileName = 'test-volume0000.tif';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160321_debug/';
+outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160321_debug/png';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160321_sbmrm/intermediate';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160321_debug/intermediate';
 showIntermediateImages = 0;
 
 % to generate sbmrm files for structured learning
@@ -31,7 +34,7 @@ i = 1;
      segmentationOut = doILP_w_dir(inputPath,inputFileName,i,...
         rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-        labelImagePath,labelImageFileName);
+        labelImagePath,labelImageFileName,produceBMRMfiles);
     % save segmentation output
     writeFileName = fullfile(outputPath,imageFileName);
     imwrite(segmentationOut,writeFileName,'tif');

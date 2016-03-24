@@ -59,11 +59,18 @@ disp('Junctions extracted!')
 % visualize junctions
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
-% wsVis = zeros(sizeR,sizeC,3);
-% wsVis(:,:,3) = wsBoundaries;
-% wsVis(:,:,1) = wsJ;
-% figure;imshow(wsVis);
-% title('Junctions from WS')
+
+% save image
+if(saveIntermediateImages)
+    wsVis = zeros(sizeR,sizeC,3);
+    wsVis(:,:,3) = wsBoundaries;
+    wsVis(:,:,1) = wsJ;
+    intermediateImgDescription = 'WSjunctions';
+    saveIntermediateImage(wsVis,rawImageID,intermediateImgDescription,...
+    saveIntermediateImagesPath);
+    %figure;imshow(wsVis);
+    % title('Junctions from WS')
+end
 % ws edges with OFR color code
 hsvOutput_V = hsvOutput(:,:,3);
 edgepix = zeros(sizeR,sizeC);

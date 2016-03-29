@@ -68,7 +68,7 @@ if(saveIntermediateImages)
     intermediateImgDescription = 'WSjunctions';
     saveIntermediateImage(wsVis,rawImageID,intermediateImgDescription,...
     saveIntermediateImagesPath);
-    %figure;imshow(wsVis);
+    figure;imshow(wsVis);
     % title('Junctions from WS')
 end
 % ws edges with OFR color code

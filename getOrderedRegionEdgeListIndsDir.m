@@ -78,7 +78,34 @@ if(numel(nextCwEdgeLId_inRegion)>1)
 %     nodeInd,prevEdgeLID,nextEdgeLIDsList,edgepixels,...
 %     connectedJunctionIDs,sizeR,sizeC);
 %     disp('tie broken');
-    error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges >1')
+    disp('Warning: getOrderedRegionEdgeListIndsDir. numEdges >1')
+    disp('Recalculating using new alphas ..')
+    
+    % calculate new alphas
+    alphas1 = recalculateAlphas(nodeListInds(1),nodeEdgeIDs,...
+        edges2pixels,sizeR,sizeC);
+    nextCwEdgeLId_1 = getNextClockwiseEdgeWithNewAlphas(nodeListInds(1),edgeLId_1,edgeID_1,...
+            nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+            edges2pixels,sizeR,sizeC,alphas1);
+
+    alphas2 = recalculateAlphas(nodeListInds(2),nodeEdgeIDs,...
+        edges2pixels,sizeR,sizeC);
+nextCwEdgeLId_2 = getNextClockwiseEdgeWithNewAlphas(nodeListInds(2),edgeLId_1,edgeID_1,...
+            nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+            edges2pixels,sizeR,sizeC,alphas2);
+
+% One of the two edges belongs to the current region. Keep this edge as the
+% next edge
+nextCwEdgeLId_inRegion = intersect...
+                (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
+
+    if(numel(nextCwEdgeLId_inRegion)>1)
+        error('Warning: getOrderedRegionEdgeListIndsDir. numEdges >1')
+    elseif(numel(nextCwEdgeLId_inRegion)<1)
+        error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
+    end
+            
+    
 elseif(numel(nextCwEdgeLId_inRegion)<1)
     error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
 else
@@ -225,6 +252,8 @@ function nextCwEdgeLInd = getNextClockwiseEdge(nodeLId,edgeLId,edgeID,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListInds,...
             edges2pixels,sizeR,sizeC)
 % at the node nodeLId, wrt the edge edgeLId, what is the next edge in cw direction
+% 20160330: if there are mulitiple edges found at the same angle, return
+% all of theM
 nodeEdgeIDsAll = nodeEdgeIDs(nodeLId,:);
 nodeEdgeIDsAll(1) = []; % first element is the nodePixelInd
 nodeEdgeIDsAll = nodeEdgeIDsAll(nodeEdgeIDsAll>0);
@@ -233,26 +262,33 @@ nodeEdgeIDsAll = nodeEdgeIDsAll(nodeEdgeIDsAll>0);
 alphas_junctionType = jAnglesAll_alpha{junctionType};
 
 nodeAlphas_0 = alphas_junctionType(junctionListInd,:);
-numOfUniqueAngles = unique(nodeAlphas_0);
-if(numel(numOfUniqueAngles)<numel(nodeAlphas_0))
-    % duplicate alphas detected. recalculate using only the immediate edge pixel
-    % wrt to node pixel
-    nodeAlphas_0 = recalculateAlphas(nodeLId,nodeEdgeIDs,...
-        edges2pixels,sizeR,sizeC);
-end
-% inputEdgePos = find(nodeEdgesAll==edgeID);
+% REMOVING alpha recalculation: 
+% numOfUniqueAngles = unique(nodeAlphas_0);
+% if(numel(numOfUniqueAngles)<numel(nodeAlphas_0))
+%     % duplicate alphas detected. recalculate using only the immediate edge pixel
+%     % wrt to node pixel
+%     nodeAlphas_0 = recalculateAlphas(nodeLId,nodeEdgeIDs,...
+%         edges2pixels,sizeR,sizeC);
+% end
+
 alpha_inputEdge = nodeAlphas_0(nodeEdgeIDsAll==edgeID);
 % clockwise search
 % get the edge with next smaller alpha
 % get all angles smaller than alpha_0    
 smallerAlphas = nodeAlphas_0(nodeAlphas_0<alpha_inputEdge);
-if(~isempty(smallerAlphas))
+
+if(sum(nodeAlphas_0==alpha_inputEdge)>1) % see if there are edges with equal alphas to incoming alpha
+    whichEdgeIDs_inlist = nodeEdgeIDsAll(nodeAlphas_0==alpha_inputEdge);
+    nextCwEdgeID = setdiff(whichEdgeIDs_inlist,edgeID);
+elseif(~isempty(smallerAlphas))
     nextAlpha = max(smallerAlphas);
+    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
 else
     % get the largest alpha
     nextAlpha = max(nodeAlphas_0);
+    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
 end
-nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+
 [~,nextCwEdgeLInd] = intersect(edgeListInds,nextCwEdgeID);
 
 
@@ -290,3 +326,46 @@ for i=1:numEdges
 
 end % for loop
 % end of function recalculateAlphas
+
+function nextCwEdgeLInd = getNextClockwiseEdgeWithNewAlphas(nodeLId,edgeLId,edgeID,...
+            nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListInds,...
+            edges2pixels,sizeR,sizeC,nodeAlphas_0)
+% at the node nodeLId, wrt the edge edgeLId, what is the next edge in cw direction
+% 20160330: if there are mulitiple edges found at the same angle, return
+% all of theM
+nodeEdgeIDsAll = nodeEdgeIDs(nodeLId,:);
+nodeEdgeIDsAll(1) = []; % first element is the nodePixelInd
+nodeEdgeIDsAll = nodeEdgeIDsAll(nodeEdgeIDsAll>0);
+
+[junctionListInd,junctionType] = find(junctionTypeListInds==nodeLId);
+alphas_junctionType = jAnglesAll_alpha{junctionType};
+
+% nodeAlphas_0 = alphas_junctionType(junctionListInd,:);
+% REMOVING alpha recalculation: 
+% numOfUniqueAngles = unique(nodeAlphas_0);
+% if(numel(numOfUniqueAngles)<numel(nodeAlphas_0))
+%     % duplicate alphas detected. recalculate using only the immediate edge pixel
+%     % wrt to node pixel
+%     nodeAlphas_0 = recalculateAlphas(nodeLId,nodeEdgeIDs,...
+%         edges2pixels,sizeR,sizeC);
+% end
+
+alpha_inputEdge = nodeAlphas_0(nodeEdgeIDsAll==edgeID);
+% clockwise search
+% get the edge with next smaller alpha
+% get all angles smaller than alpha_0    
+smallerAlphas = nodeAlphas_0(nodeAlphas_0<alpha_inputEdge);
+
+if(sum(nodeAlphas_0==alpha_inputEdge)>1) % see if there are edges with equal alphas to incoming alpha
+    whichEdgeIDs_inlist = nodeEdgeIDsAll(nodeAlphas_0==alpha_inputEdge);
+    nextCwEdgeID = setdiff(whichEdgeIDs_inlist,edgeID);
+elseif(~isempty(smallerAlphas))
+    nextAlpha = max(smallerAlphas);
+    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+else
+    % get the largest alpha
+    nextAlpha = max(nodeAlphas_0);
+    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+end
+
+[~,nextCwEdgeLInd] = intersect(edgeListInds,nextCwEdgeID);

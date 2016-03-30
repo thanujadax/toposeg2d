@@ -58,26 +58,40 @@ orderedSetOfEdges = getOrderedSetOfEdges();
 
 cwOrderedDirEdgeListInds = orderEdgeSetCw();
 
+
+
 function orderedSetOfEdges = getOrderedSetOfEdges(edgeListInds_region,...
-    edges2nodes_directional,edgeListIndsAll)
+    edges2nodes_directional,edges2nodes,edgeListIndsAll)
 % Pick one edge (1st in the list)
 nextEdgeLID = edgeListInds_region(1);
 edgeID_1 = edgeListIndsAll(nextEdgeLID);
 
+N1LID = edges2nodes(nextEdgeLID,1);
+
 numEdges_region = numel(edgeListInds_region);
+
 orderedDirEdgeListInds = zeros(numEdges_region,1);
 orderedNodeListInds = zeros(numEdges_region,1);
 
-numEdges = numel(edgeListIndsAll);
-nextNodePair = edges2nodes(nextEdgeLID,:);
-startNode = nextNodePair(1);
+nextEdgeNodeLID_pair = edges2nodes_directional(nextEdgeLID,:);
 
-numRegionEdges = numel(edgeListInds_region);
 
-for i=1:numRegionEdges
-    orderedDirEdgeListInds(i) = nextEdgeLID;
+for i=1:numEdges_region
+    
+    nextEdgeNodeLID_pair = edges2nodes(nextEdgeLID,:);
+    if(nextEdgeNodeLID_pair(1)==N2LID)
+        nextEdgeLID_dir = nextEdgeLID;
+    else
+        nextEdgeLID_dir = nextEdgeLID + numEdges;
+    end
+    
     
 end
+
+
+
+
+
 
 
 

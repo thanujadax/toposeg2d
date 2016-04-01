@@ -37,6 +37,13 @@ for i=1:numRegions
 
         nodeLIdsForRegion = edgeLIDs2nodes_directional(edgeLIDsForRegion,:);
         nodeLIdsForRegion = unique(nodeLIdsForRegion);
+        
+        % debug start
+        if(i==267)
+            a = 999;
+        end
+        % debug stop
+        
         c_edgeLIDsForRegions_dir_cw{i} = getCwOrderedEdgesForRegion...
                 (edgeLIDsForRegion,edgeLIDs2nodes_directional,junctionTypeListInds,...
                 nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion,...
@@ -60,6 +67,7 @@ nodeListInds = edges2nodes_directional(edgeLId_1,:);
 nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC);
+        
 
 nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
@@ -67,8 +75,13 @@ nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
 
 % One of the two edges belongs to the current region. Keep this edge as the
 % next edge
+
+% % debug code 20160330 horzcat
+% if(numel(nextCwEdgeLId_1)~=1 || numel(nextCwEdgeLId_2)~=1)
+%     bbb = 1;
+% end
 nextCwEdgeLId_inRegion = intersect...
-                (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
+                (edgeListInds_region,[nextCwEdgeLId_1; nextCwEdgeLId_2]);
             
             
 % debug code start 20141224
@@ -97,7 +110,7 @@ nextCwEdgeLId_2 = getNextClockwiseEdgeWithNewAlphas(nodeListInds(2),edgeLId_1,ed
 % One of the two edges belongs to the current region. Keep this edge as the
 % next edge
 nextCwEdgeLId_inRegion = intersect...
-                (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
+                (edgeListInds_region,[nextCwEdgeLId_1; nextCwEdgeLId_2]);
 
     if(numel(nextCwEdgeLId_inRegion)>1)
         error('Warning: getOrderedRegionEdgeListIndsDir. numEdges >1')
@@ -108,7 +121,7 @@ nextCwEdgeLId_inRegion = intersect...
     
 elseif(numel(nextCwEdgeLId_inRegion)<1)
     error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
-else
+end
     % debug code stop
 
     % % debug code start (???): important to make sure the outputs are assigned
@@ -146,7 +159,7 @@ else
         % From this edge, pick the node at the other end find the edge attached to
         % it in the same region. This is the next edge. Continue finding the next
         % edges in the clockwise order until all the edges are collected.
-        if(nextCwEdgeLId_inRegion==nextCwEdgeLId_1)
+        if(intersect(nextCwEdgeLId_inRegion,nextCwEdgeLId_1))
             nodeLId_0 = nodeListInds(1);
         else
             nodeLId_0 = nodeListInds(2);
@@ -160,7 +173,7 @@ else
 
     end
 
-end % new end added to match the new debug code 20141224
+%end % new end added to match the new debug code 20141224
 
 function cwOrderedDirEdgeListInds = getCwDirSetOfEdges(edgeLId_1,nextEdgeLID,...
                         nextNodeLID,edges2nodes_directional,edgeListInds_region,...
@@ -195,6 +208,13 @@ if(numEdges_region>1)
     for i = 2:numEdges_region
         % nextNodePair = edges2nodes(nextEdgeLID,:);
         nextNodeLID = setdiff(nextNodePair,nextNodeLID);
+        
+        % debug start 20160330
+        if(numel(nextNodeLID)~=1)
+            aaa = 99;
+        end
+        % debug stop
+        
         cwOrderedNodeListInds(i) = nextNodeLID;
 
         allEdgeIDsForNextNode = nodeEdgeIDs(nextNodeLID,:);
@@ -276,17 +296,20 @@ alpha_inputEdge = nodeAlphas_0(nodeEdgeIDsAll==edgeID);
 % get the edge with next smaller alpha
 % get all angles smaller than alpha_0    
 smallerAlphas = nodeAlphas_0(nodeAlphas_0<alpha_inputEdge);
-
+nextCwEdgeID = [];
 if(sum(nodeAlphas_0==alpha_inputEdge)>1) % see if there are edges with equal alphas to incoming alpha
     whichEdgeIDs_inlist = nodeEdgeIDsAll(nodeAlphas_0==alpha_inputEdge);
     nextCwEdgeID = setdiff(whichEdgeIDs_inlist,edgeID);
-elseif(~isempty(smallerAlphas))
+end
+if(~isempty(smallerAlphas))
     nextAlpha = max(smallerAlphas);
-    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+    nextCwEdgeID1 = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+    nextCwEdgeID = [nextCwEdgeID nextCwEdgeID1];
 else
     % get the largest alpha
     nextAlpha = max(nodeAlphas_0);
-    nextCwEdgeID = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+    nextCwEdgeID1 = nodeEdgeIDsAll(nodeAlphas_0==nextAlpha);
+    nextCwEdgeID = [nextCwEdgeID nextCwEdgeID1];
 end
 
 [~,nextCwEdgeLInd] = intersect(edgeListInds,nextCwEdgeID);

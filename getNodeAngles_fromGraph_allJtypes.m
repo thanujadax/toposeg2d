@@ -36,11 +36,11 @@ for dim=1:numJtypes
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
             
-            % debug start 20160329
-            if(nodeListInd==10476)
-                aaa = 999;
-            end
-            % debug stop
+%             % debug start 20160329
+%             if(nodeListInd==10476)
+%                 aaa = 999;
+%             end
+%             % debug stop
             
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree

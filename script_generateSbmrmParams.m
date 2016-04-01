@@ -22,21 +22,21 @@ labelImageFileName = '00.tiff';
 
 % read all images in the raw images file path
 rawImagePath = fullfile(inputPath,'raw');
-allRawFiles = dir(fullfile(rawImagePath,'*.png'));
+allRawFiles = dir(fullfile(rawImagePath,strcat('*',rawType)));
 
 % for each file
 numFiles = length(allRawFiles);
 %for i=1:numFiles
 i = 1;
 %    disp(i);
-%    imageFileName = allRawFiles(i).name;
-     % imageFileName = fullfile(inputPath,inputFileName);
+     % imageFileName = allRawFiles(i).name;
+     imageFileName = fullfile(inputPath,inputFileName);
      segmentationOut = doILP_w_dir(inputPath,inputFileName,i,...
         rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
         labelImagePath,labelImageFileName,produceBMRMfiles);
     % save segmentation output
-    writeFileName = fullfile(outputPath,imageFileName);
+    writeFileName = fullfile(outputPath,inputFileName);
     imwrite(segmentationOut,writeFileName,'tif');
     pngFileName = sprintf('%d.png',(i-1));
     pngFileName = fullfile(outputPathPNG,pngFileName);

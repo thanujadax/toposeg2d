@@ -92,10 +92,10 @@ orientations = 0:orientationStepSize:350;
 wsgsigma = 1.5;
 gsigma = 4.5; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
-barWidth = 4; %
+barWidth = 4; % should be even?
 marginSize = ceil(barLength/2);
 marginPixVal = 0.3;
-threshFrac = 0.1;   % 0.1 for raw images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+threshFrac = 0.1;   % threshold for OFR 0.1 for raw images %%
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
@@ -613,6 +613,14 @@ if(useGurobi)
     disp('using Gurobi ILP solver...');
     % model.A = sparse(double(A));
     model.rhs = b;
+    % TODO: check if f contains nan. replace with zero
+    fnan = isnan(f);
+    if(sum(fnan)>0)
+        f(fnan==1) = 0;
+        disp('Warning! : Nan found in objective function f.')
+        disp('Replacing Nan with zero for f(i), where i = ')
+        find(fnan==1)
+    end
     model.obj = f';
     model.sense = senseArray;
     % model.vtype = vtypeArray;
@@ -652,9 +660,9 @@ if (produceBMRMfiles)
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
             regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
             nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf); % w's are set to 1.
-    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions);
-    constraints = writeConstraintsFile(model.A,b,senseArray);
-    labels = writeLabelsFile(x);
+    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,outputPath);
+    constraints = writeConstraintsFile(model.A,b,senseArray,outputPath);
+    labels = writeLabelsFile(x,outputPath);
 end
 
 %% visualize

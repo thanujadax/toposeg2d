@@ -19,6 +19,7 @@ function nodeAngleCost = getNodeAngleCost_smooth(alpha,gsigma)
 
 if(alpha==0)
     nodeAngleCost = nan;
+    % nodeAngleCost = 0;	
 else
     if(numEdgesPerNode>0)
         numCombinations = nchoosek(numEdgesPerNode,2);

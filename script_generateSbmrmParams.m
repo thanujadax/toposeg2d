@@ -3,22 +3,22 @@
 produceBMRMfiles = 0;
 
 rawType = 'tif';
-neuronProbabilityType = 'tiff';
-membraneProbabilityType = 'tif';
+neuronProbabilityType = 'png';
+membraneProbabilityType = 'tiff';
 mitoProbabilityType = 'png';
 
 % inputPath = '/home/thanuja/Dropbox/data/em_2013january/';
-inputPath = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/isbiSegmentations/';
-inputFileName = 'test-volume0000.tif';
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160321_debug/';
-outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160321_debug/png';
+inputPath = '/home/thanuja/projects/data/toyData/set8/';
+inputFileName = '00.tif';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160403_sbmrm/';
+outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160403_sbmrm/png';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160321_debug/intermediate';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160403_sbmrm/intermediate';
 showIntermediateImages = 0;
 
 % to generate sbmrm files for structured learning
-labelImagePath = '/home/thanuja/Dropbox/data/em_2013january/neurons';
-labelImageFileName = '00.tiff';
+labelImagePath = '/home/thanuja/projects/data/toyData/set8/neurons';
+labelImageFileName = 'neurons0000.png';
 
 % read all images in the raw images file path
 rawImagePath = fullfile(inputPath,'raw');

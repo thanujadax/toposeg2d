@@ -4,42 +4,58 @@
 %   1 - active edge (neuron boundary)
 %   0 - inactive (neuron interior)
 
-%% Parameters
+%% Paths
 % use wild cards to allow for indices
 
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160503_edgeProbabilityRFC';
+subDirIntermediates = 'intermediates';
 
-pathForImages_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/training'; 
-pathForImages_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/test';
+checkAndCreateSubDir(outputRoot,subDirIntermediates);
+intermediateOutputPath = fullfile(outputRoot,subDirIntermediates);
+saveIntermediate = 1;
 
-pathForLabels_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/training';
-pathForLabels_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/test';
+pathForImages_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/raw/training'; 
+pathForImages_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/raw/test';
 
-pathForMembranes_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/training';
-pathForMembranes_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/test';
+pathForLabels_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/labels/training';
+pathForLabels_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/labels/test';
+
+pathForMembranes_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/membranes/training';
+pathForMembranes_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/membranes/test';
 
 fileNameString = '*.tif';
 
-showIntermediate = 0;
+%% params
+params.showIntermediate = 0;
+params.orientationsStepSize = 10;
+params.orientations = 0:params.orientationsStepSize:350;
 
+params.barLength = 13; % should be odd
+params.barWidth = 4; %
+params.marginSize = ceil(params.barLength/2);
+% marginPixVal = 0.1;
+params.withBorder = 1;
+params.addBorder = ceil(params.barLength/2);
+params.threshFrac = 0; % zero threshold for membrane prob map 
+params.medianFilterH = 0;
+
+params.marginPixVal = 0;
+params.withBorder = 1;
+
+useMembraneProbMap = 1;
+if(useMembraneProbMap)
+    params.invertImg = 0; % no invertion (0) for membrane prob maps
+else
+    params.invertImg = 1;  % 1 for EM images when input image is taken from imagePath
+end
+
+%% RFC params
 maxNumberOfSamplesPerClass = 100000;
 LEN_IMG_IND = 3;
 % RF training param
 NUM_TREES = 500;
 MTRY = 7; % number of predictors sampled for splitting each tree
 
-orientationsStepSize = 10;
-orientations = 0:orientationsStepSize:350;
-
-barLength = 13; % should be odd
-barWidth = 4; %
-marginSize = ceil(barLength/2);
-% marginPixVal = 0.1;
-addBorder = ceil(barLength/2);
-threshFrac = 0.1;
-medianFilterH = 0;
-invertImg = 1;      % 1 for EM images when input image is taken from imagePath
-marginPixVal = 0;
 %% read training data - x
 rawImageFiles_training = dir(fullfile(pathForImages_training,fileNameString)); % raw images for training
 labelImageFiles_training = dir(fullfile(pathForLabels_training,fileNameString)); % training labels
@@ -63,7 +79,9 @@ for i=1:numTrainingImgs
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
     boundaryEdgeIDs]...
-        = createStructuredTrainingData(rawImagePath_i,labelImagePath_i);
+        = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
+        membraneProbMapPath_i,useMembraneProbMap,...
+        saveIntermediate,intermediateOutputPath,i,params);
     numEdgesTot = numel(edgeListInds);
     edgeListIndSequence = 1:numEdgesTot;
     % edges part of object boundaries - active
@@ -196,7 +214,9 @@ for i=1:numTestingImgs
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
     boundaryEdgeIDs]...
-        = createStructuredTrainingData(rawImagePath_i,labelImagePath_i);
+        = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
+        membraneProbMapPath_i,useMembraneProbMap,...
+        saveIntermediate,intermediateOutputPath,i,params);
     % edges part of object boundaries - active
     activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
     % edges inside cells - inactive

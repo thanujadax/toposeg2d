@@ -1,7 +1,9 @@
 function [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
     boundaryEdgeIDs] = ...
-    createStructuredTrainingData(rawImagePath,labelImagePath)
+    createStructuredTrainingData(rawImagePath,labelImagePath,...
+    membraneProbPath,useMembraneProbMap,...
+    saveIntermediate,saveIntermediateImagesPath,rawImageID,params)
 % create structured training labels: edges, nodes and regions
 
 % Inputs:
@@ -14,44 +16,53 @@ function [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,..
 % ...
 
 %% Parameters
-showIntermediate = 0;
-
-orientationsStepSize = 10;
-orientations = 0:orientationsStepSize:350;
-
-barLength = 13;     % should be odd
-barWidth = 4;       %
-b_imWithBorder = 1; % 1 to add thick border
-marginSize = ceil(barLength/2);
-marginPixVal = 0;
-addBorder = ceil(barLength/2);
-threshFrac = 0.1;
-medianFilterH = 0;
-invertImg = 1;      % 1 for EM images when input image is taken from imagePath
+% params.showIntermediate = 0;
+% 
+% params.orientationsStepSize = 10;
+% params.orientations = 0:params.orientationsStepSize:350;
+% 
+% params.barLength = 13;     % should be odd
+% params.barWidth = 4;       %
+% params.withBorder = 1; % 1 to add thick border
+% params.marginSize = ceil(params.barLength/2);
+% params.marginPixVal = 0;
+% addBorder = ceil(params.barLength/2);
+% params.threshFrac = 0.1;
+% medianFilterH = 0;
+% params.invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 
 % rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
 
 %% Read inputs. Perform initial processing
-rawImage = double(imread(rawImagePath));
+
+if(useMembraneProbMap)
+    rawImage = double(imread(membraneProbPath));
+else
+    rawImage = double(imread(rawImagePath));
+end
+
 rawImage = rawImage./(max(max(rawImage)));
 labelImage = imread(labelImagePath);
 
 % add thick border
-if(b_imWithBorder)
-    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
-    labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+if(params.withBorder)
+    rawImage = addThickBorder(rawImage,params.marginSize,params.marginPixVal);
+    labelImage = addThickBorder(labelImage,params.marginSize,params.marginPixVal);
 end
 %% Extract WS graph for raw image
-[HSVmat,rgbimg,OFR] = getOFR(rawImage,orientations,...
-                            barLength,barWidth,invertImg,threshFrac);
+
+[HSVmat,rgbimg,OFR] = getOFR(rawImage,params.orientations,...
+                            params.barLength,params.barWidth,params.invertImg,params.threshFrac);
+
 OFR_mag = HSVmat(:,:,3);    % OFR value matrix
 
 ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
-    = getGraphFromWS(ws,HSVmat,showIntermediate);
+    = getGraphFromWS(ws,HSVmat,params.showIntermediate,saveIntermediate,...
+    saveIntermediateImagesPath,rawImageID);
 
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
 edgeListInds = edges2pixels(:,1);
@@ -65,12 +76,11 @@ wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
 edgepixels = edges2pixels(:,2:nce);
 wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 
-boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
-    nodeEdges,edgeListInds,showIntermediate);
+boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,params.barLength,edgepixels,...
+    nodeEdges,edgeListInds,params.showIntermediate);
 
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
-    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
-
+    = getFaceAdjFromWS(ws,edges2pixels,params.withBorder,boundaryEdgeIDs);
 
 edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 %% get regions that matches individual neurons (connected components)

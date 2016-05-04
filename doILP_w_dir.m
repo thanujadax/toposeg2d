@@ -14,7 +14,7 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 % showIntermediateImages = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
-fromInputImage = 1;
+useMembraneProbMapForOFR = 1;
 usePrecomputedProbabilityMaps = 1;
 useMitochondriaDetection = 0;
 
@@ -95,7 +95,7 @@ barLength = 13; % should be odd
 barWidth = 4; % should be even?
 marginSize = ceil(barLength/2);
 marginPixVal = 0.3;
-threshFrac = 0.1;   % threshold for OFR 0.1 for raw images %%
+threshFrac = 0;   % threshold for OFR 0.1 for raw images %%
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image

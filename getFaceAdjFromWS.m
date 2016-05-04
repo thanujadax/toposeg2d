@@ -78,6 +78,13 @@ for i=1:numel(wsIDsForRegions)
         zeroArray = zeros(1,numZerosForPadding);
         setOfEdgesForRegion_i = [setOfEdgesForRegion_i zeroArray];
     end
+    [r,c] = size(setOfEdgesForRegion_i);
+    % debug code start
+    if(r ~= 1 || c ~= maxNumEdgesPerRegion)
+        disp('problem')
+        aa = 99;
+    end
+    % debug code end
     setOfRegionsMat(i,:) = setOfEdgesForRegion_i;
 end
 

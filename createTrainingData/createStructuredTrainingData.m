@@ -84,7 +84,8 @@ boundaryEdgeIDs = getBoundaryEdgeIDs(ws,edges2pixels);
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,params.withBorder,boundaryEdgeIDs);
 
-edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
+edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag,...
+    psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);

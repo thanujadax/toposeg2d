@@ -39,7 +39,7 @@ params.addBorder = ceil(params.barLength/2);
 params.threshFrac = 0; % zero threshold for membrane prob map 
 params.medianFilterH = 0;
 
-params.marginPixVal = 0;
+params.marginPixVal = 1; % 1 for membrane probability. 0 for raw image.
 params.withBorder = 1;
 
 useMembraneProbMap = 1;

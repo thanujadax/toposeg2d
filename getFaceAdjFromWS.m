@@ -50,15 +50,15 @@ for i=start:numWsFaces
         maxNumEdgesPerRegion = numEdgesInSet; 
     end
     % keep track of edge usage
-    edgeListInds_logical = ismember(edgeIdList,edgeIdSet_i);
-    edgeCurrentUsage_i = edgeUsage(edgeListInds_logical);
+    edgeIDListInds_logical = ismember(edgeIdList,edgeIdSet_i);
+    edgeCurrentUsage_i = edgeUsage(edgeIDListInds_logical);
     edgeUsageUpdated_i = edgeCurrentUsage_i + 1; % increment usage
-    edgeUsage(edgeListInds_logical) = edgeUsageUpdated_i;
+    edgeUsage(edgeIDListInds_logical) = edgeUsageUpdated_i;
 end
 
-nonBoundaryEdgeListInds_logical = ~ismember(edgeIdList,boundaryEdgeIDs);
-nonBoundaryEdgeIDs = edgeIdList(nonBoundaryEdgeListInds_logical);
-nonBoundaryEdgeUsage = edgeUsage(nonBoundaryEdgeListInds_logical);
+nonBoundaryEdgeIDListInds_logical = ~ismember(edgeIdList,boundaryEdgeIDs);
+nonBoundaryEdgeIDs = edgeIdList(nonBoundaryEdgeIDListInds_logical);
+nonBoundaryEdgeUsage = edgeUsage(nonBoundaryEdgeIDListInds_logical);
 underUtilizedEdgeListInd_wrt_NBE_logical = (nonBoundaryEdgeUsage==1);
 
 underUtilizedEdgeIDs = nonBoundaryEdgeIDs(underUtilizedEdgeListInd_wrt_NBE_logical);

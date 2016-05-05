@@ -76,8 +76,10 @@ wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
 edgepixels = edges2pixels(:,2:nce);
 wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 
-boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,params.barLength,edgepixels,...
-    nodeEdges,edgeListInds,params.showIntermediate);
+% boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,params.barLength,edgepixels,...
+%     nodeEdges,edgeListInds,params.showIntermediate);
+
+boundaryEdgeIDs = getBoundaryEdgeIDs(ws,edges2pixels);
 
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,params.withBorder,boundaryEdgeIDs);

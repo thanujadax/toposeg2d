@@ -7,23 +7,26 @@
 %% Paths
 % use wild cards to allow for indices
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160503_edgeProbabilityRFC';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160506_edgeProbabilityRFC';
 subDirIntermediates = 'intermediates';
 
 checkAndCreateSubDir(outputRoot,subDirIntermediates);
 intermediateOutputPath = fullfile(outputRoot,subDirIntermediates);
 saveIntermediate = 1;
 
-pathForImages_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/raw/training'; 
-pathForImages_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/raw/test';
+pathForImages_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/training'; 
+pathForImages_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/test';
 
-pathForLabels_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/labels/training';
-pathForLabels_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/labels/test';
+pathForLabels_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/training';
+pathForLabels_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/test';
 
-pathForMembranes_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/membranes/training';
-pathForMembranes_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability_test/membranes/test';
+pathForMembranes_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/training';
+pathForMembranes_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/test';
 
 fileNameString = '*.tif';
+
+logfile = fullfile(outputRoot,'log.txt');
+fID = fopen(logfile,'w');
 
 %% params
 params.showIntermediate = 0;
@@ -168,10 +171,12 @@ disp('saved!')
 
 totActiveEdges = sum(y==1);
 totInactiveEdges = sum(y==0);
-str1 = sprintf('Number of positive samples: %d', totActiveEdges);
+str1 = sprintf('Number of positive samples: %d \n', totActiveEdges);
 disp(str1)
-str1 = sprintf('Number of negative samples: %d', totInactiveEdges);
+fprintf(fID,str1);
+str1 = sprintf('Number of negative samples: %d \n', totInactiveEdges);
 disp(str1)
+fprintf(fID,str1);
 
 disp('Training RF for edges...')
 extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass];
@@ -294,8 +299,14 @@ visualization(:,:,3) = visualizeB;
 figure; imshow(visualization)
 
 % prediction error
-numTestEdges = numel(y_h)
-predictionError = (sum(abs(y0 - y_h)))/numTestEdges
+numTestEdges = numel(y_h);
+str1 = sprintf('Number of edges in test images: %d \n',numTestEdges);
+disp(str1)
+fprintf(fID,str1);
+predictionError = (sum(abs(y0 - y_h)))/numTestEdges;
+str1 = sprintf('Prediction error: %4.4f \n', predictionError);
+disp(str1)
+fprintf(fID,str1);
 
 % visualize edge probabilities
 visualizeEdgeProbPred = zeros(sizeR,sizeC);
@@ -311,3 +322,4 @@ figure;imagesc(visualizeEdgeProbPred);title('predicted probabilities')
 figure;imagesc(visualizeEdgePriorProb);title('prior probabilities')
 
 imwrite(visualizeEdgeProbPred,fullfile(outputRoot,'prediction.tif'),'tif');
+fclose(fID);

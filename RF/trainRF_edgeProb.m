@@ -189,9 +189,9 @@ extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass
 
 forestEdgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
 disp('RFC learned for edge classification!')
-save(fullfile(outputRoot,'forestEdgeProbV7.mat'),forestEdgeProb,'-v7.3');
+save(fullfile(outputRoot,'forestEdgeProbV7.mat'),'forestEdgeProb','-v7.3');
 %     save forestEdgeProb.mat forestEdgeProb
-save(fullfile(outputRoot,'forestEdgeProb.mat'),forestEdgeProb);
+save(fullfile(outputRoot,'forestEdgeProb.mat'),'forestEdgeProb');
 disp('saved forest forestEdgeProb.mat')
 
 clear x y

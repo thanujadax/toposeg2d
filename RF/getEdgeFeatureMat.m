@@ -1,12 +1,16 @@
 function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
                 boundaryEdgeIDs,edgeListInds,psuedoEdgeIDs,psuedoEdges2nodes,...
-                membraneProbabilityMap)
+                membraneProbabilityMap,edgeListIndsOriginal)
 
 % Inputs:
 %   rawImage
 %   edgepixels
 %   OFR - 3D matrix containing the oriented edge filter response
-
+%   edgeListInds - these edges are reordered esp in training. so it's not
+%   the same as the typical edgeListInds used in the rest of the
+%   application
+%   edgeListIndsOriginal - usual edgeListInds, with edgeIDs in ascending
+%   order
 % Output:
 %   fm = feature matrix, each row corresponds to an edge. each column
 %   corresponds to a feature.
@@ -29,22 +33,24 @@ function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
 %   51-58: unsorted normalized histogram (8)
 %   59: 1 if the edge is a boundary edge. else 0.
 
-% Tot number of features = 59
+% Tot number of features = 69
 
-numFeatures = 68;
+numFeatures = 69;
 numEdges = size(edgepixels,1);
 [sizeR,sizeC,numOFRdim] = size(OFR);
 % dimVector = 1:numOFRdim;
 
 fm = zeros(numEdges,numFeatures);
 
-parfor i=1:numEdges
+for i=1:numEdges
     fm_i = zeros(1,numFeatures);
     edgepixels_i = edgepixels(i,:);
     edgepixels_i = edgepixels_i(edgepixels_i>0);
+    isPsEdge = 0;
     if(isempty(edgepixels_i))
         edgepixels_i = getPsuedoEdgePixels...
-            (i,psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
+            (i,psuedoEdgeIDs,psuedoEdges2nodes,edgeListIndsOriginal);
+        isPsEdge = 1;
     end
     
     numEdgePixels = numel(edgepixels_i);
@@ -60,6 +66,11 @@ parfor i=1:numEdges
     OFRneg_i = zeros(numEdgePixels,numOFRdim);
     for j=1:numOFRdim
         z = ones(1,numEdgePixels) * j;
+        % debug code start
+        if(~isequal(size(r),size(c)) || ~isequal(size(r),size(z)))
+            aaa = 999;
+        end
+        % debug code end
         pixInd3D_j = sub2ind([sizeR sizeC numOFRdim],r,c,z);
         OFR_ij = OFR(pixInd3D_j);
         OFR_i(:,j) = OFR_ij;          
@@ -126,7 +137,7 @@ parfor i=1:numEdges
     % 59: isBoundaryEdge
     k = K(end) + 1;
     K = k;
-    fm_i(K) = isBoundaryEdge(i,boundaryEdgeIDs,edgeListInds)
+    fm_i(K) = isBoundaryEdge(i,boundaryEdgeIDs,edgeListInds);
     % 60-68: membrane probabilities (from low-level RFC)
     k=K(end) + 1;
     K = k:(k+4);
@@ -136,6 +147,11 @@ parfor i=1:numEdges
     [mean,max,min,std,median] ...
      = getVecStats(pixIntensityVector);
     fm_i(K) = [mean,max,min,std,median];
+    
+    % 69: is psuedo edge
+    k = K(end) + 1;
+    K = k;
+    fm_i(K) = isPsEdge;
     
     fm(i,:) = fm_i;
 end

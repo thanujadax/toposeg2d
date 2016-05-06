@@ -1,11 +1,12 @@
 function edgeProbabilities = getEdgeProbabilitiesFromRFC...
             (forestEdgeProb,rawImage,OFR,edgepixels,edgePriors,...
-            boundaryEdgeIDs,edgeListInds,numTrees,psuedoEdgeIDs,psuedoEdges2nodes)
+            boundaryEdgeIDs,edgeListIndsToProcess,numTrees,...
+            psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds)
         
         
 
 fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,boundaryEdgeIDs,...
-    edgeListInds,psuedoEdgeIDs,psuedoEdges2nodes);
+    edgeListIndsToProcess,psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
 [y_h,v] = classRF_predict(double(fm), forestEdgeProb);
 
 edgeProbabilities = v(:,2)./numTrees;

@@ -311,7 +311,8 @@ else
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
                 (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
-                boundaryEdgeIDs,edgeListInds,numTrees,psuedoEdgeIDs,psuedoEdges2nodes);
+                boundaryEdgeIDs,edgeListInds,numTrees,...
+                psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
 end
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost

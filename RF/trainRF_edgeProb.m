@@ -40,6 +40,7 @@ params.threshFrac = 0; % zero threshold for membrane prob map
 params.medianFilterH = 0;
 
 params.marginPixVal = 1; % 1 for membrane probability. 0 for raw image.
+params.marginPixValRaw = 0;
 params.withBorder = 1;
 
 useMembraneProbMap = 1;
@@ -78,7 +79,7 @@ for i=1:numTrainingImgs
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
-    boundaryEdgeIDs]...
+    boundaryEdgeIDs,psuedoEdgeIDs,psuedoEdges2nodes,psuedoEdgeLIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
         membraneProbMapPath_i,useMembraneProbMap,...
         saveIntermediate,intermediateOutputPath,i,params);
@@ -109,16 +110,16 @@ for i=1:numTrainingImgs
     edgePriors_reordered_tr = edgePriors(edgeListInds_reordered_tr);
     rawImage = double(imread(rawImagePath_i));
     rawImage = rawImage./(max(max(rawImage)));
-    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    rawImage = addThickBorder(rawImage,params.marginSize,params.marginPixValRaw);
     
     membraneProbabilityMap = double(imread(membraneProbMapPath_i));
     membraneProbabilityMap = membraneProbabilityMap./(max(max(membraneProbabilityMap)));
-    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,marginSize,0);
+    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,params.marginSize,params.marginPixVal);
     
     % clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered_tr,OFR,...
         edgePriors_reordered_tr,boundaryEdgeIDs,edgeListInds_reordered_tr,...
-        membraneProbabilityMap);
+        psuedoEdgeIDs,psuedoEdges2nodes,membraneProbabilityMap,edgeListInds);
     % append to the feature matrix x and the label matrix y
     x = [x; fm];
     numActiveEdges = numel(activeEdgeIDs);
@@ -174,17 +175,24 @@ disp(str1)
 
 disp('Training RF for edges...')
 extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass];
-if ~exist('forestEdgeProb.mat','file')
-    forestEdgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
-    disp('RFC learned for edge classification!')
-    save(fullfile(outputRoot,'forestEdgeProbV7.mat'),forestEdgeProb,'-v7.3');
+% if ~exist('forestEdgeProb.mat','file')
+%     forestEdgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
+%     disp('RFC learned for edge classification!')
+%     save(fullfile(outputRoot,'forestEdgeProbV7.mat'),forestEdgeProb,'-v7.3');
+% %     save forestEdgeProb.mat forestEdgeProb
+%     save(fullfile(outputRoot,'forestEdgeProb.mat'),forestEdgeProb);
+%     disp('saved forest forestEdgeProb.mat')
+% else
+%     disp('forestEdgeProb.mat already exists!')
+%     load forestEdgeProb.mat
+% end
+
+forestEdgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
+disp('RFC learned for edge classification!')
+save(fullfile(outputRoot,'forestEdgeProbV7.mat'),forestEdgeProb,'-v7.3');
 %     save forestEdgeProb.mat forestEdgeProb
-    save(fullfile(outputRoot,'forestEdgeProb.mat'),forestEdgeProb);
-    disp('saved forest forestEdgeProb.mat')
-else
-    disp('forestEdgeProb.mat already exists!')
-    load forestEdgeProb.mat
-end
+save(fullfile(outputRoot,'forestEdgeProb.mat'),forestEdgeProb);
+disp('saved forest forestEdgeProb.mat')
 
 clear x y
 
@@ -213,7 +221,7 @@ for i=1:numTestingImgs
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
-    boundaryEdgeIDs]...
+    boundaryEdgeIDs,psuedoEdgeIDs,psuedoEdges2nodes,psuedoEdgeLIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
         membraneProbMapPath_i,useMembraneProbMap,...
         saveIntermediate,intermediateOutputPath,i,params);
@@ -243,7 +251,7 @@ for i=1:numTestingImgs
     clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,...
         edgePriors_reordered,boundaryEdgeIDs,edgeListInds_reordered,...
-        membraneProbabilityMap);
+        psuedoEdgeIDs,psuedoEdges2nodes,membraneProbabilityMap,edgeListInds);
     % append to the feature matrix x and the label matrix y
     x0 = [x0; fm];
     numActiveEdges = numel(activeEdgeIDs);

@@ -242,11 +242,11 @@ for i=1:numTestingImgs
     
     rawImage = double(imread(rawImagePath_i));
     rawImage = rawImage./(max(max(rawImage)));
-    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    rawImage = addThickBorder(rawImage,params.marginSize,params.marginPixValRaw);
     
     membraneProbabilityMap = double(imread(membraneProbMapPath_i));
     membraneProbabilityMap = membraneProbabilityMap./(max(max(membraneProbabilityMap)));
-    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,marginSize,0);
+    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,params.marginSize,params.marginPixVal);
     
     clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,...

@@ -20,7 +20,7 @@ useMitochondriaDetection = 0;
 
 %% File names and paths
 % trained RFC for edge probability
-forestEdgeProbFileName = 'forestEdgeProb.mat'; 
+forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
 % inputPath = '/home/thanuja/Dropbox/data2';
 

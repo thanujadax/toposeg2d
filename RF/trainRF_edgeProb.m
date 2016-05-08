@@ -81,7 +81,7 @@ for i=1:numTrainingImgs
     membraneProbMapPath_i = fullfile(pathForMembranes_training,membraneFiles_training(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
+    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriorsOFR,OFR_mag,...
     boundaryEdgeIDs,psuedoEdgeIDs,psuedoEdges2nodes,psuedoEdgeLIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
         membraneProbMapPath_i,useMembraneProbMap,...
@@ -110,7 +110,7 @@ for i=1:numTrainingImgs
     [~,inactiveEdgeListInds_tr] = intersect(edgeListInds,inactiveEdgeIDs);
     edgeListInds_reordered_tr = [activeEdgeListInds_tr; inactiveEdgeListInds_tr];
     edgepixels_reordered_tr = edgepixels(edgeListInds_reordered_tr,:);
-    edgePriors_reordered_tr = edgePriors(edgeListInds_reordered_tr);
+    edgePriors_reordered_tr = edgePriorsOFR(edgeListInds_reordered_tr);
     rawImage = double(imread(rawImagePath_i));
     rawImage = rawImage./(max(max(rawImage)));
     rawImage = addThickBorder(rawImage,params.marginSize,params.marginPixValRaw);
@@ -225,7 +225,7 @@ for i=1:numTestingImgs
     membraneProbMapPath_i = fullfile(pathForMembranes_testing,membraneFiles_testing(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
+    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriorsOFR,OFR_mag,...
     boundaryEdgeIDs,psuedoEdgeIDs,psuedoEdges2nodes,psuedoEdgeLIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i,...
         membraneProbMapPath_i,useMembraneProbMap,...
@@ -243,7 +243,7 @@ for i=1:numTestingImgs
     [~,inactiveEdgeListInds] = intersect(edgeListInds,inactiveEdgeIDs);
     edgeListInds_reordered = [activeEdgeListInds; inactiveEdgeListInds];
     edgepixels_reordered = edgepixels(edgeListInds_reordered,:);
-    edgePriors_reordered = edgePriors(edgeListInds_reordered);
+    edgePriors_reordered = edgePriorsOFR(edgeListInds_reordered);
     
     rawImage = double(imread(rawImagePath_i));
     rawImage = rawImage./(max(max(rawImage)));
@@ -319,7 +319,7 @@ for i=1:numEdges
     visualizeEdgePriorProb(edgePixels_i) = edgePriors_reordered(i);
 end
 figure;imagesc(visualizeEdgeProbPred);title('predicted probabilities')
-figure;imagesc(visualizeEdgePriorProb);title('prior probabilities')
+figure;imagesc(visualizeEdgePriorProb);title('OFR prior probabilities')
 
 imwrite(visualizeEdgeProbPred,fullfile(outputRoot,'prediction.tif'),'tif');
 fclose(fID);

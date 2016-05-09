@@ -143,6 +143,7 @@ for i=1:numEdges
     K = k:(k+4);
     rawImage_i = membraneProbabilityMap;
     % rawImage_i = invertImage(rawImage_i);
+    clear pixIntensityVector 
     pixIntensityVector = rawImage_i(edgepixels_i);
     [mean,max,min,std,median] ...
      = getVecStats(pixIntensityVector);

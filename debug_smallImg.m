@@ -6,11 +6,15 @@ membraneProbabilityType = 'png';
 mitoProbabilityType = 'png';
 
 inputPath = '/home/thanuja/projects/data/toyData/set5/';
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160321';
-outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160321/png';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160509';
+outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160509/png';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160321/intermediate';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160509/intermediate';
 showIntermediateImages = 0;
+
+labelImagePath = '';
+labelImageFileName = '';
+produceBMRMFiles = 0;
 
 % read all images in the raw images file path
 rawImagePath = fullfile(inputPath,'raw');
@@ -24,7 +28,8 @@ i = 1;
     imageFileName = allRawFiles(i).name;
     segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...
         rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
-        saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages);
+        saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
+        labelImagePath,labelImageFileName,produceBMRMFiles);
     % save segmentation output
     writeFileName = fullfile(outputPath,imageFileName);
     imwrite(segmentationOut,writeFileName,'tif');

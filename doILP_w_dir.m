@@ -3,7 +3,9 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     labelImagePath,labelImageFileName,produceBMRMfiles)
 
-% version 3. 2014.01.06
+% version 5. 20160509: 
+
+% version 4. 2014.01.06
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 % 20160321 - updated with new node angle cost function
 
@@ -14,11 +16,14 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 % showIntermediateImages = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
-useMembraneProbMapForOFR = 1;
+useMembraneProbMapForOFR = 1;  %%%%%%%%% TODO %%%%%%%%%%%
 usePrecomputedProbabilityMaps = 1;
 useMitochondriaDetection = 0;
 
 %% File names and paths
+% corresponding images inside different subdirectories should have the same
+% name i.e 00.tif, 01.tif etc
+
 % trained RFC for edge probability
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
@@ -51,9 +56,9 @@ if(~isempty(imageID))
     
     membraneProbabilityImageFilesAll = dir(fullfile(...
         probabilityMapPath,dir_membraneProb,imgFileString));
-    membraneProbabilityImage = membraneProbabilityImageFilesAll(imageID).name;
-    membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,...
-        membraneProbabilityImage);
+    membraneProbMapFileName = membraneProbabilityImageFilesAll(imageID).name;
+    membraneProbMapFileName = fullfile(probabilityMapPath,dir_membraneProb,...
+        membraneProbMapFileName);
   
 %     imgFileString = strcat('*.',neuronProbabilityType);
 %     neuronProbabilityImageFilesAll = dir(fullfile(...
@@ -75,7 +80,7 @@ if(~isempty(imageID))
     end
     
 else
-    membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
+    membraneProbMapFileName = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
     % neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
     if(useMitochondriaDetection)
         mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
@@ -94,7 +99,8 @@ gsigma = 4.5; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
 marginSize = ceil(barLength/2);
-marginPixVal = 0.3;
+marginPixValRaw = 0;
+marginPixValMem = 1;
 threshFrac = 0;   % threshold for OFR 0.1 for raw images %%
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
@@ -172,8 +178,10 @@ imgIn0 = double(imread(rawImageFullFile));
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
-
-% imgIn0 = imgIn0(1:128,:);
+membraneProbMap = double(imread(membraneProbMapFileName));
+if(max(max(membraneProbMap)))
+    membraneProbMap = membraneProbMap./255;
+end
 
 if(produceBMRMfiles)
     labelImage = imread(labelImageFullFile);
@@ -181,22 +189,28 @@ if(produceBMRMfiles)
 end
 % add thick border
 if(b_imWithBorder)
-    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    rawImg = addThickBorder(imgIn0,marginSize,marginPixValRaw);
+    membraneProbMap = addThickBorder(membraneProbMap,marginSize,marginPixValMem);
     if(saveIntermediateImages)
         intermediateImgDescription = 'rawImage';
-        imgInNormal = imgIn./max(max(imgIn));
+        imgInNormal = rawImg./max(max(rawImg));
         saveIntermediateImage(imgInNormal,rawImageID,intermediateImgDescription,...
     saveIntermediateImagesPath);
     end
     if(produceBMRMfiles)
-        labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+        labelImage = addThickBorder(labelImage,marginSize,marginPixValRaw);
     end
 end
 
 
 %% Oriented Edge Filtering
-[output,rgbimg,OFR] = getOFR(imgIn,orientations,...
+if(useMembraneProbMapForOFR)
+    [output,rgbimg,OFR] = getOFR(membraneProbMap,orientations,...
                         barLength,barWidth,invertImg,threshFrac);
+else
+    [output,rgbimg,OFR] = getOFR(rawImg,orientations,...
+                        barLength,barWidth,invertImg,threshFrac);
+end
 % output is in HSV form
 OFR_mag = output(:,:,3);
 OFR_hue = output(:,:,1);
@@ -310,9 +324,10 @@ else
     end
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
-                (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
+                (forestEdgeProb,rawImg,OFR,edgepixels,edgePriors,...
                 boundaryEdgeIDs,edgeListInds,numTrees,...
-                psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
+                psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds,...
+                 membraneProbMap,edgeListInds);
 end
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
@@ -384,8 +399,8 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 if(usePrecomputedProbabilityMaps)
     
     regionUnary = getRegionScoreFromProbImage(...
-    membraneProbabilityImage,mitochondriaProbabilityImage,...
-    useMitochondriaDetection,marginSize,marginPixVal,...
+    membraneProbMapFileName,mitochondriaProbabilityImage,...
+    useMitochondriaDetection,marginSize,marginPixValRaw,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...
     saveIntermediateImagesPath,rawImageID);

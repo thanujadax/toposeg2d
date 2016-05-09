@@ -1,39 +1,26 @@
 % debug image small
 
-rawType = 'png';
-neuronProbabilityType = 'png';
-membraneProbabilityType = 'png';
-mitoProbabilityType = 'png';
+rawImageDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/raw';
+rawImageFileName = '01.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/membranes/01.tif';
+mitoProbMapFullFileName = '';
 
-inputPath = '/home/thanuja/projects/data/toyData/set5/';
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160509';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm';
 outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160509/png';
+sbmrmOutputDir = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm/sbmrmRun';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160509/intermediate';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm/intermediate';
 showIntermediateImages = 0;
+labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/01.tif';
+produceBMRMfiles = 1;
 
-labelImagePath = '';
-labelImageFileName = '';
-produceBMRMFiles = 0;
+segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
+    membraneProbMapFullFileName,mitoProbMapFullFileName,...
+    saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir);
 
-% read all images in the raw images file path
-rawImagePath = fullfile(inputPath,'raw');
-allRawFiles = dir(fullfile(rawImagePath,'*.png'));
-
-% for each file
-numFiles = length(allRawFiles);
-%for i=1:numFiles
-i = 1;
-    disp(i);
-    imageFileName = allRawFiles(i).name;
-    segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...
-        rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
-        saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-        labelImagePath,labelImageFileName,produceBMRMFiles);
-    % save segmentation output
-    writeFileName = fullfile(outputPath,imageFileName);
-    imwrite(segmentationOut,writeFileName,'tif');
-    pngFileName = sprintf('%d.png',(i-1));
-    pngFileName = fullfile(outputPathPNG,pngFileName);
-    imwrite(segmentationOut,pngFileName,'png');
-%end
+writeFileName = fullfile(outputPath,rawImageFileName);
+imwrite(segmentationOut,writeFileName,'tif');
+% pngFileName = sprintf('%s.png',(i-1));
+% pngFileName = fullfile(outputPathPNG,pngFileName);
+% imwrite(segmentationOut,pngFileName,'png');

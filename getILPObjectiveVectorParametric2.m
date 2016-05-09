@@ -94,7 +94,8 @@ for i=(f_start_ind):(f_start_ind+numRegions-2)
     k = k + 1;
 end
 
-% regionsLikely to be turned off: set offScore to +1
+% % commenting out 20160509. 
+% % regionsLikely to be turned off: set offScore to +1
 offset_for_regionOff_LIDs = numEdges*3 + totJunctionVar + numRegions;
 likelyOffRegionIDs = find(regionUnary<regionOffThreshold) +1; % +1 for border region
 likelyOffRegionIDs_offset = likelyOffRegionIDs + offset_for_regionOff_LIDs;

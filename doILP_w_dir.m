@@ -1,7 +1,7 @@
-function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
-    rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType,...
+function segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
+    membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    labelImagePath,labelImageFileName,produceBMRMfiles)
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir)
 
 % version 5. 20160509: 
 
@@ -26,70 +26,7 @@ useMitochondriaDetection = 0;
 
 % trained RFC for edge probability
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
-
-% inputPath = '/home/thanuja/Dropbox/data2';
-
-% probability map image file should have the same name as the raw image file
-rawImagePath = fullfile(inputPath,'raw');
-% rawImagePath = '/home/thanuja/Dropbox/data2/raw';
-% rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-% rawImageFileName = '00.png';
-if(~isempty(imageID))
-    imgFileString = strcat('*.',rawType);
-    rawImageFilesAll = dir(fullfile(rawImagePath,imgFileString));
-    rawImageFileName = rawImageFilesAll(imageID).name;
-else
-    rawImageFileName = imageFileName;
-end
-
-rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
-
-% probabilityMapPath = '/home/thanuja/Dropbox/data2/probabilities';
-% probabilityMapPath = fullfile(inputPath,'probabilities');
-probabilityMapPath = inputPath;
-dir_membraneProb = 'membranes';
-dir_mitochondriaProb = 'mitochondria';
-dir_neuronProb = 'neurons';
-
-if(~isempty(imageID))
-    imgFileString = strcat('*.',membraneProbabilityType);
-    
-    membraneProbabilityImageFilesAll = dir(fullfile(...
-        probabilityMapPath,dir_membraneProb,imgFileString));
-    membraneProbMapFileName = membraneProbabilityImageFilesAll(imageID).name;
-    membraneProbMapFileName = fullfile(probabilityMapPath,dir_membraneProb,...
-        membraneProbMapFileName);
-  
-%     imgFileString = strcat('*.',neuronProbabilityType);
-%     neuronProbabilityImageFilesAll = dir(fullfile(...
-%         probabilityMapPath,dir_neuronProb,imgFileString));
-%     neuronProbabilityImage = neuronProbabilityImageFilesAll(imageID).name;
-%     neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,neuronProbabilityImage);
-%     disp(neuronProbabilityImage);
-    
-    if(useMitochondriaDetection)
-    imgFileString = strcat('*.',mitoProbabilityType);
-    mitoProbabilityImageFilesAll = dir(fullfile(...
-        probabilityMapPath,dir_mitochondriaProb,imgFileString));
-    mitochondriaProbabilityImage = mitoProbabilityImageFilesAll(imageID).name;
-    mitochondriaProbabilityImage = fullfile(...
-        probabilityMapPath,dir_mitochondriaProb,mitochondriaProbabilityImage);
-    disp(mitochondriaProbabilityImage)
-    else
-        mitochondriaProbabilityImage = [];
-    end
-    
-else
-    membraneProbMapFileName = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
-    % neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
-    if(useMitochondriaDetection)
-        mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
-    end
-end
-% for sbmrm
-if(produceBMRMfiles)
-    labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
-end
+rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 
 %% Parameters
 orientationStepSize = 10;
@@ -115,10 +52,6 @@ minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 
 % param
 
-cEdge = 1;        % general scaling factor for edge priors
-cCell = 1;        % positive scaling factor for cell priors
-cPos = 1;         % scaling factor for positive nodeAngleCosts
-cNeg = 1;         % scaling factor for negative nodeAngleCosts
 bbEdgeReward = 1;
 offEdgeReward = 1;
 
@@ -178,13 +111,19 @@ imgIn0 = double(imread(rawImageFullFile));
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
-membraneProbMap = double(imread(membraneProbMapFileName));
+membraneProbMap = double(imread(membraneProbMapFullFileName));
 if(max(max(membraneProbMap)))
     membraneProbMap = membraneProbMap./255;
 end
 
+if(useMitochondriaDetection)
+    mitochondriaProbabilityImage = double(imread(mitoProbMapFullFileName));
+else
+    mitochondriaProbabilityImage = [];
+end
+
 if(produceBMRMfiles)
-    labelImage = imread(labelImageFullFile);
+    labelImage = imread(labelImageFileName);
     % labelImage = labelImage(1:128,:,:);
 end
 % add thick border
@@ -399,7 +338,7 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 if(usePrecomputedProbabilityMaps)
     
     regionUnary = getRegionScoreFromProbImage(...
-    membraneProbMapFileName,mitochondriaProbabilityImage,...
+    membraneProbMapFullFileName,mitochondriaProbabilityImage,...
     useMitochondriaDetection,marginSize,marginPixValRaw,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...
@@ -676,9 +615,9 @@ if (produceBMRMfiles)
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
             regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
             nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf); % w's are set to 1.
-    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,outputPath);
-    constraints = writeConstraintsFile(model.A,b,senseArray,outputPath);
-    labels = writeLabelsFile(x,outputPath);
+    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,sbmrmOutputDir);
+    constraints = writeConstraintsFile(model.A,b,senseArray,sbmrmOutputDir);
+    labels = writeLabelsFile(x,sbmrmOutputDir);
 end
 
 %% visualize

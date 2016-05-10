@@ -5,11 +5,11 @@ rawImageFileName = '01.tif';
 membraneProbMapFullFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/membranes/01.tif';
 mitoProbMapFullFileName = '';
 
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm';
 outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160509/png';
-sbmrmOutputDir = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm/sbmrmRun';
+sbmrmOutputDir = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm/sbmrmRun';
 saveIntermediateImages = 1;
-saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160509_sbmrm/intermediate';
+saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm/intermediate';
 showIntermediateImages = 0;
 labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/01.tif';
 produceBMRMfiles = 1;

@@ -91,6 +91,10 @@ else
     w_off_r = -18;
 end
 
+% weights learned with regionThresholding 20160510
+% [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724]
+
+
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
 % coeff (unary prior) for turning off each edge = +edgePriors (col vector)

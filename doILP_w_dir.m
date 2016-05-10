@@ -69,6 +69,18 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 %   4. w_on_n
 %   5. w_off_r
 %   6. w_on_r
+
+% old weights: OFR from raw image. older verision of edgeProbRFC
+% linearWeights = [-10, -7.38296, 0.468054, 0.403942, -7.79221, -18]
+
+% weights learned with regionThresholding 20160510
+% and edgeRFC learned with RFC membrane probmap for OFR
+% linearWeights =  [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724]
+
+% without region thresholding 20160510
+% RFC probmap for OFR
+linearWeights = [-9.66278, -7.77851, 3.16516, -0.0328264, -4.84211, -14.7709];
+
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
     w_on_e = 1;     % edge weight
@@ -81,19 +93,14 @@ else
     % use pre-learned parameters
     % optimial w is [-7.52064, -7.38296, 0.468054, 0.403942, -7.79221, -5.75401]
 %    w_on_e = -7.52064;     % edge weight
-    w_on_e = -10;
-    w_off_e = -7.38296;
+    w_on_e = linearWeights(1);
+    w_off_e = linearWeights(2);
 
-    w_off_n = 0.468054;    % node off weight
-    w_on_n = 0.403942;     % node on weight
-    w_on_r = -7.79221;     % region weight
-    % w_off_r = -5.75401;
-    w_off_r = -18;
+    w_off_n = linearWeights(3);    % node off weight
+    w_on_n = linearWeights(4);     % node on weight
+    w_on_r = linearWeights(5);     % region weight
+    w_off_r = linearWeights(6);
 end
-
-% weights learned with regionThresholding 20160510
-% [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724]
-
 
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4

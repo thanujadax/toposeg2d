@@ -1,19 +1,19 @@
 % debug image small
 
-rawImageDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/raw';
-rawImageFileName = '01.tif';
-membraneProbMapFullFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/membranes/01.tif';
+rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
+rawImageFileName = '03.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
 mitoProbMapFullFileName = '';
 
-outputPath = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm';
+outputPath = '/home/thanuja/projects/RESULTS/contours/20160510/01_withoutRegionThresh';
 outputPathPNG = '/home/thanuja/projects/RESULTS/contours/20160509/png';
 sbmrmOutputDir = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm/sbmrmRun';
 saveIntermediateImages = 1;
 saveIntermediateImagesPath = '/home/thanuja/projects/RESULTS/contours/20160510_sbmrm/intermediate';
-showIntermediateImages = 0;
+showIntermediateImages = 1;
 labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/01.tif';
-produceBMRMfiles = 1;
-
+produceBMRMfiles = 0;
+dbstop if error
 segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
@@ -24,3 +24,6 @@ imwrite(segmentationOut,writeFileName,'tif');
 % pngFileName = sprintf('%s.png',(i-1));
 % pngFileName = fullfile(outputPathPNG,pngFileName);
 % imwrite(segmentationOut,pngFileName,'png');
+
+% what are the conditions for the error to occur
+% how to automatically stop at debug

@@ -5,6 +5,10 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 % jAnglesAll{i} - each row corresponds to the set of angles for each
 % junction of type i (type 1 = J2)
 
+% the angle is calculated as an avg of
+% all the angles made by the pixels closest to the root node, for long
+% edges. for short edges, the two ends are used
+
 % Inputs:
 %   ...
 %   jEdgesAll - cell array with jEdgesAll{i} corresponding the edgeSet of
@@ -13,7 +17,7 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 %   edges2pixels - appended with psuedo edges with zeros for pixes
 %   edges2nodes - appended with psuedo edges
 
-MAX_NUM_PIXELS = 5;  % maximum number of pixels away from the node used to calculate alpha
+MAX_NUM_PIXELS = 7;  % maximum number of pixels away from the node used to calculate alpha
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 
@@ -35,17 +39,11 @@ for dim=1:numJtypes
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
-            
-%             % debug start 20160329
-%             if(nodeListInd==10476)
-%                 aaa = 999;
-%             end
-%             % debug stop
-            
+
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
             % TODO: If the node is a cluster node determine the angle based on
-            % the neares pixel of the clusternode to the edge in concern
+            % the nearest pixel of the clusternode to the edge in concern
             
                 % for each edge of this node
                 edgeID = edges_i(j);
@@ -70,7 +68,8 @@ for dim=1:numJtypes
                         [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                         numEdgePix = numel(nodePixels);
     %                     orientations = zeros(numEdgePix,1);
-                        if(numEdgePix<8)
+
+                        if(numEdgePix<MAX_NUM_PIXELS)
                             % if the edge is not very long, only look at the pixels
                             % close to this node to determine the direction
                             % get the 2 junction nodes
@@ -85,6 +84,8 @@ for dim=1:numJtypes
                             % calculate alpha based on these 2
                             nodeInd2 = nodeInds(node2ListInd); 
                             [rNode2,cNode2] = ind2sub([sizeR sizeC],nodeInd2);
+                            % calculate alpha based on all the pixels
+                            
                             if(isClusterNode(nodeInd,connectedJunctionIDs))
                                 % is cluster node. pick the closest cluster
                                 % pixel
@@ -96,14 +97,21 @@ for dim=1:numJtypes
 
                             y = rNode2 - rNode;
                             x = cNode2 - cNode;
+
+                            % y = rP - rNode;
+                            % x = cP - cNode;
                         else
                             % get alpha wrt the end edge pixels
                             % edge is too long. Take the direction wrt pixel at
                             % MAX_NUM_PIXELS away from current node which is set above
                             rp1 = rP(1);
-                            rp2 = rP(end);
+                            % rp2 = rP(end);
+                            rp2 = rP;
+                            rp2(1) = [];
                             cp1 = cP(1);
-                            cp2 = cP(end);
+                            % cp2 = cP(end);
+                            cp2 = cP;
+                            cp2(1) = [];
                             y = rp2 - rp1;
                             x = cp2 - cp1;
                         end
@@ -115,7 +123,7 @@ for dim=1:numJtypes
                         x = cNode2 - cNode;                        
                     end
                
-                    alpha = atan2d(y,x);
+                    alpha = mean(atan2d(y,x));
                     if(alpha<0)
                         alpha = alpha + 360;
                     end

@@ -58,12 +58,12 @@ edgeID_1 = edgeListIndsAll(edgeLId_1);
 % Get the nodes at each end of the edge. At each node get the next edge as
 % if to complete a clockwise cycle.
 nodeListInds = edges2nodes_directional(edgeLId_1,:);
-nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
+[nextCwEdgeLId_1,numNodeEdges_1] = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC);
         
 
-nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
+[nextCwEdgeLId_2,numNodeEdges_2] = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC);
 
@@ -103,7 +103,17 @@ nextCwEdgeLId_inRegion = intersect...
                 (edgeListInds_region,[nextCwEdgeLId_1; nextCwEdgeLId_2]);
 
     if(numel(nextCwEdgeLId_inRegion)>1)
-        error('Warning: getOrderedRegionEdgeListIndsDir. numEdges >1')
+        if(numNodeEdges_1 == 2)
+            % there could be a node with only two edges. the clockwise edge
+            % detection logic breaks down here since no matter what the 2nd
+            % edge would be also part of the original region
+            % return the other as the nextEdge
+            nextCwEdgeLId_inRegion = nextCwEdgeLId_2;
+        elseif(numNodeEdges_2 == 2)
+            nextCwEdgeLId_inRegion = nextCwEdgeLId_1;
+        else
+            error('Error: getOrderedRegionEdgeListIndsDir. numEdges >1')
+        end
     elseif(numel(nextCwEdgeLId_inRegion)<1)
         error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
     end
@@ -180,7 +190,7 @@ if(numEdges_region>1)
             % get the ccw angles wrt incoming edge
             
             % get the edge with the closest ccw angle as the next edge
-            nextEdgeLID = getNextClockwiseEdge(nextNodeLID,0,edgeListIndsAll(nextEdgeLID),...
+            [nextEdgeLID,~] = getNextClockwiseEdge(nextNodeLID,0,edgeListIndsAll(nextEdgeLID),...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC);
         
@@ -222,7 +232,7 @@ end
 % end
 
 
-function nextCwEdgeLInd = getNextClockwiseEdge(nodeLId,edgeLId,edgeID,...
+function [nextCwEdgeLInd,numNodeEdges] = getNextClockwiseEdge(nodeLId,edgeLId,edgeID,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListInds,...
             edges2pixels,sizeR,sizeC)
 % at the node nodeLId, wrt the edge edgeLId, what is the next edge in cw direction
@@ -231,6 +241,8 @@ function nextCwEdgeLInd = getNextClockwiseEdge(nodeLId,edgeLId,edgeID,...
 nodeEdgeIDsAll = nodeEdgeIDs(nodeLId,:);
 nodeEdgeIDsAll(1) = []; % first element is the nodePixelInd
 nodeEdgeIDsAll = nodeEdgeIDsAll(nodeEdgeIDsAll>0);
+
+numNodeEdges = numel(nodeEdgeIDsAll);
 
 [junctionListInd,junctionType] = find(junctionTypeListInds==nodeLId);
 alphas_junctionType = jAnglesAll_alpha{junctionType};

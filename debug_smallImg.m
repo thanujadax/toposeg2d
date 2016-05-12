@@ -1,8 +1,8 @@
 % debug image small
 
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
-rawImageFileName = '03.tif';
-membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
+rawImageFileName = '02.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/02_probability.tif';
 mitoProbMapFullFileName = '';
 
 outputPath = '/home/thanuja/projects/RESULTS/contours/20160510/01_withoutRegionThresh';

@@ -38,6 +38,11 @@ for dim=1:numJtypes
             % for each node
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
+            % start debug
+            if(nodeListInd==684)
+                aaa = 999;
+            end
+            % end debug
             nodeInd = nodeInds(nodeListInd); 
 
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
@@ -122,11 +127,11 @@ for dim=1:numJtypes
                         y = rNode2 - rNode;
                         x = cNode2 - cNode;                        
                     end
-               
-                    alpha = median(atan2d(y,x));
-                    if(alpha<0)
-                        alpha = alpha + 360;
-                    end
+                    alpha = calculateAvgAlpha(y,x);
+%                     alpha = median(atan2d(y,x));
+%                     if(alpha<0)
+%                         alpha = alpha + 360;
+%                     end
 
                     jAngles(i,j) = alpha;
                 end

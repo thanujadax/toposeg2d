@@ -32,7 +32,7 @@ rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
 wsgsigma = 1.5;
-gsigma = 4.5; % spread for the smoothness cost of nodes (gaussian sigma)
+gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
 marginSize = ceil(barLength/2);
@@ -77,7 +77,7 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 % and edgeRFC learned with RFC membrane probmap for OFR
 % linearWeights =  [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724]
 
-% without region thresholding 20160510
+% without region thresholding 20160510. gsig= 4.5
 % RFC probmap for OFR
 linearWeights = [-9.66278, -7.77851, 3.16516, -0.0328264, -4.84211, -14.7709];
 

@@ -39,9 +39,9 @@ for dim=1:numJtypes
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             % start debug
-            if(nodeListInd==684)
-                aaa = 999;
-            end
+%             if(nodeListInd==4188)
+%                 aaa = 999;
+%             end
             % end debug
             nodeInd = nodeInds(nodeListInd); 
 

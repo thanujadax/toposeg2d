@@ -1,14 +1,16 @@
 % debug image small
 
+produceBMRMfiles = 0;
+
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
-rawImageFileName = '01.tif';
-membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/01_probability.tif';
+rawImageFileName = '03.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160517_sbmrm';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160517';
 
-checkAndCreateSubDir(outputRoot,'gsig55');
-outputPath = fullfile(outputRoot,'gsig55');
+checkAndCreateSubDir(outputRoot,'001');
+outputPath = fullfile(outputRoot,'001');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -22,7 +24,9 @@ checkAndCreateSubDir(outputPath,'intermediate');
 
 showIntermediateImages = 1;
 labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/01.tif';
-produceBMRMfiles = 1;
+
+
+
 dbstop if error
 segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...

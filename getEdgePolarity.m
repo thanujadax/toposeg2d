@@ -24,6 +24,6 @@ for i=1:numNodeEdges
         % inwards
         edgePolarities(i) = -1;        
     else
-        disp('ERROR: getEdgePolarity.m: matching node not found')
+        error('ERROR: getEdgePolarity.m: matching node not found')
     end
 end

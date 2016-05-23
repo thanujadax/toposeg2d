@@ -93,18 +93,18 @@ end
 
 if(enforceActiveRegions)
         numEnforceRegionsEqns = 1;
-        disp('Enforce active regions from training labels: ON')
+        disp('Debug: Enforce active regions from training labels: ON')
 else
     numEnforceRegionsEqns = 0;
-    disp('Enforce active regions from training labels: OFF')
+    % disp('Debug Enforce active regions from training labels: OFF')
 end
 
 if(enforceActiveRegions)
         numEnforceRegionInactEqns = 1;
-        disp('Enforce inactive regions from training labels: ON')
+        disp('Debug: Enforce inactive regions from training labels: ON')
 else
     numEnforceRegionInactEqns = 0;
-    disp('Enforce inactive regions from training labels: OFF')
+    % disp('Enforce inactive regions from training labels: OFF')
 end
 
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
@@ -154,7 +154,7 @@ for jType = 1:numJtypes
     end    
 end
 
-%% Equallity constraint: edge directionality at active nodes 
+%% Equality constraint: edge directionality at active nodes 
 % each node configuration is an active configuration where exactly 2 edges
 % have to be active.
 
@@ -292,7 +292,7 @@ if(withCD)
                     senseArray(rowStop) = '<';
                     
                 else
-                    disp('ERROR1:getILPConstraints.m problem with polarity calculation')
+                    error('ERROR1:getILPConstraints.m problem with polarity calculation')
                     % disp('jType = %d   jInd = %d',jType,j)
                 end
                 

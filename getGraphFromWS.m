@@ -1,6 +1,6 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
     selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,...
-    psuedoEdgeIDs,psuedoEdges2nodes]...
+    psuedoEdgeIDs,psuedoEdges2nodeInds]...
     = getGraphFromWS(ws,hsvOutput,displayImg,saveIntermediateImages,...
       saveIntermediateImagesPath,rawImageID)
 
@@ -124,7 +124,8 @@ disp('done!')
 %% extract edges with zero pixel length
 % connectedJunctionIDs = getClusteredJunctions(wsJ);
 disp('Extracting psuedo edges ..')
-[connectedJunctionIDs,psuedoEdges2nodes] = getClusterNodesAndPsEdges(wsJ);
+[connectedJunctionIDs,psuedoEdges2nodeInds] = ...
+                getClusterNodesAndPsEdges(wsJ);
 disp('done!')
 % connectedJunctionIDs contain the same ID for each node that is connected
 % together with zero length edges, in the 4 neighborhood.
@@ -138,7 +139,7 @@ disp('done!')
 % edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
 
-numPsuedoEdges = size(psuedoEdges2nodes,1);
+numPsuedoEdges = size(psuedoEdges2nodeInds,1);
 maxEdgeID = size(edges2pixels,1);
 psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
 % append psuedoEdgeIDs to edges2pixels
@@ -146,14 +147,27 @@ edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
 disp('get nodeEdges ..')
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
-            psuedoEdgeIDs,psuedoEdges2nodes);
+            psuedoEdgeIDs,psuedoEdges2nodeInds);
 disp('done!')
 
 disp('get adjacencyMat')
-[adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
+% nodeEdges already contains psuedo edges
+[adjacencyMat,edges2nodes,selfEdgeIDs,edges2nodes_edgeIDs] = getAdjacencyMat(nodeEdges);
 disp('done!')
+% all edges without 2 distinct nodes are assigned as selfEdges
+str1 = sprintf('Number of self edges found = %d',numel(selfEdgeIDs));
+disp(str1)
 
-edges2nodes = [edges2nodes; psuedoEdges2nodes];
+% remove ps edges from self edges, if any.
+psuedoSelfEdgeIDs = intersect(selfEdgeIDs,psuedoEdgeIDs);
+str1 = sprintf('%d out of %d self edges are psueodo edges. Removing those..',...
+            numel(psuedoSelfEdgeIDs),numel(selfEdgeIDs));
+disp(str1)
+selfEdgeIDs = setdiff(selfEdgeIDs,psuedoEdgeIDs);
+
+
+% psuedoEdges2nodeLIDs = getNodeLIDsForNodeIDs(psuedoEdges2nodes,nodeInds);
+% edges2nodes = [edges2nodes; psuedoEdges2nodeLIDs];
 
 % calculate new ws by merging those ws regions that were initially separated
 ws_original = ws;
@@ -202,7 +216,7 @@ if(selfEdgeIDs(1)~=0)
     nodeEdges = removeSelfEdgesFromNodeEdges(nodeEdges,selfEdgeIDs);
     
     [edges2pixels,edges2nodes,selfEdgePixelSet] = removeSelfEdgesFromEdges2Pixels2Nodes...
-            (edges2pixels,edges2nodes,selfEdgeIDs,psuedoEdgeIDs);
+            (edges2pixels,edges2nodes,selfEdgeIDs);
     
     % Now, after removing the self edges, the graph contains some junctions
     % with only two edges connecting to them. i.e. they are not junctions
@@ -269,23 +283,36 @@ nodeEdges_wo_nIDs(selfEdgeIndInNodeEdges_logical) = 0;
 nodeEdges = [nodeInds nodeEdges_wo_nIDs];
 
 function [edges2pixels,edges2nodes,selfEdgePixelSet] = removeSelfEdgesFromEdges2Pixels2Nodes...
-            (edges2pixels,edges2nodes,selfEdgeIDs,psuedoEdgeIDs)
+            (edges2pixels,edges2nodes,selfEdgeIDs)
+        
+% already removed psuedoEdgeIDs from selfEdgeIDs
+
+        
 edgeLIDsAll = edges2pixels(:,1);
 [~,selfEdgeLIDs] = intersect(edgeLIDsAll,selfEdgeIDs);
 selfEdgePixelSet = edges2pixels(selfEdgeLIDs,:);
 selfEdgePixelSet(:,1) = [];
 edges2pixels(selfEdgeLIDs,:) = 0;
 
-% from edges2pixels, remove the rows who's second column has a zero
-edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
+% from edges2pixels, remove the rows who's first column has a zero
+edges2pixels = edges2pixels((edges2pixels(:,1)~=0),:);
 % nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
 % the zeros
 % the above operation also removes the psuedoEdges. Reinsert them:
-edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
+% edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
 % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
 % edges2nodes
-edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
+
+nodeLessEdgeLIDs_logical = (edges2nodes(:,1)==0);
+nodeLessEdgeIDs = edgeLIDsAll(nodeLessEdgeLIDs_logical);
+
+a = setdiff(nodeLessEdgeIDs,selfEdgeIDs);
+b = setdiff(selfEdgeIDs,nodeLessEdgeIDs);
+if(~isempty(a) || ~isempty(b))
+    error('problem in edges2nodes. node-less edges and self edges dont match!!')
+end
+edges2nodes = edges2nodes(~nodeLessEdgeLIDs_logical,:);
 
 
 function nodeEdges = removeMiddleZeros(nodeEdges)

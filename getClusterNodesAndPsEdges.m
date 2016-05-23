@@ -9,7 +9,8 @@ function [connectedJunctionIDs,pEdges2nodes] = getClusterNodesAndPsEdges(wsJ)
 %   pEdges2nodes - psuedoEdges. contains the nodeInds which are being
 %   connected
 %      TODO: what if one of those nodes is a clusterNode?
-
+%   clusteredJunctions - only with 4-neighborhood
+%   psuedoEdges - with 8-nh nodes without the 4-nh nodes
 
 % extract edges with zero pixel length
 % junction nodes (pixels) which are next to each other
@@ -91,7 +92,7 @@ else
     % nodeZeroEdges - store node - edge1,edge2 etc for these zero length edges
 end
 
-% pseudo edges between only-8-neighboring pixels
+% pseudo edges between only-8-neighboring pixels (w o 4-nh)
 psuedoEdgeNodeInds = find(eightNH_J>0);
 numPsuedoEdgeNodes = numel(psuedoEdgeNodeInds);
 if(numPsuedoEdgeNodes==0)
@@ -100,6 +101,13 @@ else
     pEdges2nodes = zeros(1,2);
     k = 0;
     for i = 1: numPsuedoEdgeNodes
+        % start debug code
+        psNodePInd = psuedoEdgeNodeInds(i);
+        if(psNodePInd==114859 || psNodePInd==115372 || psNodePInd==114344 || psNodePInd==114857)
+            aaa = 999;
+        end
+        % end debug code
+        
         % get 8 neighbors
         neighbors = get8NeighborsWithout4(psuedoEdgeNodeInds(i),sizeR,sizeC);
         neighbors = intersect(neighbors,psuedoEdgeNodeInds);

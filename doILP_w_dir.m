@@ -79,7 +79,11 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 
 % without region thresholding 20160510. gsig= 4.5
 % RFC probmap for OFR
-linearWeights = [-9.66278, -7.77851, 3.16516, -0.0328264, -4.84211, -14.7709];
+% linearWeights = [-9.66278, -7.77851, 3.16516, -0.0328264, -4.84211, -14.7709];
+
+% without region thresholding 20160510. gsig= 55
+% RFC probmap for OFR
+linearWeights = [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1

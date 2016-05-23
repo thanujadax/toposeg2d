@@ -1,4 +1,5 @@
-function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges...
+function [nodeEdges,nodeIndsNoDuplicates,psuedoEdgeIDs,psuedoEdges2nodeInds]...
+    = getNodeEdges...
     (ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
     psuedoEdgeIDs,psuedoEdges2nodeInds)
 % Inputs:
@@ -21,6 +22,7 @@ function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges...
 % for each node, get the neighbors
 % get the edgeID of the neighbors
 disp('Constructing nodeEdges look up table ...')
+psEID_tobe_removed = []
 if(size(connectedJunctionIDs,2)==2)
     numClusters = max(connectedJunctionIDs(:,2));
     numClusteredNodes = size(connectedJunctionIDs,1);
@@ -80,14 +82,26 @@ for i=1:numNodesCombined
 %             nodeEdges(i,k:(k+numPEs-1)) = psuedoEdgeIDs_i;
 %         end
         % if this node is in psuedoEdges2nodes, add the psuedoEdgeID
+        % only if this node and the its neighbor connected via a ps edge is
+        % already connected with a real edge. in the latter case, remove
+        % the corresponding psEdgeId and psEdges2Nodes entries by recording
+        % that instance, to be later removed!
         if(sum(ismember(psuedoNodeInds,thisNodeIndex)))
             
-            psEIDs_thisNode = getPSedgeIDsForThisNode...
+            [psEIDs_thisNode,neighborNodeInds] = getPSedgeIDsForThisNode...
                 (thisNodeIndex,psuedoEdges2nodeInds,psuedoEdgeIDs);
             if(~isempty(psEIDs_thisNode))
                 for p=1:numel(psEIDs_thisNode)
-                    k = k+1;
-                    nodeEdges(i,k) = psEIDs_thisNode(p);
+                    if(isempty(isEdgeBetweenNodes...
+                            (thisNodeIndex,neighborNodeInds(p),...
+                            edgePixLabels,connectedJunctionIDs,sizeR,sizeC)))
+                        k = k+1;
+                        nodeEdges(i,k) = psEIDs_thisNode(p);
+                    else
+                        % this psEID should be removed. also from
+                        % psEdges2nodes
+                        psEID_tobe_removed = [psEID_tobe_removed; psEIDs_thisNode(p)];
+                    end
                 end
             end
         end
@@ -134,3 +148,8 @@ for i=1:numNodesCombined
         
     end
 end
+psEID_tobe_removed = unique(psEID_tobe_removed);
+% removing psuedo edges which are already covered by real edges
+[~,psEID_LIDs]=intersect(psuedoEdgeIDs,psEID_tobe_removed);
+psuedoEdgeIDs(psEID_LIDs) = [];
+psuedoEdges2nodeInds(psEID_LIDs,:) = [];

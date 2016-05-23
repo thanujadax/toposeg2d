@@ -146,7 +146,7 @@ psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
 edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
 disp('get nodeEdges ..')
-[nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
+[nodeEdges,nodeInds,psuedoEdgeIDs,psuedoEdges2nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
             psuedoEdgeIDs,psuedoEdges2nodeInds);
 disp('done!')
 

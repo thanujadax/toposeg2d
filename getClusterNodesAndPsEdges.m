@@ -101,12 +101,12 @@ else
     pEdges2nodes = zeros(1,2);
     k = 0;
     for i = 1: numPsuedoEdgeNodes
-        % start debug code
-        psNodePInd = psuedoEdgeNodeInds(i);
-        if(psNodePInd==114859 || psNodePInd==115372 || psNodePInd==114344 || psNodePInd==114857)
-            aaa = 999;
-        end
-        % end debug code
+%         % start debug code
+%         psNodePInd = psuedoEdgeNodeInds(i);
+%         if(psNodePInd==114859 || psNodePInd==115372 || psNodePInd==114344 || psNodePInd==114857)
+%             aaa = 999;
+%         end
+%         % end debug code
         
         % get 8 neighbors
         neighbors = get8NeighborsWithout4(psuedoEdgeNodeInds(i),sizeR,sizeC);

@@ -86,13 +86,13 @@ if(numel(nextCwEdgeLId_inRegion)>1)
     
     % calculate new alphas
     alphas1 = recalculateAlphas(nodeListInds(1),nodeEdgeIDs,...
-        edges2pixels,sizeR,sizeC);
+        edges2pixels,sizeR,sizeC,edges2nodes);
     nextCwEdgeLId_1 = getNextClockwiseEdgeWithNewAlphas(nodeListInds(1),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC,alphas1);
 
     alphas2 = recalculateAlphas(nodeListInds(2),nodeEdgeIDs,...
-        edges2pixels,sizeR,sizeC);
+        edges2pixels,sizeR,sizeC,edges2nodes);
 nextCwEdgeLId_2 = getNextClockwiseEdgeWithNewAlphas(nodeListInds(2),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC,alphas2);
@@ -281,7 +281,8 @@ end
 [~,nextCwEdgeLInd] = intersect(edgeListInds,nextCwEdgeID);
 
 
-function alphas = recalculateAlphas(nodeListInd,nodeEdges,edges2pixels,sizeR,sizeC)
+function alphas = recalculateAlphas(nodeListInd,nodeEdges,edges2pixels,...
+    sizeR,sizeC,edges2nodes)
 % alphas wrt to the node pixel using only the immediate edge pixels
 % inputs:
 %   nodeListInd
@@ -297,11 +298,20 @@ alphas = zeros(1,numEdges);
 [y0,x0] = ind2sub([sizeR,sizeC],nodePixInd);
 
 for i=1:numEdges
-    edgePixelInds=edges2pixels((edges2pixels(:,1)==nodeEdgeIDs(i)),:);
+    nodeEdgeLID_i = find(edges2pixels(:,1)==nodeEdgeIDs(i));
+    edgePixelInds=edges2pixels(nodeEdgeLID_i,:);
     edgePixelInds(1) = []; % first element is the edgeID
     edgePixelInds = edgePixelInds(edgePixelInds>0);
-    nodeEdgePixel = getNodeEdgePixel(nodePixInd,edgePixelInds,sizeR,sizeC,...
+    if(isempty(edgePixelInds))
+        % is ps edge. look at connected psNode as edgePixel
+        edgeNodeLIDs = edges2nodes(nodeEdgeLID_i,:);
+        nextNodeLID = setdiff(edgeNodeLIDs,nodeListInd);
+        nodeEdgePixel = nodeEdges(nextNodeLID,1);
+        
+    else
+        nodeEdgePixel = getNodeEdgePixel(nodePixInd,edgePixelInds,sizeR,sizeC,...
                                     MAX_NUM_PIXELS);
+    end
     [y1,x1] = ind2sub([sizeR,sizeC],nodeEdgePixel);
     y = y1 - y0;
     x = x1 - x0;

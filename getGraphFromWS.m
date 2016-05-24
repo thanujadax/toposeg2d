@@ -145,10 +145,14 @@ psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
 % append psuedoEdgeIDs to edges2pixels
 edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
 
+% NB. some of the psuedoEdges will be removed in the following step
 disp('get nodeEdges ..')
-[nodeEdges,nodeInds,psuedoEdgeIDs,psuedoEdges2nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
+[nodeEdges,nodeInds,psuedoEdgeIDs,psuedoEdges2nodeInds,removedPsEdgeLIDs] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
             psuedoEdgeIDs,psuedoEdges2nodeInds);
 disp('done!')
+
+disp('Updating edges2nodes and edges2pixels by removing discarded psEdges..')
+edges2pixels(removedPsEdgeLIDs) = [];
 
 disp('get adjacencyMat')
 % nodeEdges already contains psuedo edges

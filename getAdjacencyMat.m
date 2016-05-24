@@ -1,4 +1,5 @@
-function [adjacencyMat, edges2nodes,selfEdgeIDs,listOfEdgeIDs] = getAdjacencyMat(nodeEdges)
+function [adjacencyMat, edges2nodes,selfEdgeIDs,nodelessEdgeIDs,listOfEdgeIDs]...
+    = getAdjacencyMat(nodeEdges)
 % Input:
 %   nodeEdges: gives the list of edgeIDs connected to each junction node
 %       each row is -> junctionInd,edge1, edge2, edge3, edge4, ..
@@ -7,10 +8,10 @@ adjacencyMat = zeros(numNodes);
 
 numEdges = max(max(nodeEdges(:,2:numEdgesPerNode)));
 edges2nodes = zeros(numEdges,2);
-edge2nodes_edgeIDs = zeros(numEdges,1);
 
-sid = 0;
-k = 0;
+selfEdgeIDs = [];
+nodelessEdgeIDs = [];
+listOfEdgeIDs = [];
 for i=1:numEdges
     % for each edge, find the two corresponding nodes at its ends
     [R,C] = find(nodeEdges(:,2:numEdgesPerNode)==i);
@@ -32,27 +33,26 @@ for i=1:numEdges
             edges2nodes(i,1) = j1;  % should we use i or k??. i since we need to collect the nodes for each edgeID
             edges2nodes(i,2) = j2;
             % also, add the edgeID to the listOfEdgeIDs
-            k = k + 1;
-            listOfEdgeIDs(k) = i;
+            listOfEdgeIDs(end+1) = i;
         else
-            sid = sid + 1;
-            selfEdgeIDs(sid) = i;
+            
+            selfEdgeIDs(end+1) = i;
         end
     elseif(numel(R)==1)
         % if 1, it contains a self edge.
         % disp('warning:getAdjacencyMat - edge skipped')       
-        sid = sid + 1;
-        selfEdgeIDs(sid) = i;
         
-    else
+        selfEdgeIDs(end+1) = i;
+        
+    elseif(numel(R)==0)
         % disp('warning:getAdjacencyMat - edge skipped')
         % i
-        sid = sid + 1;
-        selfEdgeIDs(sid) = i;
-        
+        % sid = sid + 1;
+        % selfEdgeIDs(sid) = i;
+        nodelessEdgeIDs(end+1) = i;
+        str1 = sprintf('warning: nodeless: edgeID %d not found in nodeEdges!',i);
+        disp(str1)
+    else
+        error('edgeID %d found in more than 2 nodes in nodeEdges!',i);       
     end
-end
-
-if(sid==0)
-    selfEdgeIDs = 0;
 end

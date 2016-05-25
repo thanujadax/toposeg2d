@@ -2,6 +2,8 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
         jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr)
 
+% Version 4.0 (2016.05.25)    
+    
 % version 3.1:
 % 2014.01.07
 
@@ -23,7 +25,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 
 %% Initialize
 
-numEdges = numel(edgeListInds);
+numEdges = numel(edgeListInds); % number of undirected edges
 numRegions = size(setOfRegions,1) + 1; % + 1 for border
 
 % node stats
@@ -60,10 +62,14 @@ numColsA = numEdges * 3 + numNodeConf + numRegions * 2;
 % constraints types
 % 1. Closedness with edge directionality (withCD)
 % 2. Edge-region co-activation (withER)
+% 3. Binary constraint on regions ??
+% 4. Region continuity - for off (membrane) regions, there should be at
+% least 2 off edges so that it continues along at least two sides.
 
 withCD = 1;
 withER = 1;
 regionVarBin = 1;
+regionContinuity = 1;
 enforceActiveRegions = 0;
 enforceInactiveRegions = 0;
 
@@ -81,6 +87,14 @@ if(withER)
 else
     numEReqns = 0;
     disp('region and edge co-activation constraint: OFF')
+end
+
+if(regionContinuity)
+    numRCeqns = numRegions*2;
+    disp('region continuity constraint: ON')
+else
+    numRCeqns = 0;
+    disp('region continuity constraint: OFF')
 end
 
 if(regionVarBin)
@@ -109,7 +123,7 @@ end
 
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
                     + numEnforceRegionsEqns + numEnforceRegionInactEqns...
-                    + numRVB;
+                    + numRVB + numRCeqns;
 
 % Initialize outputs
 A = sparse(totNumConstraints,numColsA);
@@ -366,6 +380,31 @@ if(regionVarBin)
     end
     
 end
+%% Continuity of off regions (membranes)
+if(regionContinuity)
+    % for each region, get variable indices for (i) region_on (ii)
+    % region_off (iii) edge_off_state for all edges of the region
+    regionOffset = numEdges*3 + numNodeConf +1; % start of region variables
+    % +1 is for imageBorderRegion (wsID=1)
+    for i=1:size(setOfRegions,1)
+        rowStop = rowStop + 1; % row index for the constraint matrix
+        regionOnInd = regionOffset + i;
+        regionOffInd = regionOnInd + numRegions;
+        
+        regionEdgeIDs = setOfRegions(i,:);
+        regionEdgeIDs = regionEdgeIDs(regionEdgeIDs>0);
+        [~,regionEdgeLIDs] = intersect(edgeListInds,regionEdgeIDs);
+        regionEdgeOffstates = regionEdgeLIDs + 2*numEdges;
+        
+        A(rowStop,regionOnInd) = 1;
+        A(rowStop,regionOffInd) = -1;
+        A(rowStop,regionEdgeOffstates) = 1;
+        
+        b(rowStop) = 1;
+        senseArray(rowStop) = '>';
+    end 
+end
+
 %% Enforce Active regions
 if(enforceActiveRegions)
     

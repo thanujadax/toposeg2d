@@ -185,7 +185,7 @@ disp('done!')
 selfEdgePixelSet = [];
 
 disp('remove selfedges ..')
-if(selfEdgeIDs(1)~=0)
+if(~isempty(selfEdgeIDs))
 %     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
 %     % edges2nodes
 %     edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);

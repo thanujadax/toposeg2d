@@ -7,10 +7,10 @@ rawImageFileName = '03.tif';
 membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160517';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160525';
 
-checkAndCreateSubDir(outputRoot,'003');
-outputPath = fullfile(outputRoot,'003');
+checkAndCreateSubDir(outputRoot,'002');
+outputPath = fullfile(outputRoot,'002');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');

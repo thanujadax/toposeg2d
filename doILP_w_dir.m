@@ -1,7 +1,7 @@
 function segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir)
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat)
 
 % version 5. 20160509: 
 
@@ -86,7 +86,12 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 % linearWeights = [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -13.724];
 
 % experimental weights, increasing w_r_off reward
-linearWeights = [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -25];
+% linearWeights = [-10.2536, -8.18983, 3.3004, -0.0163147, -4.44784, -25];
+
+% weights trained after region continuity constraint 20160528
+%linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -11.6639];
+% increasing reward for membranes w_off_r! (w(5))
+linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -8, -11.6639];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
@@ -152,7 +157,7 @@ if(b_imWithBorder)
         intermediateImgDescription = 'rawImage';
         imgInNormal = rawImg./max(max(rawImg));
         saveIntermediateImage(imgInNormal,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
     end
     if(produceBMRMfiles)
         labelImage = addThickBorder(labelImage,marginSize,marginPixValRaw);
@@ -181,7 +186,7 @@ if(saveIntermediateImages)
     intermediateImgDescription = 'orientationFiltering';
 %     rgbimg = rgbimg./(max(max(max(rgbimg))));
     saveIntermediateImage(rgbimg,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
 end
 
 %% watershed segmentation
@@ -200,7 +205,7 @@ set(gca,'position',[0 0 1 1],'units','normalized')
 outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
 outputFileName = fullfile(saveIntermediateImagesPath,outputFileName);
 % print(outputFileName)
-saveas(gcf,outputFileName)
+saveas(gcf,outputFileName,saveOutputFormat)
 end
 
 %% generate graph from the watershed edges
@@ -209,7 +214,7 @@ disp('creating graph from watershed boundaries...');
     ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes,...
     selfEdgeIDs,nodelessEdgeIDs] ...
     = getGraphFromWS(ws,output,showIntermediateImages,saveIntermediateImages,...
-      saveIntermediateImagesPath,rawImageID);
+      saveIntermediateImagesPath,rawImageID,saveOutputFormat);
 
 % edges2nodes is already appended with psuedoEdges2nodes
 % edges2pixels is already appended with psuedoEdgeIDs, with zeros as
@@ -244,7 +249,7 @@ end
 if(saveIntermediateImages)
     intermediateImgDescription = 'wsRegions2';
     saveIntermediateImage(wsRegionBoundariesFromGraph,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
 end
 
 numEdges = size(edges2nodes,1);
@@ -300,7 +305,7 @@ end
 if(saveIntermediateImages)
     intermediateImgDescription = 'edgeUnary';
     saveIntermediateImage(edgeUnaryMat,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
 % h = overlayLabelOnImage(imgInNormal,edgeUnaryMat);
 % set(gca,'position',[0 0 1 1],'units','normalized');
 % outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
@@ -361,7 +366,7 @@ if(usePrecomputedProbabilityMaps)
     useMitochondriaDetection,marginSize,marginPixValRaw,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...
-    saveIntermediateImagesPath,rawImageID);
+    saveIntermediateImagesPath,rawImageID,saveOutputFormat);
     
 else
     
@@ -377,7 +382,7 @@ else
     end
     regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
         nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediateImages,...
-        saveIntermediateImages,saveIntermediateImagesPath,rawImageID);   
+        saveIntermediateImages,saveIntermediateImagesPath,rawImageID,saveOutputFormat);   
     
 end
 
@@ -647,5 +652,5 @@ segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
 if(saveIntermediateImages)
     intermediateImgDescription = 'segmentationOutput';
     saveIntermediateImage(segmentationOut,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
 end

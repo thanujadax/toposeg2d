@@ -2,7 +2,7 @@ function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,.
     selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,...
     psuedoEdgeIDs,psuedoEdges2nodeInds,selfEdgeIDs,nodelessEdgeIDs]...
     = getGraphFromWS(ws,hsvOutput,displayImg,saveIntermediateImages,...
-      saveIntermediateImagesPath,rawImageID)
+      saveIntermediateImagesPath,rawImageID,saveOutputFormat)
 
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd
@@ -67,7 +67,7 @@ if(saveIntermediateImages)
     wsVis(:,:,1) = wsJ;
     intermediateImgDescription = 'WSjunctions';
     saveIntermediateImage(wsVis,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
     figure;imshow(wsVis);
     % title('Junctions from WS')
 end
@@ -89,7 +89,7 @@ end
 if(saveIntermediateImages)
     intermediateImgDescription = 'orientationFiltering_WS';
     saveIntermediateImage(RGBimg,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath);
+    saveIntermediateImagesPath,saveOutputFormat);
 end
 %% extracting edges connecting junctions
 % assign unique labels for edges

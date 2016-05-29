@@ -3,14 +3,15 @@
 produceBMRMfiles = 0;
 
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
-rawImageFileName = '03.tif';
-membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
+rawImageFileName = '00.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/00_probability.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160525';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160529';
+saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'002');
-outputPath = fullfile(outputRoot,'002');
+checkAndCreateSubDir(outputRoot,'001');
+outputPath = fullfile(outputRoot,'001');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -23,18 +24,18 @@ saveIntermediateImagesPath = fullfile(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'intermediate');
 
 showIntermediateImages = 1;
-labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/01.tif';
-
+%labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
+labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
 
 
 dbstop if error
 segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir);
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat);
 
 writeFileName = fullfile(outputPath,rawImageFileName);
-imwrite(segmentationOut,writeFileName,'tif');
+imwrite(segmentationOut,writeFileName,saveOutputFormat);
 % pngFileName = sprintf('%s.png',(i-1));
 % pngFileName = fullfile(outputPathPNG,pngFileName);
 % imwrite(segmentationOut,pngFileName,'png');

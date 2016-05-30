@@ -10,8 +10,8 @@ mitoProbMapFullFileName = '';
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160529';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'001');
-outputPath = fullfile(outputRoot,'001');
+checkAndCreateSubDir(outputRoot,'004');
+outputPath = fullfile(outputRoot,'004');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -27,12 +27,16 @@ showIntermediateImages = 1;
 %labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
 labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
 
+logFileName = 'log.txt';
+logFileFullPath = fullfile(outputPath,logFileName);
+
 
 dbstop if error
 segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat);
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat,...
+    logFileFullPath);
 
 writeFileName = fullfile(outputPath,rawImageFileName);
 imwrite(segmentationOut,writeFileName,saveOutputFormat);

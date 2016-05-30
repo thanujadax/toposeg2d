@@ -1,13 +1,22 @@
 function segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat)
+    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,...
+    saveOutputFormat,logFilePath)
 
 % version 5. 20160509: 
 
 % version 4. 2014.01.06
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 % 20160321 - updated with new node angle cost function
+%% logging
+if exist(logFilePath)
+    % append
+    logFileH = fopen(logFilePath,'a');
+else
+    % open new file for writing
+    logFileH = fopen(logFilePath,'w');
+end
 
 %% Settings
 
@@ -27,6 +36,9 @@ useMitochondriaDetection = 0;
 % trained RFC for edge probability
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
+
+fprintf(logFileH,'Processsing image file: %s \n',rawImageFullFile);
+fprintf(logFileH,'pre-trained RFC for edge scores: %s \n',forestEdgeProbFileName);
 
 %% Parameters
 orientationStepSize = 10;
@@ -59,7 +71,7 @@ bbJunctionReward = 1;       % inactivation cost for bbjunction
 boundaryEdgeReward = 1;     % prior value for boundary edges so that
                             % they won't have too much weight
 %% Set parameters
-regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off score 
+regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions to set off score 
 % to +1*w_off_r in the objective
                             
 %%  learned parameters
@@ -67,8 +79,8 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 %   2. w_on_e
 %   3. w_off_n
 %   4. w_on_n
-%   5. w_off_r
-%   6. w_on_r
+%   5. w_on_r
+%   6. w_off_r
 
 % old weights: OFR from raw image. older verision of edgeProbRFC
 % linearWeights = [-10, -7.38296, 0.468054, 0.403942, -7.79221, -18]
@@ -91,7 +103,7 @@ regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off sc
 % weights trained after region continuity constraint 20160528
 %linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -11.6639];
 % increasing reward for membranes w_off_r! (w(5))
-linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -8, -11.6639];
+linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -27];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
@@ -101,6 +113,7 @@ if(produceBMRMfiles)
     w_on_n = 1;     % node on weight
     w_on_r = 1;     % region weight
     w_off_r = 1;
+    fprint(logFileH,'Setting all linear weights to 1 to produce files for sbmrm ... \n')
 else
     % use pre-learned parameters
     % optimial w is [-7.52064, -7.38296, 0.468054, 0.403942, -7.79221, -5.75401]
@@ -114,6 +127,9 @@ else
     w_off_r = linearWeights(6);
 end
 
+fprintf(logFileH,'Linear weights: \n');
+fprintf(logFileH,'w_on_e:%0.4f, w_off_e:%0.4f, w_off_n:%0.4f, w_on_n:%0.4f, w_on_r:%0.4f, w_off_r:%0.4f, \n',...
+    w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r);
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
 % coeff (unary prior) for turning off each edge = +edgePriors (col vector)
@@ -135,6 +151,7 @@ if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
 membraneProbMap = double(imread(membraneProbMapFullFileName));
+fprintf(logFileH,'using membrane probability map file: %s \n',membraneProbMapFullFileName);
 if(max(max(membraneProbMap)))
     membraneProbMap = membraneProbMap./255;
 end
@@ -147,6 +164,7 @@ end
 
 if(produceBMRMfiles)
     labelImage = imread(labelImageFileName);
+    fprintf(logFileH,'using lablel image file: %s \n',labelImageFileName);
     % labelImage = labelImage(1:128,:,:);
 end
 % add thick border
@@ -585,6 +603,13 @@ end
 % lbArray(1:(numBinaryVar+numParam)) = 0;
 % upper bounds
 % ubArray(1:(numBinaryVar+numParam)) = 1;
+%% log stats
+fprintf(logFileH,'********************************** \n');
+fprintf(logFileH,'Number of edges: %d \n',numel(edgeListInds));
+fprintf(logFileH,'Number of regions: %d \n',numel(regionUnary));
+fprintf(logFileH,'Number of nodes: %d \n',size(nodeEdges,1));
+fprintf(logFileH,'Total number of ILP variables: %d \n',numel(f));
+fprintf(logFileH,'Number of ILP constraints: %d \n',numel(b));
 
 
 %% solver
@@ -654,3 +679,4 @@ if(saveIntermediateImages)
     saveIntermediateImage(segmentationOut,rawImageID,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 end
+fprintf(logFileH,'ILP is done! \n');

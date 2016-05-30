@@ -5,7 +5,8 @@ function regionIDs = getRegionsForEdgePixels(ws,edgepixels,sizeR,sizeC)
 %   edgepixels - of the current edge
 
 neighbors8_pixind = get8Neighbors(edgepixels,sizeR,sizeC);
-
+% warning: contains zero for non existent neighbors
+neighbors8_pixind = neighbors8_pixind(neighbors8_pixind>0);
 wsidsFor8Neighbors = ws(neighbors8_pixind);
 wsidsFor8Neighbors = wsidsFor8Neighbors(wsidsFor8Neighbors>0);
 

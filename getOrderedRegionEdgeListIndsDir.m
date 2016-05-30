@@ -197,7 +197,10 @@ if(numEdges_region>1)
         elseif(numel(nodeEdgeLIDpair)<2)
            error('getOrderedRegionEdgeListIndsDir.m: no next edge!')  
             
-        else            
+        else    
+            % TODO: * how to make it robust against this unlikely case?
+            % this can only happen when the OFR is blurred too much during
+            % post processing, or unrealistically large filter sizes
             nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID); 
         end
         nextNodePair = edges2nodes(nextEdgeLID,:);     

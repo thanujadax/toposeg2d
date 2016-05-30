@@ -10,8 +10,8 @@ mitoProbMapFullFileName = '';
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160529';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'004');
-outputPath = fullfile(outputRoot,'004');
+checkAndCreateSubDir(outputRoot,'009');
+outputPath = fullfile(outputRoot,'009');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');

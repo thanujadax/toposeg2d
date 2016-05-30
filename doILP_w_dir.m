@@ -43,7 +43,11 @@ fprintf(logFileH,'pre-trained RFC for edge scores: %s \n',forestEdgeProbFileName
 %% Parameters
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
-wsgsigma = 1.5;
+
+smoothenOFR = 1; % if OFR should be smoothened before generating WS transform
+wsgsigma = 1.7;
+wsgmask = 9;
+
 gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
@@ -103,7 +107,7 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % weights trained after region continuity constraint 20160528
 %linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -11.6639];
 % increasing reward for membranes w_off_r! (w(5))
-linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -27];
+linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -25];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
@@ -150,6 +154,8 @@ imgIn0 = double(imread(rawImageFullFile));
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
+fprintf(logFileH,'input image size: [%d, %d] pixels\n',size(imgIn0,1),size(imgIn0,2));
+
 membraneProbMap = double(imread(membraneProbMapFullFileName));
 fprintf(logFileH,'using membrane probability map file: %s \n',membraneProbMapFullFileName);
 if(max(max(membraneProbMap)))
@@ -208,6 +214,11 @@ if(saveIntermediateImages)
 end
 
 %% watershed segmentation
+if(smoothenOFR)
+    fprintf(logFileH,'Smoothening OFR before WS transform sigma %0.4f, mask %d \n',...
+        wsgsigma,wsgmask);
+    OFR_mag = gaussianFilter(OFR_mag,wsgsigma,wsgmask);
+end
 ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 % randomize WS region IDs

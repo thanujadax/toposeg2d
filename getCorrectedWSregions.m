@@ -34,6 +34,13 @@ for i=1:numel(removeEdgeIDs)
     regionIDs = getRegionsForEdgePixels(ws,edgepixels_i,sizeR,sizeC);
     regionIDs = sort(regionIDs);
     % regionIDs contain original wsIDs
+    
+%     % start debug code 20160530
+%     if(ismember(515,regionIDs) || ismember(516,regionIDs))
+%         aaa = 999;
+%     end
+%     % end debug code
+    
 % find the bigger region and assign its wsID to the smaller region except
 % if its region 1 = border (takes precedence)
     if(ismember(1,regionIDs))
@@ -170,6 +177,38 @@ for i=1:numel(removeEdgeIDs)
                 % oldWsID = getOldWsID(ws,newWS,regionIDs(2));
                 cell_mergedWsIDs_original{mergedRegionInd}(end+1) = regionIDs(2);
                 removedWsIDs = [removedWsIDs regionIDs(2)];                
+            end
+        elseif(ismember(regionIDs(1),removedWsIDs) && ismember(regionIDs(2),removedWsIDs))
+            % if both regions are already removed!
+            % check if one of them is assigned 1
+            % otherwise pick one in random (first one!;) and take it's
+            % current label
+            changedID1 = unique(newWS(ws==regionIDs(1)));
+            changedID2 = unique(newWS(ws==regionIDs(2)));
+            if(changedID1==1)
+                newWS(ws==regionIDs(2)) = 1;
+                % assign the edge pixels also the ws id
+                newWS(edgepixels_i) = 1; 
+                % update merged regions list
+                mergedRegionInd = find(expandedWsIDs==1);
+                cell_mergedWsIDs_original{mergedRegionInd}(end+1) = regionIDs(2);
+                removedWsIDs = [removedWsIDs regionIDs(2)];
+            elseif(changedID2==1)
+                newWS(ws==regionIDs(1)) = 1;
+                % assign the edge pixels also the ws id
+                newWS(edgepixels_i) = 1; 
+                % update merged regions list
+                mergedRegionInd = find(expandedWsIDs==1);
+                cell_mergedWsIDs_original{mergedRegionInd}(end+1) = regionIDs(1);
+                removedWsIDs = [removedWsIDs regionIDs(1)];
+            else
+                newWS(ws==regionIDs(2)) = changedID1;
+                % assign the edge pixels also the ws id
+                newWS(edgepixels_i) = changedID1; 
+                % update merged regions list
+                mergedRegionInd = find(expandedWsIDs==changedID1);
+                cell_mergedWsIDs_original{mergedRegionInd}(end+1) = regionIDs(2);
+                removedWsIDs = [removedWsIDs regionIDs(2)];
             end
         else
             error('something wrong in getCorrectedWSregions')

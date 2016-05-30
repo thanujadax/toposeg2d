@@ -3,15 +3,15 @@
 produceBMRMfiles = 0;
 
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
-rawImageFileName = '00.tif';
-membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/00_probability.tif';
+rawImageFileName = '03.tif';
+membraneProbMapFullFileName = '/home/thanuja/projects/data/toyData/set8/membranes_rfc/03_probability.tif';
 mitoProbMapFullFileName = '';
 
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160529';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'009');
-outputPath = fullfile(outputRoot,'009');
+checkAndCreateSubDir(outputRoot,'014');
+outputPath = fullfile(outputRoot,'014');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');

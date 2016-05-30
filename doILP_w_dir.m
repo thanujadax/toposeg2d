@@ -45,7 +45,7 @@ orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
 
 smoothenOFR = 1; % if OFR should be smoothened before generating WS transform
-wsgsigma = 1.7;
+wsgsigma = 1.4;
 wsgmask = 9;
 
 gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
@@ -329,7 +329,8 @@ end
 % visualize edge unaries
 edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgeUnary,sizeR,sizeC);
 if(showIntermediateImages)
-    figure;imagesc(edgeUnaryMat);title('edge unary score')
+    figure;imshow(edgeUnaryMat);
+    % title('edge unary score')
 end
 if(saveIntermediateImages)
     intermediateImgDescription = 'edgeUnary';

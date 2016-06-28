@@ -30,8 +30,8 @@ labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtrut
 logFileName = 'log.txt';
 logFileFullPath = fullfile(outputPath,logFileName);
 
-
 dbstop if error
+
 segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
     membraneProbMapFullFileName,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...

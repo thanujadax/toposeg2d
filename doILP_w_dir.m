@@ -107,7 +107,7 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % weights trained after region continuity constraint 20160528
 %linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -11.6639];
 % increasing reward for membranes w_off_r! (w(5))
-linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -25];
+linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -20];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
@@ -369,10 +369,10 @@ for i=1:numJtypes
     if(theta_i<0)
         % no such angles for this type of junction
     else
-        edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
-                    nodeEdges,edgeUnary,edgeListInds);
-        %nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
-        %                        edgePriors_i,w_on_n);
+%         edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
+%                     nodeEdges,edgeUnary,edgeListInds);
+%         nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
+%                                 edgePriors_i,w_on_n);
         nodeAngleCosts{i} = getNodeAngleCost_smooth(alpha_i,gsigma);
     end
 end
@@ -419,6 +419,8 @@ end
 
 numRegions = numel(regionUnary);
 %% Boundary edges
+% we have already obtained boundaryEdgeIDs above. The following is
+% obsolete?
 % assigning predetermined edge priors for boundary edges after
 % nodeAngleCost calculation
 
@@ -437,8 +439,10 @@ for i=1:numel(boundaryNodeEdges)
 end
 
 %% Removing misoriented edges
+% used in the objective function
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
+
 
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,OFR_hue,sizeR,sizeC);
@@ -455,37 +459,37 @@ if(showIntermediateImages)
 end
 %% Backbone
 
-onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
-                lenThreshBB,priorThreshFracBB);
-% removing boundary edges from the onEdgeListID list
-onEdgeListIDs = setdiff(onEdgeListIDs,boundaryEdgeListInds);
-
-bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
-bbNodePixInds = nodeInds(bbNodeListInds);
-bbnodesVis = wsRegionBoundariesFromGraph;
-bbnodesVis(bbNodePixInds) = 0.2;
-if(showIntermediateImages)
-    figure;imagesc(bbnodesVis);
-end
-% visualize BB edges
-imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediateImages)
-    figure;imshow(imgBBEdges); title('visualization of backbone 1')
-end
-edgePriors(onEdgeListIDs) = bbEdgeReward;
-% test - enforcing some edges to be picked
-clear onEdgeListIDs
-onEdgeListIDs = [];
-
-% visualize BB edges
-imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediateImages)
-    figure;imshow(imgBBEdges); title('visualization of backbone 2')
-end
-    % onEdgeListIDs = 2024;
+% onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
+%                 lenThreshBB,priorThreshFracBB);
+% % removing boundary edges from the onEdgeListID list
+% onEdgeListIDs = setdiff(onEdgeListIDs,boundaryEdgeListInds);
+% 
+% bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
+% bbNodePixInds = nodeInds(bbNodeListInds);
+% bbnodesVis = wsRegionBoundariesFromGraph;
+% bbnodesVis(bbNodePixInds) = 0.2;
+% if(showIntermediateImages)
+%     figure;imagesc(bbnodesVis);
+% end
 % % visualize BB edges
 % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-% figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
+% if(showIntermediateImages)
+%     figure;imshow(imgBBEdges); title('visualization of backbone 1')
+% end
+% edgePriors(onEdgeListIDs) = bbEdgeReward;
+% % test - enforcing some edges to be picked
+% clear onEdgeListIDs
+% onEdgeListIDs = [];
+% 
+% % visualize BB edges
+% imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+% if(showIntermediateImages)
+%     figure;imshow(imgBBEdges); title('visualization of backbone 2')
+% end
+%     % onEdgeListIDs = 2024;
+% % % visualize BB edges
+% % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+% % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
 
 
 %% visualize training data

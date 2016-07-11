@@ -39,8 +39,8 @@ mitoProbMapFullFileName = '';
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160628';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'002_rfc');
-outputPath = fullfile(outputRoot,'002_rfc');
+checkAndCreateSubDir(outputRoot,'003_rfc_WO_continuity');
+outputPath = fullfile(outputRoot,'003_rfc_WO_continuity');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');

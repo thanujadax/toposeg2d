@@ -228,6 +228,7 @@ if(saveIntermediateImages)
     intermediateImgDescription = 'regionsWS';
 %     saveIntermediateImage(ind2rgb(ws,'default'),rawImageID,intermediateImgDescription,...
 % saveIntermediateImagesPath);
+figure()
 watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws);
 % figure;imagesc(ws);colormap('jet')
 set(gca,'position',[0 0 1 1],'units','normalized')

@@ -6,7 +6,7 @@ inputDir = '/home/thanuja/projects/data/toyData/set8.2';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
 
 %% Params
-
+overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %%
 inputFileList = dir(fullfile(inputDir,'*.tif'));
 numFiles = length(inputfileList);

@@ -6,10 +6,8 @@ function slices = getSlicesFromSection(imageFileName,sectionID)
 %   slices - structure array. Each structure has the
 %   following fields:
 %       slices(i).sectionID
-%       slices(i).sliceID
+%       slices(i).sliceLID - local ID w.r.t the current sectionID
 %       slices(i).pixelInds
-
-
 
 im = double(imread(imageFileName));
 figure;imagesc(im)
@@ -31,13 +29,13 @@ slices = [];
 if(cc.NumObjects>0)
     slices = struct(...
         'sectionID',0,...
-        'sliceID',0,...
+        'sliceLID',0,...
         'pixelInds',cc.PixelIdxList);
     for i=1:cc.NumObjects
         slices(i).sectionID = sectionID;
         slices(i).sliceID = i;
         % slices(i).pixelInds = cc.PixelIdxList{i};
-        % pixelInds are already set during initialization
+        % pixelInds are already set during initia
     end
     
 else
@@ -45,4 +43,3 @@ else
     disp(str1)
     
 end
-

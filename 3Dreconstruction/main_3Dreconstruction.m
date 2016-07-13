@@ -8,7 +8,7 @@
 inputDir = '/home/thanuja/projects/data/toyData/set8.2';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
 %% Params
-weights = [1; 1; 1];
+weights = [10; -10; -5];
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
@@ -67,7 +67,7 @@ slices = getOverlappingSlices(...
 ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
 [constraintsA, constraintsB, constraintsSense] = get3DILPConstraints...
                         (ends,continuations,branches);
-% solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
-%                 constraintSense);
+solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
+                constraintSense);
 %             
 % create3Dreconstruction(solutionVector,outputDir);

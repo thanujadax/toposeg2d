@@ -17,6 +17,8 @@ function f =  get3DILPobjective(weights,ends,continuations,branches)
 %  branches.stopSlice2ID
 %  branches.minOverlap
 
+% weights = [10; -10; -5];
+
 numEnds = length(ends);
 numContinuations = length(continuations);
 numBranches = length(branches);

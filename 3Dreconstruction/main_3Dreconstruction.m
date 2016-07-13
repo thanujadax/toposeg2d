@@ -18,7 +18,7 @@ slices = struct([]); % row vector of slice-structures
 %       slices(i).sectionID
 %       slices(i).sliceID
 %       slices(i).pixelInds
-
+slicesPerSection = zeros(numFiles,1);
 for i=1:numFiles
 % get slices from input 2D segments
     imageFileName = fullfile(inputDir,inputFileList(i).name);
@@ -26,6 +26,7 @@ for i=1:numFiles
     slicesNext = getSlicesFromSection(imageFileName,sectionID);
     % returns a structure array containing slices for the given section
     slices = [slices, slicesNext];
+    slicesPerSection = length(slicesNext);
 end
 [sizeR,sizeC] = size(imread(imageFileName));
 % get overlapping slices in the next section and add it in a new field of
@@ -37,10 +38,21 @@ slices = getOverlappingSlices(...
 % define variables
 % We define 3 types of variables for the optimization task. All variables
 % are links between slices of adjacent sections
-% 1. continuations: one-to-one link
-% 2. stops: slice has no continuation to the next section
+% 1. ends: slice has no continuation to the next section
+% 2. continuations: one-to-one link
 % 3. branches: this slice has two continuations into the next section
-[continuations,stops,branches] = getAllLinks(slices);
+[continuations,stops,branches] = getAllLinks(slices,slicesPerSection);
+%  ends.variableID
+%  ends.startSliceID
+
+%  continuations.variableID
+%  continuations.startSliceID
+%  continuations.stopSliceID
+
+%  branches.variableID
+%  branches.startSliceID
+%  branches.stopSlice1ID
+%  branches.stopSlice2ID
 
 %% ILP
 % ilpObjective =  get3DILPobjective();

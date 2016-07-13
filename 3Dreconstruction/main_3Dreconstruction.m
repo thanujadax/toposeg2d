@@ -8,6 +8,7 @@
 inputDir = '/home/thanuja/projects/data/toyData/set8.2';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
 %% Params
+weights = [1; 1; 1];
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
@@ -45,7 +46,7 @@ slices = getOverlappingSlices(...
 % 1. ends: slice has no continuation to the next section
 % 2. continuations: one-to-one link
 % 3. branches: this slice has two continuations into the next section
-[continuations,stops,branches] = getAllLinks(slices,slicesPerSection);
+[ends,continuations,branches] = getAllLinks(slices,slicesPerSection);
 %  ends.variableID
 %  ends.startSliceID
 %  ends.numPixels
@@ -61,10 +62,11 @@ slices = getOverlappingSlices(...
 %  branches.stopSlice2ID
 %  branches.minOverlap
 
-
 %% ILP
-% ilpObjective =  get3DILPobjective();
-% [constraintsA, constraintsB, constraintsSense] = get3DILPConstraints();
+% stateVector: [ends continuations branches]
+ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
+[constraintsA, constraintsB, constraintsSense] = get3DILPConstraints...
+                        (ends,continuations,branches);
 % solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
 %                 constraintSense);
 %             

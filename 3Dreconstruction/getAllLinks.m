@@ -1,4 +1,4 @@
-function [continuations,ends,branches] = getAllLinks(slices,slicesPerSection)
+function [ends,continuations,branches] = getAllLinks(slices,slicesPerSection)
 % define variables
 % We define 3 types of variables for the optimization task. All variables
 % are links between slices of adjacent sections

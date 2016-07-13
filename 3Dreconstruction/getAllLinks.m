@@ -10,15 +10,18 @@ function [continuations,ends,branches] = getAllLinks(slices,slicesPerSection)
 
 %  ends.variableID
 %  ends.startSliceID
+%  ends.numPixels
 
 %  continuations.variableID
 %  continuations.startSliceID
 %  continuations.stopSliceID
+%  continuations.minOverlap
 
 %  branches.variableID
 %  branches.startSliceID
 %  branches.stopSlice1ID
 %  branches.stopSlice2ID
+%  branches.minOverlap
 
 numSlices = sum(slicesPerSection);
 
@@ -35,13 +38,15 @@ branchesID = 0;
 for i=1:numSlices
     % define ends for this slice
     [ends,variableID,endsID] = updateEnds...
-        (ends,i,variableID,endsID);
+        (ends,i,variableID,endsID,slices(i).pixelInds);
     % get the overlapping partners for this slice
     overlapSlices = slices(i).overlapSlices;
+    minOverlaps = slices(i).minOverlaps;
     % define continuations with each overlapping partner
     [continuations,variableID,continuationsID] = updateContinuations...
-                (continuations,i,variableID,continuationsID,overlapSlices);
+                (continuations,i,variableID,continuationsID,overlapSlices,...
+                minOverlaps);
     % define branches with each unique pair of overlapping partners
     [branches,variableID,branchesID] = updateBranches...
-                (branches,i,variableID,branchesID,overlapSlices);
+                (branches,i,variableID,branchesID,overlapSlices,minOverlaps);
 end

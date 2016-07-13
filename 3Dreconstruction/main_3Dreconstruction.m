@@ -18,6 +18,9 @@ slices = struct([]); % row vector of slice-structures
 %       slices(i).sectionID
 %       slices(i).sliceID
 %       slices(i).pixelInds
+%       slices(i).overlapSlices,[] - contains absolute sliceIDs. filled in
+%       later
+%       slices(i).minOverlaps,[] - min overlap fraction, filled in later
 slicesPerSection = zeros(numFiles,1);
 for i=1:numFiles
 % get slices from input 2D segments
@@ -31,9 +34,10 @@ end
 [sizeR,sizeC] = size(imread(imageFileName));
 % get overlapping slices in the next section and add it in a new field of
 % the slices structure
-% 'overlapSlices',[] - contains absolute sliceIDs)
+% 'overlapSlices',[] - contains absolute sliceIDs
+% 'minOverlaps', [] - fractions 
 slices = getOverlappingSlices(...
-            slices,slicesPerSection,searchRadius,sizeR,sizeC);
+            slices,slicesPerSection,searchRadius);
 
 % define variables
 % We define 3 types of variables for the optimization task. All variables
@@ -44,15 +48,19 @@ slices = getOverlappingSlices(...
 [continuations,stops,branches] = getAllLinks(slices,slicesPerSection);
 %  ends.variableID
 %  ends.startSliceID
+%  ends.numPixels
 
 %  continuations.variableID
 %  continuations.startSliceID
 %  continuations.stopSliceID
+%  continuations.minOverlap
 
 %  branches.variableID
 %  branches.startSliceID
 %  branches.stopSlice1ID
 %  branches.stopSlice2ID
+%  branches.minOverlap
+
 
 %% ILP
 % ilpObjective =  get3DILPobjective();

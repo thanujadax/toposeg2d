@@ -1,6 +1,6 @@
-function [branches,variableID,branchesID] = updateBranches...
+function [branches,variableID,branchesID,var2slices] = updateBranches...
                 (branches,startSliceID,variableID,branchesID,...
-                overlapSlices,minOverlaps)
+                overlapSlices,minOverlaps,var2slices)
 
 if(~isempty(overlapSlices))
     numOverlaps = numel(overlapSlices);
@@ -18,5 +18,9 @@ if(~isempty(overlapSlices))
         branches(branchesID).stopSlice1ID = endCombinations(i,1);
         branches(branchesID).stopSlice2ID = endCombinations(i,2);
         branches(branchesID).minOverlap = sum(overlapCombinations(i,:));
+        
+        var2slices(variableID,1) = startSliceID;
+        var2slices(variableID,1) = endCombinations(i,1);
+        var2slices(variableID,1) = endCombinations(i,2);
     end 
 end

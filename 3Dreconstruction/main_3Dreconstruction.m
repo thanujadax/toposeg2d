@@ -46,7 +46,7 @@ slices = getOverlappingSlices(...
 % 1. ends: slice has no continuation to the next section
 % 2. continuations: one-to-one link
 % 3. branches: this slice has two continuations into the next section
-[ends,continuations,branches] = getAllLinks(slices,slicesPerSection);
+[ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPerSection);
 %  ends.variableID
 %  ends.startSliceID
 %  ends.numPixels
@@ -62,6 +62,9 @@ slices = getOverlappingSlices(...
 %  branches.stopSlice2ID
 %  branches.minOverlap
 
+% var2slices: matrix. each raw is variableID. col1: startSlice,
+% col2:stopslice1, col3: stopslice2
+
 %% ILP
 % stateVector: [ends continuations branches]
 ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
@@ -70,4 +73,4 @@ ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
 solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
                 constraintSense);
 %             
-create3Dreconstruction(solutionVector,outputDir,slices,sizeR,sizeC);
+create3Dreconstruction(solutionVector,outputDir,slices,var2slices,sizeR,sizeC);

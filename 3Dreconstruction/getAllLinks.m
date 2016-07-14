@@ -1,4 +1,4 @@
-function [ends,continuations,branches] = getAllLinks(slices,slicesPerSection)
+function [ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPerSection)
 % define variables
 % We define 3 types of variables for the optimization task. All variables
 % are links between slices of adjacent sections
@@ -34,19 +34,23 @@ variableID = 0;
 continuationsID = 0;
 endsID = 0;
 branchesID = 0;
+var2slices = zeros(1,1);
+% each row corresponds to the varID. col1: start slice, col2: stop slice,
+% col3: stop slice2
 
 for i=1:numSlices
     % define ends for this slice
-    [ends,variableID,endsID] = updateEnds...
-        (ends,i,variableID,endsID,slices(i).pixelInds);
+    [ends,variableID,endsID,var2slices] = updateEnds...
+        (ends,i,variableID,endsID,slices(i).pixelInds,var2slices);
     % get the overlapping partners for this slice
     overlapSlices = slices(i).overlapSlices;
     minOverlaps = slices(i).minOverlaps;
     % define continuations with each overlapping partner
-    [continuations,variableID,continuationsID] = updateContinuations...
+    [continuations,variableID,continuationsID,var2slices] = updateContinuations...
                 (continuations,i,variableID,continuationsID,overlapSlices,...
-                minOverlaps);
+                minOverlaps,var2slices);
     % define branches with each unique pair of overlapping partners
-    [branches,variableID,branchesID] = updateBranches...
-                (branches,i,variableID,branchesID,overlapSlices,minOverlaps);
+    [branches,variableID,branchesID,var2slices] = updateBranches...
+                (branches,i,variableID,branchesID,overlapSlices,...
+                minOverlaps,var2slices);
 end

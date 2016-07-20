@@ -73,4 +73,5 @@ ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
 solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
                 constraintSense);
 %             
-create3Dreconstruction(solutionVector,outputDir,slices,var2slices,sizeR,sizeC);
+create3Dreconstruction(solutionVector,outputDir,slices,var2slices,...
+    slicesPerSection,sizeR,sizeC);

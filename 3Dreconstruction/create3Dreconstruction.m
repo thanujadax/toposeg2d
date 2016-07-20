@@ -105,11 +105,30 @@ neuronG = random(numNeurons,1);
 neuronB = random(numNeurons,1);
 k = 0;
 for i=1:numSections
-    section_i = zeros(sizeR,sizeC);
+    section_i = zeros(sizeR,sizeC,3);
+    imR = zeros(sizeR,sizeC);
+    imG = zeros(sizeR,sizeC);
+    imB = zeros(sizeR,sizeC);
+    
     numSlicesInSection = slicesPerSection(i);
     for j=i:numSlicesInSection
         % paint each slice
         k = k+1;
-        slicePixels = slices(i)
+        slicePixels = slices(k).pixelInds;
+        neuronID_slice = neuronIDsForSlices(k);
+        R = neuronR(neuronIDs==neuronID_slice);
+        G = neuronG(neuronIDs==neuronID_slice);
+        B = neuronB(neuronIDs==neuronID_slice);
+        imR(slicePixels) = R;
+        imG(slicePixels) = G;
+        imB(slicePixels) = B;
     end
+    section_i(:,:,1) = imR;
+    section_i(:,:,2) = imG;
+    section_i(:,:,3) = imB;
+    % save
+    saveIntermediateImage(section_i,sprintf('%03d',i),'3Dseg',...
+    outputDir);
 end
+
+ 

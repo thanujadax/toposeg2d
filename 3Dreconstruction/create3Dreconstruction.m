@@ -44,18 +44,27 @@ activeBranches = find(solutionVector(...
 
 numSlices = length(slices2var);
 neuronCounter = 0;
+
 for i=1:numSlices
     varIDs_slice = slices2var{i};
     activeVarIDs_slice = intersect(activeStates,varIDs_slice);
-    % get continuation
-    continuations_slice = intersect(activeVarIDs_slice,((numEnds+1):(numEnds+numContinuations)));
+    % get continuations
+    continuationIDs_slice = intersect...
+        (activeVarIDs_slice,((numEnds+1):(numEnds+numContinuations)));
     % find the partner
-    stopSlices_continuations = getStopSlicesForContinuations(continuationIDs,continuations);
+    stopSlices_continuations = getStopSlicesForContinuations(...
+        continuationIDs_slice,continuations);
     % assign the same neuron ID
-    [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs();
+    [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
+        (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
+        i,stopSlices_continuations);
     
-    % get branch
+    % get branches
+    branchIDs_slice = intersect...
+        (activeVarIDs_slice,((numEnds+numContinuations+1):(numEnds+numContinuations+numBranches)));
     % find partners
+    stopSlices_Branches = getStopSlicesForBranches(...
+        branchIDs_slice,branches);
     % assign the same neuron ID
     
 end

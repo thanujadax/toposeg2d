@@ -1,8 +1,8 @@
 function [allPartnerSliceIDs,partnerNeuronIDs] = getAllPartnersNIDs...
-    (partnerSliceIDs,neuronIDsForSlices,slicesInNeuronID)
+    (directPartnerSliceIDs,neuronIDsForSlices,slicesInNeuronID)
 
 % get NIDs for initial partnerIDs
-partnerNeuronIDs = neuronIDsForSlices(partnerSliceIDs);
+partnerNeuronIDs = neuronIDsForSlices(directPartnerSliceIDs);
 % get all slices for these NIDs
 allPartnerSliceIDs = slicesInNeuronID(partnerNeuronIDs,:);
 allPartnerSliceIDs = allPartnerSliceIDs(allPartnerSliceIDs>0);

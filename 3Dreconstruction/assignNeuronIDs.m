@@ -1,6 +1,6 @@
 function [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = ...
         assignNeuronIDs(neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
-        currentSliceID,partnerSliceIDs)
+        currentSliceID,directPartnerSliceIDs)
     
 currentSliceNID = neuronIDsForSlices(currentSliceID);
 % do any of its partners have a neuronID?
@@ -9,7 +9,7 @@ currentSliceNID = neuronIDsForSlices(currentSliceID);
 % should fix partners of partners etc as well
 
 [allPartnerSliceIDs,partnerNeuronIDs] = getAllPartnersNIDs...
-    (partnerSliceIDs,neuronIDsForSlices,slicesInNeuronID);
+    (directPartnerSliceIDs,neuronIDsForSlices,slicesInNeuronID);
     
 [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = ...
     updateNeuronIDs(neuronIDsForSlices,slicesInNeuronID,neuronCounter,...

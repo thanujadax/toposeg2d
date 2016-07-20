@@ -61,7 +61,7 @@ for i=1:numSlices
     % find the partner
     stopSlices_continuations = getStopSlicesForContinuations(...
         continuationIDs_slice,continuations);
-    partnerCollector = [partnerCollector stopSlices_continuations];
+    partnerCollector = [partnerCollector continuationIDs_slice stopSlices_continuations];
     % assign the same neuron ID
     [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
         (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
@@ -73,7 +73,7 @@ for i=1:numSlices
     % find partners
     stopSlices_branches = getStopSlicesForBranches(...
         branchIDs_slice,branches);
-    partnerCollector = [partnerCollector stopSlices_branches];
+    partnerCollector = [partnerCollector branchIDs_slice stopSlices_branches];
     % assign the same neuron ID
     [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
         (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
@@ -85,8 +85,16 @@ for i=1:numSlices
 end
 % extract isolate slices
 partnerCollector = unique(partnerCollector);
-if(~isempty(partnerCollector))
+isolateSlices = setdiff((1:numSlices),partnerCollector);
+if(~isempty(isolateSlices))
     % assign neuronIDs for the isolate slices. and report them!
+    disp('******************************************')
+    str1 = sprintf('%d ISOLATE SLICES FOUND!!!',numel(isolateSlices));
+    disp(str1)
+    disp('******************************************')
+    [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = ...
+        assignNeuronIDsForIsolateSlices(neuronIDsForSlices,...
+        slicesInNeuronID,neuronCounter,isolateSlices);
 end
 %% paint each section with the slices of each neuron having a unique color
 % create a unique color for each neuronID

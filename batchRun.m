@@ -36,11 +36,11 @@ membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160628';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160721';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'003_rfc_WO_continuity');
-outputPath = fullfile(outputRoot,'003_rfc_WO_continuity');
+checkAndCreateSubDir(outputRoot,'000');
+outputPath = fullfile(outputRoot,'000');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -77,7 +77,8 @@ for i=1:numel(rawFilesDirList)
         outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);
 
-    writeFileName = fullfile(outputPath,rawImageFileName);
+    rawImageID = strtok(rawImageFileName,'.');
+    writeFileName = fullfile(outputPathPNG,strcat(rawImageID,'.',saveOutputFormat));
     imwrite(segmentationOut,writeFileName,saveOutputFormat);
 
 end

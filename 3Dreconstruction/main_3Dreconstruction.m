@@ -5,15 +5,15 @@
 % 2016.07.11
 
 %% Inputs
-inputDir = '/home/thanuja/projects/data/toyData/set8.2';
+inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
 %% Params
 weights = [10; -10; -5];
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
-inputFileList = dir(fullfile(inputDir,'*.tif'));
-numFiles = length(inputfileList);
+inputFileList = dir(fullfile(inputDir,'*.png'));
+numFiles = length(inputFileList);
 slices = struct([]); % row vector of slice-structures
 % 'slices' is a structure array with the following fields
 %       slices(i).sectionID
@@ -23,6 +23,9 @@ slices = struct([]); % row vector of slice-structures
 %       later
 %       slices(i).minOverlaps,[] - min overlap fraction, filled in later
 slicesPerSection = zeros(numFiles,1);
+str1 = sprintf('Number of input files found: %d',numFiles);
+disp(str1)
+
 for i=1:numFiles
 % get slices from input 2D segments
     imageFileName = fullfile(inputDir,inputFileList(i).name);
@@ -30,15 +33,18 @@ for i=1:numFiles
     slicesNext = getSlicesFromSection(imageFileName,sectionID);
     % returns a structure array containing slices for the given section
     slices = [slices, slicesNext];
-    slicesPerSection = length(slicesNext);
+    slicesPerSection(i) = length(slicesNext);
 end
+str1 = sprintf('Number of slices found: %d',numel(slices));
+disp(str1)
+imageFileName = fullfile(inputDir,inputFileList(1).name);
 [sizeR,sizeC] = size(imread(imageFileName));
 % get overlapping slices in the next section and add it in a new field of
 % the slices structure
 % 'overlapSlices',[] - contains absolute sliceIDs
 % 'minOverlaps', [] - fractions 
 slices = getOverlappingSlices(...
-            slices,slicesPerSection,searchRadius);
+            slices,slicesPerSection,overlapRadius);
 
 % define variables
 % We define 3 types of variables for the optimization task. All variables
@@ -69,9 +75,9 @@ slices = getOverlappingSlices(...
 % stateVector: [ends continuations branches]
 ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
 [constraintsA, constraintsB, constraintsSense] = get3DILPConstraints...
-                        (ends,continuations,branches);
+                        (ends,continuations,branches,length(slices));
 solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
-                constraintSense);
+                constraintsSense);
 %             
 create3Dreconstruction(solutionVector,outputDir,slices,var2slices,...
     slicesPerSection,sizeR,sizeC);

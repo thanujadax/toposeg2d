@@ -10,10 +10,10 @@ function slices = getSlicesFromSection(imageFileName,sectionID)
 %       slices(i).pixelInds
 
 im = double(imread(imageFileName));
-figure;imagesc(im)
+% figure;imagesc(im)
 level = 0;
 bw = im2bw(im,level);
-figure;imagesc(bw)
+% figure;imagesc(bw)
 
 % get connected components
 

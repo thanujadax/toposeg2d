@@ -41,7 +41,7 @@ var2slices = zeros(1,1);
 for i=1:numSlices
     % define ends for this slice
     [ends,variableID,endsID,var2slices] = updateEnds...
-        (ends,i,variableID,endsID,slices(i).pixelInds,var2slices);
+        (ends,i,variableID,endsID,numel(slices(i).pixelInds),var2slices);
     % get the overlapping partners for this slice
     overlapSlices = slices(i).overlapSlices;
     minOverlaps = slices(i).minOverlaps;

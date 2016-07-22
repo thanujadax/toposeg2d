@@ -15,7 +15,8 @@ function slicesAll = getOverlappingSlices(...
 % directly overlapping in the next section
 % TODO: search radius -> version 0.2
 
-slicesAll().OverlapSlices = [];
+slicesAll().overlapSlices = [];
+slicesAll().minOverlaps = [];
 numSections = numel(slicesPerSection);
 currentSliceID = 0;
 

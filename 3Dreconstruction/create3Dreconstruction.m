@@ -91,6 +91,7 @@ for i=1:numSlices
     % isolate slices using this.
     if(sliceNotConnected)
         % assign a neuronID if it already doesn't have one
+        [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = a
         [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
             (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
             i,[]);

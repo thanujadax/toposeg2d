@@ -7,10 +7,13 @@ currentSliceNID = neuronIDsForSlices(currentSliceID);
 % If yes, we should make sure this slice and its partners have the same
 % neuronID
 % should fix partners of partners etc as well
-
-[allPartnerSliceIDs,partnerNeuronIDs] = getAllPartnersNIDs...
-    (directPartnerSliceIDs,neuronIDsForSlices,slicesInNeuronID);
-    
+if(~isempty(directPartnerSliceIDs))
+    [allPartnerSliceIDs,partnerNeuronIDs] = getAllPartnersNIDs...
+        (directPartnerSliceIDs,neuronIDsForSlices,slicesInNeuronID);
+else
+    allPartnerSliceIDs = [];
+    partnerNeuronIDs = [];
+end
 [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = ...
     updateNeuronIDs(neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
     allPartnerSliceIDs,partnerNeuronIDs,currentSliceID,currentSliceNID);

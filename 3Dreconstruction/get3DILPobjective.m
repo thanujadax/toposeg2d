@@ -18,6 +18,9 @@ function f =  get3DILPobjective(weights,ends,continuations,branches)
 %  branches.minOverlap
 
 % weights = [10; -10; -5];
+% variables are not in the order of ends,continuations,branches
+% each of ends, continuations and branches have a field .variableID
+% arrange them in that order in the objective
 
 numEnds = length(ends);
 numContinuations = length(continuations);
@@ -25,22 +28,21 @@ numBranches = length(branches);
 numStates = numEnds + numContinuations + numBranches;
 
 f = zeros(numStates,1);
-j = 0;
 
 % ends
 for i = 1:numEnds
-    j = j+1;
+    j = ends(i).variableID;
     f(j) = weights(1) * ends(i).numPixels;
 end
 
 % continuations
 for i = 1:numContinuations
-    j = j+1;
+    j = continuations(i).variableID;
     f(j) = weights(2) * continuations(i).minOverlap;
 end
 
 % branches
 for i = 1:numBranches
-    j = j+1;
+    j = branches(i).variableID;
     f(j) = weights(3) * branches(i).minOverlap;
 end

@@ -1,5 +1,5 @@
 function create3Dreconstruction(solutionVector,outputDir,slices,...
-    var2slices,slices2var,ends,continuations,branches,slicesPerSection,...
+    slicesPerSection,slices2var,ends,continuations,branches,...
 sizeR,sizeC)
 
 %  ends.variableID
@@ -31,7 +31,7 @@ sizeR,sizeC)
 numSections = numel(slicesPerSection);
 numSlices = sum(slicesPerSection);
 neuronIDsForSlices = zeros(numSlices,1); % rowID: sliceID
-slicesInNeuronID = zeros(1,1); % rowID:neuronID
+slicesInNeuronID = zeros(numSlices,1); % rowID:neuronID
 
 numEnds = length(ends);
 numContinuations = length(continuations);
@@ -52,36 +52,48 @@ for i=1:numSlices
     % look at all the link variables starting from this slice
     % keep track of the slices that are already linked to something in a
     % previous slice so that isolate slices can be painted as well
-    
+    sliceNotConnected  = 1;
     varIDs_slice = slices2var{i};
     activeVarIDs_slice = intersect(activeStates,varIDs_slice);
     % get continuations
     continuationIDs_slice = intersect...
         (activeVarIDs_slice,((numEnds+1):(numEnds+numContinuations)));
     % find the partner
-    stopSlices_continuations = getStopSlicesForContinuations(...
-        continuationIDs_slice,continuations);
-    partnerCollector = [partnerCollector continuationIDs_slice stopSlices_continuations];
-    % assign the same neuron ID
-    [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
-        (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
-        i,stopSlices_continuations);
-    
+    if(~isempty(continuationIDs_slice))
+        continuationIDs_slice = continuationIDs_slice - numEnds;
+        stopSlices_continuations = getStopSlicesForContinuations(...
+            continuationIDs_slice,continuations);
+        partnerCollector = [partnerCollector continuationIDs_slice stopSlices_continuations];
+        % assign the same neuron ID
+        [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
+            (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
+            i,stopSlices_continuations);
+        sliceNotConnected = 0;
+    end
     % get branches
     branchIDs_slice = intersect...
         (activeVarIDs_slice,((numEnds+numContinuations+1):(numEnds+numContinuations+numBranches)));
-    % find partners
-    stopSlices_branches = getStopSlicesForBranches(...
-        branchIDs_slice,branches);
-    partnerCollector = [partnerCollector branchIDs_slice stopSlices_branches];
-    % assign the same neuron ID
-    [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
-        (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
-        i,stopSlices_branches);
-    
-    % what about end slices that are not previously connected to anything?
+    if(~isempty(branchIDs_slice))
+        % find partners
+        branchIDs_slice = branchIDs_slice - numEnds - numContinuations;
+        stopSlices_branches = getStopSlicesForBranches(...
+            branchIDs_slice,branches);
+        partnerCollector = [partnerCollector branchIDs_slice stopSlices_branches'];
+        % assign the same neuron ID
+        [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
+            (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
+            i,stopSlices_branches);
+        sliceNotConnected = 0;
+    end
+    % TODO: what about end slices that are not previously connected to anything?
     % partnerCollector has all the slices that are end partners. We extract
     % isolate slices using this.
+    if(sliceNotConnected)
+        % assign a neuronID if it already doesn't have one
+        [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
+            (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
+            i,[]);
+    end
 end
 % extract isolate slices
 partnerCollector = unique(partnerCollector);

@@ -70,7 +70,10 @@ slices = getOverlappingSlices(...
 
 % var2slices: matrix. each raw is variableID. col1: startSlice,
 % col2:stopslice1, col3: stopslice2
-[endVarIDs,continuationVarIDs,branchVarIDs] = varIDTypes(var2slices);
+% The following is done in create3Dreconstruction
+% [endVarIDs,continuationVarIDs,branchVarIDs] = varIDTypes...
+%     (var2slices,length(ends),length(continuations),length(branches));
+
 %% ILP
 % stateVector: [ends continuations branches]
 ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
@@ -80,4 +83,5 @@ solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
                 constraintsSense);
 %             
 create3Dreconstruction(solutionVector,outputDir,slices,...
-    slicesPerSection,slices2var,ends,continuations,branches,sizeR,sizeC);
+    slicesPerSection,slices2var,ends,continuations,branches,sizeR,sizeC,...
+    var2slices);

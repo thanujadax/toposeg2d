@@ -1,6 +1,6 @@
 function create3Dreconstruction(solutionVector,outputDir,slices,...
     slicesPerSection,slices2var,ends,continuations,branches,...
-sizeR,sizeC)
+sizeR,sizeC,var2slices)
 
 %  ends.variableID
 %  ends.startSliceID
@@ -26,7 +26,8 @@ sizeR,sizeC)
 
 % var2slices: matrix. each raw is variableID. col1: startSlice,
 % col2:stopslice1, col3: stopslice2
-
+[endVarIDs,continuationVarIDs,branchVarIDs] = varIDTypes...
+    (var2slices,length(ends),length(continuations),length(branches));
 %% Assign neuron IDs for slices, based on solutionVector
 numSections = numel(slicesPerSection);
 numSlices = sum(slicesPerSection);
@@ -57,7 +58,7 @@ for i=1:numSlices
     activeVarIDs_slice = intersect(activeStates,varIDs_slice);
     % get continuations
     continuationIDs_slice = intersect...
-        (activeVarIDs_slice,((numEnds+1):(numEnds+numContinuations)));
+        (activeVarIDs_slice,continuationVarIDs);
     % find the partner
     if(~isempty(continuationIDs_slice))
         continuationIDs_slice = continuationIDs_slice - numEnds;
@@ -72,7 +73,7 @@ for i=1:numSlices
     end
     % get branches
     branchIDs_slice = intersect...
-        (activeVarIDs_slice,((numEnds+numContinuations+1):(numEnds+numContinuations+numBranches)));
+        (activeVarIDs_slice,branchVarIDs);
     if(~isempty(branchIDs_slice))
         % find partners
         branchIDs_slice = branchIDs_slice - numEnds - numContinuations;
@@ -90,6 +91,7 @@ for i=1:numSlices
     % isolate slices using this.
     if(sliceNotConnected)
         % assign a neuronID if it already doesn't have one
+        [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = a
         [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = assignNeuronIDs...
             (neuronIDsForSlices,slicesInNeuronID,neuronCounter,...
             i,[]);

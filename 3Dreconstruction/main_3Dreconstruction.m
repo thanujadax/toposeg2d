@@ -7,6 +7,7 @@
 %% Inputs
 inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
+outputFormat = 'png';
 %% Params
 weights = [10; -10; -5];
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
@@ -82,6 +83,6 @@ ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
 solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
                 constraintsSense);
 %             
-create3Dreconstruction(solutionVector,outputDir,slices,...
+create3Dreconstruction(solutionVector,outputDir,outputFormat,slices,...
     slicesPerSection,slices2var,ends,continuations,branches,sizeR,sizeC,...
     var2slices);

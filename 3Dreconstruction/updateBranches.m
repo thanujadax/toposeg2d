@@ -22,8 +22,8 @@ if(~isempty(overlapSlices))
             branches(branchesID).minOverlap = sum(overlapCombinations(i,:));
 
             var2slices(variableID,1) = startSliceID;
-            var2slices(variableID,1) = endCombinations(i,1);
-            var2slices(variableID,1) = endCombinations(i,2);
+            var2slices(variableID,2) = endCombinations(i,1);
+            var2slices(variableID,3) = endCombinations(i,2);
         end
     end
 end

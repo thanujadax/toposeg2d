@@ -70,7 +70,7 @@ slices = getOverlappingSlices(...
 
 % var2slices: matrix. each raw is variableID. col1: startSlice,
 % col2:stopslice1, col3: stopslice2
-
+[endVarIDs,continuationVarIDs,branchVarIDs] = varIDTypes(var2slices);
 %% ILP
 % stateVector: [ends continuations branches]
 ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);

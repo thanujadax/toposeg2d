@@ -1,4 +1,4 @@
-function [overlapSliceIDs,minOverlap] = getOverlapSlicesGivenPixels...
+function [overlapSliceIDs,minOverlap,maxOverlap] = getOverlapSlicesGivenPixels...
             (slicePixels,slicesAll,sectionID,slicesPerSection)
 
 % Output:
@@ -13,13 +13,16 @@ nextSectionSliceID_stop = nextSectionSliceID_start + ...
     
 overlapSliceIDs = [];
 minOverlap = [];
+maxOverlap = [];
 
 for i = nextSectionSliceID_start:nextSectionSliceID_stop
     nextSlicePixels = slicesAll(i).pixelInds;
     commonPix = intersect(slicePixels,nextSlicePixels);
     if(~isempty(commonPix))
         overlapSliceIDs = [overlapSliceIDs; i];
-        minOverlap_i = getMinOverlaps(slicePixels,nextSlicePixels,commonPix);
+        [minOverlap_i,maxOverlap_i] = getMinOverlaps...
+            (slicePixels,nextSlicePixels,commonPix);
         minOverlap = [minOverlap; minOverlap_i];
+        maxOverlap = [maxOverlap; maxOverlap_i];
     end
 end

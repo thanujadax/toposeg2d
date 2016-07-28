@@ -45,12 +45,13 @@ for i=1:numSlices
     % get the overlapping partners for this slice
     overlapSlices = slices(i).overlapSlices;
     minOverlaps = slices(i).minOverlaps;
+    maxOverlaps = slices(i).maxOverlaps;
     % define continuations with each overlapping partner
     [continuations,variableID,continuationsID,var2slices] = updateContinuations...
                 (continuations,i,variableID,continuationsID,overlapSlices,...
-                minOverlaps,var2slices);
+                minOverlaps,maxOverlaps,var2slices);
     % define branches with each unique pair of overlapping partners
     [branches,variableID,branchesID,var2slices] = updateBranches...
                 (branches,i,variableID,branchesID,overlapSlices,...
-                minOverlaps,var2slices);
+                minOverlaps,maxOverlaps,var2slices);
 end

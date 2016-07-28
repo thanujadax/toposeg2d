@@ -5,15 +5,17 @@
 % 2016.07.11
 
 %% Inputs
-inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
-outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160711';
+% inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
+inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
+outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160727_GTtest4';
+inputFormat = 'tif';
 outputFormat = 'png';
 %% Params
-weights = [10; -10; -5];
+weights = [1000000; -3000000; -20];
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
-inputFileList = dir(fullfile(inputDir,'*.png'));
+inputFileList = dir(fullfile(inputDir,strcat('*.',inputFormat)));
 numFiles = length(inputFileList);
 slices = struct([]); % row vector of slice-structures
 % 'slices' is a structure array with the following fields
@@ -39,11 +41,12 @@ end
 str1 = sprintf('Number of slices found: %d',numel(slices));
 disp(str1)
 imageFileName = fullfile(inputDir,inputFileList(1).name);
-[sizeR,sizeC] = size(imread(imageFileName));
+[sizeR,sizeC,sizeZ] = size(imread(imageFileName));
 % get overlapping slices in the next section and add it in a new field of
 % the slices structure
 % 'overlapSlices',[] - contains absolute sliceIDs
 % 'minOverlaps', [] - fractions 
+% 'maxOverlaps', [] - fractions 
 slices = getOverlappingSlices(...
             slices,slicesPerSection,overlapRadius);
 

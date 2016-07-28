@@ -9,6 +9,8 @@ function [constraintsA, constraintsB, constraintsSense, slice2var] = ...
 %  continuations.startSliceID
 %  continuations.stopSliceID
 %  continuations.minOverlap
+%  continuations.sizeDifference
+
 
 %  branches.variableID
 %  branches.startSliceID

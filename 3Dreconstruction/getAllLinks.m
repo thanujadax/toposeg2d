@@ -16,12 +16,16 @@ function [ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPer
 %  continuations.startSliceID
 %  continuations.stopSliceID
 %  continuations.minOverlap
+%  continuations.maxOverlap
+%  continuations.sizeDifference
 
 %  branches.variableID
 %  branches.startSliceID
 %  branches.stopSlice1ID
 %  branches.stopSlice2ID
 %  branches.minOverlap
+%  branches.maxOverlap
+%  branches.sizeDifference
 
 numSlices = sum(slicesPerSection);
 
@@ -46,12 +50,13 @@ for i=1:numSlices
     overlapSlices = slices(i).overlapSlices;
     minOverlaps = slices(i).minOverlaps;
     maxOverlaps = slices(i).maxOverlaps;
+    sizeDifferences = slices(i).sizeDifferences;
     % define continuations with each overlapping partner
     [continuations,variableID,continuationsID,var2slices] = updateContinuations...
                 (continuations,i,variableID,continuationsID,overlapSlices,...
-                minOverlaps,maxOverlaps,var2slices);
+                minOverlaps,maxOverlaps,sizeDifferences,var2slices);
     % define branches with each unique pair of overlapping partners
     [branches,variableID,branchesID,var2slices] = updateBranches...
                 (branches,i,variableID,branchesID,overlapSlices,...
-                minOverlaps,maxOverlaps,var2slices);
+                minOverlaps,maxOverlaps,sizeDifferences,var2slices);
 end

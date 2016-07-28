@@ -7,11 +7,28 @@
 %% Inputs
 % inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
-outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160727_GTtest4';
+% inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
+outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160728_GT2';
 inputFormat = 'tif';
 outputFormat = 'png';
 %% Params
-weights = [1000000; -3000000; -20];
+
+% Linear weights for the objective function
+% ends:
+% eSizeW = weights(1);
+% continuations:
+% cMinOverlapW = weights(2);
+% cMaxOverlapW = weights(3);
+% cSizeDiffW = weights(4);
+% branches:
+% bMinOverlapW = weights(5);
+% bMaxOverlapW = weights(6);
+% bSizeDiffW = weights(7);
+
+weights = [1000000; 
+    -100; -100000; -100000;
+    -100; -150000; -150000];
+
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
@@ -47,6 +64,7 @@ imageFileName = fullfile(inputDir,inputFileList(1).name);
 % 'overlapSlices',[] - contains absolute sliceIDs
 % 'minOverlaps', [] - fractions 
 % 'maxOverlaps', [] - fractions 
+% 'sizeDifferences', [] - fractions
 slices = getOverlappingSlices(...
             slices,slicesPerSection,overlapRadius);
 

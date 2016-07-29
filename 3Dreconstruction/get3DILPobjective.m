@@ -1,4 +1,4 @@
-function f =  get3DILPobjective(weights,ends,continuations,branches)
+function f =  get3DILPobjective(weights,ends,continuations,branches,endSizeCostOffset)
 
 % stateVector f: [ends continuations branches] - not in this order. The
 % order is determined by the indivicual variableIDs assigned at the time of
@@ -43,7 +43,7 @@ bSizeDiffW = weights(7);
 % ends
 for i = 1:numEnds
     j = ends(i).variableID;
-    f(j) = eSizeW * ends(i).numPixels;
+    f(j) = eSizeW * (ends(i).numPixels + endSizeCostOffset);
 end
 
 % continuations

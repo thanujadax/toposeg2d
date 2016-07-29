@@ -9,6 +9,7 @@ partnerNeuronIDs = partnerNeuronIDs(partnerNeuronIDs>0);
 if(~isempty(partnerNeuronIDs))
     allPartnerSliceIDs = slicesInNeuronID(partnerNeuronIDs,:);
     allPartnerSliceIDs = allPartnerSliceIDs(allPartnerSliceIDs>0);
+    allPartnerSliceIDs = unique(allPartnerSliceIDs);
 end
 
 [r,c] = size(allPartnerSliceIDs);

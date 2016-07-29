@@ -11,6 +11,9 @@ inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160728_GT2';
 inputFormat = 'tif';
 outputFormat = 'png';
+
+produceSbmrmFiles = 1;
+sbmrmOutputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160729_sbmrm'; 
 %% Params
 
 % Linear weights for the objective function
@@ -24,11 +27,14 @@ outputFormat = 'png';
 % bMinOverlapW = weights(5);
 % bMaxOverlapW = weights(6);
 % bSizeDiffW = weights(7);
-
-weights = [1000000; 
-    -100; -100000; -100000;
-    -100; -150000; -150000];
-
+if(produceSbmrmFiles)
+    weights = [1 1 1 1 1 1 1];
+else   
+    weights = [100000; 
+        0; -10000; 0;
+        0; -100; 0];
+end
+endSizeCostOffset = 100000;
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
@@ -98,7 +104,7 @@ slices = getOverlappingSlices(...
 
 %% ILP
 % stateVector: [ends continuations branches]
-ilpObjective =  get3DILPobjective(weights,ends,continuations,branches);
+ilpObjective =  get3DILPobjective(weights,ends,continuations,branches,endSizeCostOffset);
 [constraintsA, constraintsB, constraintsSense, slices2var] = get3DILPConstraints...
                         (ends,continuations,branches,length(slices));
 solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...

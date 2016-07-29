@@ -6,6 +6,8 @@ function [neuronIDsForSlices,slicesInNeuronID,neuronCounter] = ...
 if(currentSliceNID>0)
     % assign this to all the connected partner slices
     newID = currentSliceNID;
+    % str1 = sprintf('Assingining neuronID: %d',newID);
+    % disp(str1)
     if(~isempty(allPartnerSliceIDs))
     [neuronIDsForSlices,slicesInNeuronID]= setNIDtoGivenSlices...
             (neuronIDsForSlices,slicesInNeuronID,newID,...
@@ -15,6 +17,8 @@ elseif(~isempty(partnerNeuronIDs))
     nids = partnerNeuronIDs(partnerNeuronIDs>0);
     if(~isempty(nids))
         newID = nids(1);
+        % str1 = sprintf('Assingining neuronID: %d',newID);
+        % disp(str1)
         % assign this to everything connected to the current slice
         [neuronIDsForSlices,slicesInNeuronID]= setNIDtoGivenSlices...
             (neuronIDsForSlices,slicesInNeuronID,newID,...
@@ -25,6 +29,8 @@ else
     % So assign the current slice and all it's partners a new neuronID
     neuronCounter = neuronCounter + 1; % newID
     newID = neuronCounter;
+    % str1 = sprintf('Assingining neuronID: %d',newID);
+    % disp(str1)
     [neuronIDsForSlices,slicesInNeuronID]= setNIDtoGivenSlices...
             (neuronIDsForSlices,slicesInNeuronID,newID,...
             [allPartnerSliceIDs; currentSliceID]);

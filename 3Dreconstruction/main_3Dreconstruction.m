@@ -7,6 +7,7 @@
 %% Inputs
 % inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
+labelDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
 % inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160728_GT2';
 inputFormat = 'tif';

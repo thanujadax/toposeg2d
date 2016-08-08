@@ -18,6 +18,7 @@ function [ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPer
 %  continuations.minOverlap
 %  continuations.maxOverlap
 %  continuations.sizeDifference
+%  continuations.isSameLabel - only makes sense for GT data (sbmrm)
 
 %  branches.variableID
 %  branches.startSliceID
@@ -26,6 +27,7 @@ function [ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPer
 %  branches.minOverlap
 %  branches.maxOverlap
 %  branches.sizeDifference
+%  branches.isSameLabel - only makes sense for GT data (sbmrm)
 
 numSlices = sum(slicesPerSection);
 
@@ -48,15 +50,19 @@ for i=1:numSlices
         (ends,i,variableID,endsID,numel(slices(i).pixelInds),var2slices);
     % get the overlapping partners for this slice
     overlapSlices = slices(i).overlapSlices;
+    overlapSliceLabels = slices(i).overlapSliceLabels;
     minOverlaps = slices(i).minOverlaps;
     maxOverlaps = slices(i).maxOverlaps;
     sizeDifferences = slices(i).sizeDifferences;
+    originalLabel = slices(i).originalLabel;
     % define continuations with each overlapping partner
     [continuations,variableID,continuationsID,var2slices] = updateContinuations...
                 (continuations,i,variableID,continuationsID,overlapSlices,...
-                minOverlaps,maxOverlaps,sizeDifferences,var2slices);
+                overlapSliceLabels,minOverlaps,maxOverlaps,...
+                sizeDifferences,var2slices,originalLabel);
     % define branches with each unique pair of overlapping partners
     [branches,variableID,branchesID,var2slices] = updateBranches...
                 (branches,i,variableID,branchesID,overlapSlices,...
-                minOverlaps,maxOverlaps,sizeDifferences,var2slices);
+                overlapSliceLabels,minOverlaps,maxOverlaps,...
+                sizeDifferences,var2slices,originalLabel);
 end

@@ -7,14 +7,18 @@
 %% Inputs
 % inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
-labelDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
 % inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
-outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160728_GT2';
+outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160808sbmrm';
 inputFormat = 'tif';
 outputFormat = 'png';
 
-produceSbmrmFiles = 1;
-sbmrmOutputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160729_sbmrm'; 
+produceSbmrmFiles = 1; 
+if(produceSbmrmFiles)
+    disp('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    disp('SBMRM file generation mode .....')
+    disp('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+end
+
 %% Params
 
 % Linear weights for the objective function
@@ -28,14 +32,14 @@ sbmrmOutputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160729_sbmr
 % bMinOverlapW = weights(5);
 % bMaxOverlapW = weights(6);
 % bSizeDiffW = weights(7);
-if(produceSbmrmFiles)
-    weights = [1 1 1 1 1 1 1];
-else   
-    weights = [100000; 
-        0; -10000; 0;
-        0; -100; 0];
-end
-endSizeCostOffset = 100000;
+
+weights = [100000; 
+    0; -10000; 0;
+    0; -100; 0];
+
+endSizeCostOffset = 1000;
+% endCosts(i) = eSizeW * (ends(i).numPixels + endSizeCostOffset);
+
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
 %% 
 
@@ -48,7 +52,11 @@ slices = struct([]); % row vector of slice-structures
 %       slices(i).pixelInds
 %       slices(i).overlapSlices,[] - contains absolute sliceIDs. filled in
 %       later
+%       slices(i).overlapSliceLabels - original segmentIDs for sbmrm with
+%       GT
 %       slices(i).minOverlaps,[] - min overlap fraction, filled in later
+%       slices(i).originalLabel - assigned by the initial 2D input
+%       segmentation. Useful for groundtruth datasets for sbmrm
 slicesPerSection = zeros(numFiles,1);
 str1 = sprintf('Number of input files found: %d',numFiles);
 disp(str1)
@@ -105,12 +113,39 @@ slices = getOverlappingSlices(...
 
 %% ILP
 % stateVector: [ends continuations branches]
-ilpObjective =  get3DILPobjective(weights,ends,continuations,branches,endSizeCostOffset);
 [constraintsA, constraintsB, constraintsSense, slices2var] = get3DILPConstraints...
                         (ends,continuations,branches,length(slices));
-solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
+                    
+if(produceSbmrmFiles)
+    sbmrmObjective = ...
+        get3DILPobjectiveSBMRM(ends,continuations,branches,endSizeCostOffset);
+    disp('************************************************')
+    disp('Solving ILP to get gold standard solution vector')
+    disp('************************************************')
+    solutionVector = solve3DILPGurobi(sbmrmObjective,constraintsA,constraintsB,...
                 constraintsSense);
-%             
+    weights = [1 1 1 1 1 1 1]; 
+    % also writes the features.txt file for sbmrm
+     ilpObjective = ...
+        get3DILPobjective(weights,ends,continuations,branches,...
+        endSizeCostOffset,produceSbmrmFiles,outputDir);
+    
+    % write the sbmrm input files to the output directory
+    disp('Writing labels.txt for SBMRM ...')
+    labels = writeLabelsFile(solutionVector,outputDir);
+    disp('Writing constraints.txt for SBMRM ...')
+    constraints = writeConstraintsFile...
+        (constraintsA,constraintsB,constraintsSense,outputDir);
+    
+else
+    ilpObjective = ...
+        get3DILPobjective(weights,ends,continuations,branches,...
+        endSizeCostOffset,produceSbmrmFiles,outputDir);
+    solutionVector = solve3DILPGurobi(ilpObjective,constraintsA,constraintsB,...
+                constraintsSense);
+end
+
+% Draw the 3D reconstruction            
 create3Dreconstruction(solutionVector,outputDir,outputFormat,slices,...
     slicesPerSection,slices2var,ends,continuations,branches,sizeR,sizeC,...
     var2slices);

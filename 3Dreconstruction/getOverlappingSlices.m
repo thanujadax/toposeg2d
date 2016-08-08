@@ -9,13 +9,17 @@ function slicesAll = getOverlappingSlices(...
 %         'sliceLID',0,... - local sliceID w.r.t the current sectionID
 %         'pixelInds',[],...
 %         'overlapSlices',[] - contains absolute sliceIDs ;
+%         'overlapSliceLabels',[] - only makes sense for GT input for sbmrm  
 %         'minOverlaps',[] - fractions );
+%         'maxOverlaps'
+
 
 % version 0.1: don't use search radius. only collect the slices which are
 % directly overlapping in the next section
 % TODO: search radius -> version 0.2
 
 slicesAll().overlapSlices = [];
+slicesAll().overlapSliceLabels = [];
 slicesAll().minOverlaps = [];
 slicesAll().maxOverlaps = [];
 slicesAll().sizeDifferences = [];
@@ -28,12 +32,23 @@ for i=1:numSections-1
     for j=1:slicesPerSection(i)
         currentSliceID = currentSliceID + 1;
         slicePixels = slicesAll(currentSliceID).pixelInds;
-        [slicesAll(currentSliceID).overlapSlices, ...
+        
+        [overlapSliceIDs, ...
             slicesAll(currentSliceID).minOverlaps,...
             slicesAll(currentSliceID).maxOverlaps,...
             slicesAll(currentSliceID).sizeDifferences] = ...
             getOverlapSlicesGivenPixels(slicePixels,slicesAll,i,...
             slicesPerSection);
+        
+        slicesAll(currentSliceID).overlapSlices = overlapSliceIDs;
+        % get the initial neuronIDs (labels) for the overlapping slices
+        if(numel(overlapSliceIDs)>0)
+            overlapSliceLabels = zeros(1,numel(overlapSliceIDs));
+            for k=1:numel(overlapSliceIDs)
+                overlapSliceLabels(k) = slicesAll(overlapSliceIDs(k)).originalLabel;
+            end
+            slicesAll(currentSliceID).overlapSliceLabels = overlapSliceLabels;
+        end
     end
 end
 

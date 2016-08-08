@@ -1,6 +1,7 @@
 function [branches,variableID,branchesID,var2slices] = updateBranches...
                 (branches,startSliceID,variableID,branchesID,...
-                overlapSlices,minOverlaps,maxOverlaps,sizeDifferences,var2slices)
+                overlapSlices,overlapSliceLabels,minOverlaps,maxOverlaps,...
+                sizeDifferences,var2slices,originalLabel)
 
 if(~isempty(overlapSlices))
     numOverlaps = numel(overlapSlices);
@@ -10,6 +11,7 @@ if(~isempty(overlapSlices))
         minOverlapCombinations = nchoosek(minOverlaps,2);
         maxOverlapCombinations = nchoosek(maxOverlaps,2);
         sizeDifferenceCombinations = nchoosek(sizeDifferences,2);
+        overlapSliceLabelCombinations = nchoosek(overlapSliceLabels,2);
 
     % each row gives two elements which are the sliceIDs of the 2 ends
         for i=1:numBranches
@@ -21,6 +23,11 @@ if(~isempty(overlapSlices))
             branches(branchesID).startSliceID = startSliceID;
             branches(branchesID).stopSlice1ID = endCombinations(i,1);
             branches(branchesID).stopSlice2ID = endCombinations(i,2);
+            
+            branches(branchesID).isSameLabel = ...
+            (overlapSliceLabelCombinations(i,1)==originalLabel && ...
+            overlapSliceLabelCombinations(i,2)==originalLabel);
+            
             branches(branchesID).minOverlap = sum(minOverlapCombinations(i,:));
             branches(branchesID).maxOverlap = sum(maxOverlapCombinations(i,:));
             branches(branchesID).sizeDifference = sum(sizeDifferenceCombinations(i,:));

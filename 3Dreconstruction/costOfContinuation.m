@@ -7,7 +7,7 @@ function f = costOfContinuation(continuations,cID,w1,w2,w3)
 %  continuations.maxOverlap
 %  continuations.sizeDifference
 
-
-f = continuations(cID).minOverlap * w1 + ...
-    continuations(cID).maxOverlap * w2 + ...
-    continuations(cID).sizeDifference * w3;
+f = zeros(3,1);
+f(1) = continuations(cID).minOverlap * w1;
+f(2) = continuations(cID).maxOverlap * w2;
+f(3) = continuations(cID).sizeDifference * w3;

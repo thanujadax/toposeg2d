@@ -9,6 +9,10 @@ function [neuronIDsForSlices,slicesInNeuronID]= setNIDtoGivenSlices...
 % allPartnerSliceIDs(end+1) = currentSliceID;
 
 neuronIDsForSlices(allPartnerSliceIDs) = newID;
+
+existingPartners = slicesInNeuronID(newID,:);
+existingPartners = existingPartners(existingPartners>0);
+allPartnerSliceIDs = [allPartnerSliceIDs; existingPartners'];
 numPartners = numel(allPartnerSliceIDs);
 if(numPartners==1)
     slicesInNeuronID(newID,1) = allPartnerSliceIDs;

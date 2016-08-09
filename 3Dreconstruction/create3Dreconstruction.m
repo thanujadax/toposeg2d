@@ -43,14 +43,12 @@ numStates = numEnds + numContinuations + numBranches;
 activeStates = find(solutionVector);
 str1 = sprintf('Active states: %d',numel(activeStates));
 disp(str1)
-activeEnds = find(solutionVector(1:numEnds));
-activeContinuations = find(solutionVector((numEnds+1):(numEnds+numContinuations)));
-activeBranches = find(solutionVector(...
-    (numEnds+numContinuations+1):(numStates)));
-
+activeEnds = intersect(activeStates,endVarIDs);
+activeContinuations = intersect(activeStates,continuationVarIDs);
+activeBranches = intersect(activeStates,branchVarIDs);
 numSlices = length(slices2var);
 neuronCounter = 0;
-partnerCollector = [];
+partnerCollector = []; % just collects slices with active links
 
 for i=1:numSlices
     % str1 = sprintf('Processing link variables of slice %d',i);
@@ -143,7 +141,7 @@ for i=1:numSections
     imB = zeros(sizeR,sizeC);
     
     numSlicesInSection = slicesPerSection(i);
-    for j=i:numSlicesInSection
+    for j=1:numSlicesInSection
         % paint each slice
         k = k+1;
         slicePixels = slices(k).pixelInds;

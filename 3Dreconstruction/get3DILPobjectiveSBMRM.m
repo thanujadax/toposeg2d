@@ -27,7 +27,7 @@ for i = 1:numContinuations
     if(continuations(i).isSameLabel)
         f(j) = -25000;
     else
-        f(j) = 500000;
+        f(j) = 0;
     end
 end
 
@@ -39,6 +39,6 @@ for i = 1:numBranches
     if(branches(i).isSameLabel)
         f(j) = -30000;
     else
-        f(j) = 5000000;
+        f(j) = 0;
     end
 end

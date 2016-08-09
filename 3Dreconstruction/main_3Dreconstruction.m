@@ -7,12 +7,12 @@
 %% Inputs
 % inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
 % inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
-% inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
-inputDir = '/home/thanuja/projects/data/synthetic/set01/png';
+inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
+% inputDir = '/home/thanuja/projects/data/synthetic/set01/png';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160808sbmrm';
-inputFormat = 'png';
+inputFormat = 'tiff';
 outputFormat = 'png';
-maxInputFiles = 6;
+maxInputFiles = 10;
 
 produceSbmrmFiles = 1; 
 if(produceSbmrmFiles)

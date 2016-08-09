@@ -11,7 +11,8 @@ if(~isempty(overlapSlices))
         minOverlapCombinations = nchoosek(minOverlaps,2);
         maxOverlapCombinations = nchoosek(maxOverlaps,2);
         sizeDifferenceCombinations = nchoosek(sizeDifferences,2);
-        overlapSliceLabelCombinations = nchoosek(overlapSliceLabels,2);
+        
+        overlapSliceLabelCombinations = nchoosek((1:numOverlaps),2);
 
     % each row gives two elements which are the sliceIDs of the 2 ends
         for i=1:numBranches
@@ -23,10 +24,13 @@ if(~isempty(overlapSlices))
             branches(branchesID).startSliceID = startSliceID;
             branches(branchesID).stopSlice1ID = endCombinations(i,1);
             branches(branchesID).stopSlice2ID = endCombinations(i,2);
+                       
+            endSlice1label = overlapSliceLabels(overlapSliceLabelCombinations(i,1),:);
+            endSlice2label = overlapSliceLabels(overlapSliceLabelCombinations(i,2),:);
             
             branches(branchesID).isSameLabel = ...
-            (overlapSliceLabelCombinations(i,1)==originalLabel && ...
-            overlapSliceLabelCombinations(i,2)==originalLabel);
+            (isequal(endSlice1label,originalLabel) && ...
+            isequal(endSlice2label,originalLabel));
             
             branches(branchesID).minOverlap = sum(minOverlapCombinations(i,:));
             branches(branchesID).maxOverlap = sum(maxOverlapCombinations(i,:));

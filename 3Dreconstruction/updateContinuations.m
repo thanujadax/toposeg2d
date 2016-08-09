@@ -13,7 +13,7 @@ if(~isempty(overlapSlices))
         continuations(continuationsID).startSliceID = startSliceID;
         continuations(continuationsID).stopSliceID = overlapSlices(i);
         continuations(continuationsID).isSameLabel = ...
-            (overlapSliceLabels(i)==originalLabel);
+            isequal(overlapSliceLabels(i,:),originalLabel);
         
         continuations(continuationsID).minOverlap = minOverlaps(i);
         continuations(continuationsID).maxOverlap = maxOverlaps(i);

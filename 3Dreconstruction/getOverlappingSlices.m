@@ -43,9 +43,10 @@ for i=1:numSections-1
         slicesAll(currentSliceID).overlapSlices = overlapSliceIDs;
         % get the initial neuronIDs (labels) for the overlapping slices
         if(numel(overlapSliceIDs)>0)
-            overlapSliceLabels = zeros(1,numel(overlapSliceIDs));
+            overlapSliceLabels = zeros(numel(overlapSliceIDs),1);
             for k=1:numel(overlapSliceIDs)
-                overlapSliceLabels(k) = slicesAll(overlapSliceIDs(k)).originalLabel;
+                olabel = slicesAll(overlapSliceIDs(k)).originalLabel;
+                overlapSliceLabels(k,1:numel(olabel)) = slicesAll(overlapSliceIDs(k)).originalLabel;
             end
             slicesAll(currentSliceID).overlapSliceLabels = overlapSliceLabels;
         end

@@ -6,11 +6,13 @@
 
 %% Inputs
 % inputDir = '/home/thanuja/projects/RESULTS/contours/20160721/000/png';
-inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
+% inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
 % inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
+inputDir = '/home/thanuja/projects/data/synthetic/set01/png';
 outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160808sbmrm';
-inputFormat = 'tif';
+inputFormat = 'png';
 outputFormat = 'png';
+maxInputFiles = 6;
 
 produceSbmrmFiles = 1; 
 if(produceSbmrmFiles)
@@ -37,7 +39,7 @@ weights = [100000;
     0; -10000; 0;
     0; -100; 0];
 
-endSizeCostOffset = 1000;
+endSizeCostOffset = 1000000;
 % endCosts(i) = eSizeW * (ends(i).numPixels + endSizeCostOffset);
 
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections
@@ -55,13 +57,19 @@ slices = struct([]); % row vector of slice-structures
 %       slices(i).overlapSliceLabels - original segmentIDs for sbmrm with
 %       GT
 %       slices(i).minOverlaps,[] - min overlap fraction, filled in later
-%       slices(i).originalLabel - assigned by the initial 2D input
+%       slices(i).originalLabel - assigned by the inifoundtial 2D input
 %       segmentation. Useful for groundtruth datasets for sbmrm
-slicesPerSection = zeros(numFiles,1);
+
 str1 = sprintf('Number of input files found: %d',numFiles);
 disp(str1)
 
-for i=1:numFiles
+numFilesToUse = min(maxInputFiles,numFiles);
+str1 = sprintf('Number of input files to be used: %d',numFilesToUse);
+disp(str1)
+
+slicesPerSection = zeros(numFilesToUse,1);
+
+for i=1:numFilesToUse
 % get slices from input 2D segments
     imageFileName = fullfile(inputDir,inputFileList(i).name);
     sectionID = sprintf('%03d',i);
@@ -80,6 +88,7 @@ imageFileName = fullfile(inputDir,inputFileList(1).name);
 % 'minOverlaps', [] - fractions 
 % 'maxOverlaps', [] - fractions 
 % 'sizeDifferences', [] - fractions
+disp('Detecting overlapping slices ...')
 slices = getOverlappingSlices(...
             slices,slicesPerSection,overlapRadius);
 
@@ -89,6 +98,7 @@ slices = getOverlappingSlices(...
 % 1. ends: slice has no continuation to the next section
 % 2. continuations: one-to-one link
 % 3. branches: this slice has two continuations into the next section
+disp('Extracting link variables ...')
 [ends,continuations,branches,var2slices] = getAllLinks(slices,slicesPerSection);
 %  ends.variableID
 %  ends.startSliceID
@@ -113,10 +123,12 @@ slices = getOverlappingSlices(...
 
 %% ILP
 % stateVector: [ends continuations branches]
+disp('Defining ILP constraints ...')
 [constraintsA, constraintsB, constraintsSense, slices2var] = get3DILPConstraints...
                         (ends,continuations,branches,length(slices));
                     
 if(produceSbmrmFiles)
+    disp('Generating ILP linear objective for gold standard calculation ...')
     sbmrmObjective = ...
         get3DILPobjectiveSBMRM(ends,continuations,branches,endSizeCostOffset);
     disp('************************************************')
@@ -126,6 +138,7 @@ if(produceSbmrmFiles)
                 constraintsSense);
     weights = [1 1 1 1 1 1 1]; 
     % also writes the features.txt file for sbmrm
+    disp('Generating ILP feature vector (objective) with weights = 1 ...')
      ilpObjective = ...
         get3DILPobjective(weights,ends,continuations,branches,...
         endSizeCostOffset,produceSbmrmFiles,outputDir);
@@ -145,7 +158,8 @@ else
                 constraintsSense);
 end
 
-% Draw the 3D reconstruction            
+% Draw the 3D reconstruction    
+disp('Painting 3D reconstruction ...')
 create3Dreconstruction(solutionVector,outputDir,outputFormat,slices,...
     slicesPerSection,slices2var,ends,continuations,branches,sizeR,sizeC,...
     var2slices);

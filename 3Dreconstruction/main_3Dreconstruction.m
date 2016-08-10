@@ -9,12 +9,12 @@
 % inputDir = '/home/thanuja/projects/data/toyData/set8/groundtruth';
 inputDir = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/em_2013january/groundTruth/neurons';
 % inputDir = '/home/thanuja/projects/data/synthetic/set01/png';
-outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160808sbmrm';
+outputDir = '/home/thanuja/projects/RESULTS/3Dreconstructions/20160810';
 inputFormat = 'tiff';
 outputFormat = 'png';
-maxInputFiles = 10;
+maxInputFiles = 20;
 
-produceSbmrmFiles = 1; 
+produceSbmrmFiles = 0; 
 if(produceSbmrmFiles)
     disp('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     disp('SBMRM file generation mode .....')
@@ -35,11 +35,14 @@ end
 % bMaxOverlapW = weights(6);
 % bSizeDiffW = weights(7);
 
-weights = [100000; 
-    0; -10000; 0;
-    0; -100; 0];
+% weights = [100000; 
+%     0; -10000; 0;
+%     0; -100; 0];
 
-endSizeCostOffset = 1000000;
+% from sbmrm 20160808
+weights = [-4.24336e-05, -3.91075, -1.45628, -0.000173062, 0.0161797, -0.21193, -7.59005e-05];
+
+endSizeCostOffset = 100;
 % endCosts(i) = eSizeW * (ends(i).numPixels + endSizeCostOffset);
 
 overlapRadius = 100; % radius (px) to search for overlapping slices on adjacent sections

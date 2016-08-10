@@ -16,7 +16,8 @@ f = zeros(numStates,1);
 % ends
 for i = 1:numEnds
     j = ends(i).variableID;
-    f(j) = ends(i).numPixels + endSizeCostOffset;
+    % f(j) = ends(i).numPixels + endSizeCostOffset;
+    f(j) = 8;
 end
 
 % continuations
@@ -25,9 +26,9 @@ for i = 1:numContinuations
     % f(j) = weights(2) * continuations(i).minOverlap;
     %f(j) = costOfContinuation(continuations,i,cMinOverlapW,cMaxOverlapW,cSizeDiffW);
     if(continuations(i).isSameLabel)
-        f(j) = -25000;
+        f(j) = -25;
     else
-        f(j) = 0;
+        f(j) = 10;
     end
 end
 
@@ -37,8 +38,8 @@ for i = 1:numBranches
     % f(j) = weights(3) * branches(i).minOverlap;
     % f(j) = costOfContinuation(continuations,i,bMinOverlapW,bMaxOverlapW,bSizeDiffW);
     if(branches(i).isSameLabel)
-        f(j) = -30000;
+        f(j) = -30;
     else
-        f(j) = 0;
+        f(j) = 10;
     end
 end

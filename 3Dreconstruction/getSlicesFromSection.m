@@ -52,17 +52,6 @@ if(cc.NumObjects>0)
             % get RGB label vector
             slices(i).originalLabel = reshape(im(pR,pC,:),1,3); 
             
-            % debug start
-            allPix = cc.PixelIdxList{i};
-            pt1 = sub2ind([sizeR sizeC],122,80);
-            if(sum(ismember(allPix,pt1))==1)
-                % point found. print label
-                i
-                % tt = reshape(im(pR,pC,:),1,3);
-                % tt
-            end
-        % debug stop
-            
         else
             % get gray value
             slices(i).originalLabel = im(pR,pC); 

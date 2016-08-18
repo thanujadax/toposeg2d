@@ -30,13 +30,13 @@
 
 produceBMRMfiles = 0;
 
-rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
+rawImageDir = '';
 rawImageType = '*.tif';
 membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160721';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160811_1024x';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
 checkAndCreateSubDir(outputRoot,'000');

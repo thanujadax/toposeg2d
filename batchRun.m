@@ -1,42 +1,13 @@
-% 
-% rawType = 'tif';
-% neuronProbabilityType = 'png';
-% membraneProbabilityType = 'tiff';
-% mitoProbabilityType = 'png';
-% 
-% inputPath = '/home/thanuja/projects/toyData/set8/';
-% outputPath = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823/';
-% outputPathPNG = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823_png/';
-% % read all images in the raw images file path
-% rawImagePath = fullfile(inputPath,'raw');
-% allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
-% 
-% % for each file
-% numFiles = length(allRawFiles);
-% for i=1:numFiles
-%     disp(i);
-%     imageFileName = allRawFiles(i).name;
-%     segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...
-%         rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType);
-%     % save segmentation output
-%     writeFileName = fullfile(outputPath,imageFileName);
-%     imwrite(segmentationOut,writeFileName,'tif');
-%     pngFileName = sprintf('%d.png',(i-1));
-%     pngFileName = fullfile(outputPathPNG,pngFileName);
-%     imwrite(segmentationOut,pngFileName,'png');
-% end
-% 
-% %%%
-
 produceBMRMfiles = 0;
+useMitochondriaDetection = 0;
 
-rawImageDir = '';
+rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
 rawImageType = '*.tif';
 membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160811_1024x';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160818';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
 checkAndCreateSubDir(outputRoot,'000');
@@ -63,6 +34,11 @@ dbstop if error
 
 rawFilesDirList = dir(fullfile(rawImageDir,rawImageType));
 memProbMapDirList = dir(fullfile(membraneProbMapDir,membraneProbMapType));
+str1 = sprintf('Number of raw files: %d',numel(rawFilesDirList));
+disp(str1)
+str1 = sprintf('Number of membrane probability maps: %d',numel(memProbMapDirList));
+disp(str1)
+
 for i=1:numel(rawFilesDirList)
     rawImageFileName = rawFilesDirList(i).name; % name without path
     membraneProbFileName = memProbMapDirList(i).name; %name without path
@@ -71,10 +47,14 @@ for i=1:numel(rawFilesDirList)
     str1 = sprintf('Membrane Prob Map file name: %s',membraneProbFileName);
     disp(str1)
     membraneProbMapFullFileName = fullfile(membraneProbMapDir,membraneProbFileName);
-    segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
-        membraneProbMapFullFileName,mitoProbMapFullFileName,...
+    rawImage = double(imread(fullfile(rawImageDir,rawImageFileName)));
+    membraneProbMap = double(imread(membraneProbMapFullFileName));
+    mitochondriaProbMap = [];
+    labelImage = [];
+    segmentationOut = doILP_w_dir(rawImage,membraneProbMap,i,...
+        useMitochondriaDetection,mitochondriaProbMap,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-        outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat,...
+        outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);
 
     rawImageID = strtok(rawImageFileName,'.');

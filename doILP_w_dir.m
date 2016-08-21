@@ -35,10 +35,10 @@ useMitochondriaDetection = 0;
 
 % trained RFC for edge probability
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
-rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
+% rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 
-fprintf(logFileH,'Processsing image file: %s \n',rawImageFullFile);
-fprintf(logFileH,'pre-trained RFC for edge scores: %s \n',forestEdgeProbFileName);
+% fprintf(logFileH,'Processsing image file: %s \n',rawImageFullFile);
+% fprintf(logFileH,'pre-trained RFC for edge scores: %s \n',forestEdgeProbFileName);
 
 %% Parameters
 orientationStepSize = 10;

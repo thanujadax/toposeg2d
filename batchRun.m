@@ -28,7 +28,7 @@
 % 
 % %%%
 
-produceBMRMfiles = 0;
+produceBMRMfiles = 1;
 
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
 rawImageType = '*.tif';
@@ -36,7 +36,7 @@ membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160821';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160821_sbmrm';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
 checkAndCreateSubDir(outputRoot,'000');
@@ -54,7 +54,8 @@ checkAndCreateSubDir(outputPath,'intermediate');
 
 showIntermediateImages = 0;
 %labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
-labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
+% labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
+labelImageFileName = '/home/thanuja/projects/data/toyData/set8/groundtruth/00.tif';
 
 logFileName = 'log.txt';
 logFileFullPath = fullfile(outputPath,logFileName);
@@ -63,7 +64,12 @@ dbstop if error
 
 rawFilesDirList = dir(fullfile(rawImageDir,rawImageType));
 memProbMapDirList = dir(fullfile(membraneProbMapDir,membraneProbMapType));
-for i=1:numel(rawFilesDirList)
+if(produceBMRMfiles)
+    numFilesToProcess = 1;
+else
+    numFilesToProcess = numel(rawFilesDirList);
+end
+for i=1:numFilesToProcess
     rawImageFileName = rawFilesDirList(i).name; % name without path
     membraneProbFileName = memProbMapDirList(i).name; %name without path
     str1 = sprintf('Raw file name: %s',rawImageFileName);

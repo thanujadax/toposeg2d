@@ -155,7 +155,7 @@ fprintf(logFileH,'input image size: [%d, %d] pixels\n',size(rawImg,1),size(rawIm
 % membraneProbMap = double(imread(membraneProbMapFullFileName));
 % fprintf(logFileH,'using membrane probability map file: %s \n',membraneProbMapFullFileName);
 % TODO: DEBUG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-if(max(max(membraneProbMap)))
+if(max(max(membraneProbMap))>1)
     membraneProbMap = membraneProbMap./255;
 end
 

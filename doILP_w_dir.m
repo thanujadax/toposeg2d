@@ -117,7 +117,7 @@ if(produceBMRMfiles)
     w_on_n = 1;     % node on weight
     w_on_r = 1;     % region weight
     w_off_r = 1;
-    fprint(logFileH,'Setting all linear weights to 1 to produce files for sbmrm ... \n')
+    fprintf(logFileH,'Setting all linear weights to 1 to produce files for sbmrm ... \n')
 else
     % use pre-learned parameters
     % optimial w is [-7.52064, -7.38296, 0.468054, 0.403942, -7.79221, -5.75401]

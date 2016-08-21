@@ -1,11 +1,11 @@
-function segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
-    membraneProbMapFullFileName,mitoProbMapFullFileName,...
+function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
+    membraneProbMap,mitoProbMapFullFileName,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-    outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,...
+    outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
     saveOutputFormat,logFilePath)
 
+% version 6. 20160821: removed input file handling
 % version 5. 20160509: 
-
 % version 4. 2014.01.06
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 % 20160321 - updated with new node angle cost function
@@ -145,19 +145,16 @@ fprintf(logFileH,'w_on_e:%0.4f, w_off_e:%0.4f, w_off_n:%0.4f, w_on_n:%0.4f, w_on
 
 %% read inputimage and get orientedScoreSpace and max_abs value of OFR
 disp('using image file:')
-disp(rawImageFullFile);
-rawImageID = strsplit(rawImageFullFile,filesep);
-rawImageID = rawImageID{end};
-rawImageID = strtok(rawImageID,'.');
-imgIn0 = double(imread(rawImageFullFile));
-[a,b,c] = size(imgIn0);
+% rawImg = double(imread(rawImageFullFile));
+[a,b,c] = size(rawImg);
 if(c==3)
-    imgIn0 = rgb2gray(imgIn0);
+    rawImg = rgb2gray(rawImg);
 end
-fprintf(logFileH,'input image size: [%d, %d] pixels\n',size(imgIn0,1),size(imgIn0,2));
+fprintf(logFileH,'input image size: [%d, %d] pixels\n',size(rawImg,1),size(rawImg,2));
 
-membraneProbMap = double(imread(membraneProbMapFullFileName));
-fprintf(logFileH,'using membrane probability map file: %s \n',membraneProbMapFullFileName);
+% membraneProbMap = double(imread(membraneProbMapFullFileName));
+% fprintf(logFileH,'using membrane probability map file: %s \n',membraneProbMapFullFileName);
+% TODO: DEBUG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 if(max(max(membraneProbMap)))
     membraneProbMap = membraneProbMap./255;
 end
@@ -168,14 +165,14 @@ else
     mitochondriaProbabilityImage = [];
 end
 
-if(produceBMRMfiles)
-    labelImage = imread(labelImageFileName);
-    fprintf(logFileH,'using lablel image file: %s \n',labelImageFileName);
-    % labelImage = labelImage(1:128,:,:);
-end
+% if(produceBMRMfiles)
+%     labelImage = imread(labelImageFileName);
+%     fprintf(logFileH,'using lablel image file: %s \n',labelImageFileName);
+%     % labelImage = labelImage(1:128,:,:);
+% end
 % add thick border
 if(b_imWithBorder)
-    rawImg = addThickBorder(imgIn0,marginSize,marginPixValRaw);
+    rawImg = addThickBorder(rawImg,marginSize,marginPixValRaw);
     membraneProbMap = addThickBorder(membraneProbMap,marginSize,marginPixValMem);
     if(saveIntermediateImages)
         intermediateImgDescription = 'rawImage';
@@ -304,7 +301,7 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag,...
 if(0) % not using precomputed probability maps for graph edges - doesn't make sense!
     % calculate edgeUnary from probability map image
     edgeUnary = getEdgeProbabilityFromMap(...
-        membraneProbabilityImage,edgepixels,marginSize,(1-marginPixVal));
+        membraneProbMap,edgepixels,marginSize,(1-marginPixVal));
 else
     
     if ~exist(forestEdgeProbFileName,'file')
@@ -393,7 +390,7 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 if(usePrecomputedProbabilityMaps)
     
     regionUnary = getRegionScoreFromProbImage(...
-    membraneProbMapFullFileName,mitochondriaProbabilityImage,...
+    membraneProbMap,mitochondriaProbabilityImage,...
     useMitochondriaDetection,marginSize,marginPixValRaw,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...

@@ -30,13 +30,13 @@
 
 produceBMRMfiles = 0;
 
-rawImageDir = '';
+rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
 rawImageType = '*.tif';
 membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160811_1024x';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160821';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
 checkAndCreateSubDir(outputRoot,'000');
@@ -71,10 +71,14 @@ for i=1:numel(rawFilesDirList)
     str1 = sprintf('Membrane Prob Map file name: %s',membraneProbFileName);
     disp(str1)
     membraneProbMapFullFileName = fullfile(membraneProbMapDir,membraneProbFileName);
-    segmentationOut = doILP_w_dir(rawImageDir,rawImageFileName,...
-        membraneProbMapFullFileName,mitoProbMapFullFileName,...
+    rawImg = double(imread(fullfile(rawImageDir,rawImageFileName)));
+    rawImageID = i;
+    membraneProbMap = double(imread(membraneProbMapFullFileName));
+    labelImage = imread(labelImageFileName);
+    segmentationOut = doILP_w_dir(rawImg,rawImageID,...
+        membraneProbMap,mitoProbMapFullFileName,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-        outputPath,produceBMRMfiles,labelImageFileName,sbmrmOutputDir,saveOutputFormat,...
+        outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);
 
     rawImageID = strtok(rawImageFileName,'.');

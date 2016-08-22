@@ -1,34 +1,7 @@
-% 
-% rawType = 'tif';
-% neuronProbabilityType = 'png';
-% membraneProbabilityType = 'tiff';
-% mitoProbabilityType = 'png';
-% 
-% inputPath = '/home/thanuja/projects/toyData/set8/';
-% outputPath = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823/';
-% outputPathPNG = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823_png/';
-% % read all images in the raw images file path
-% rawImagePath = fullfile(inputPath,'raw');
-% allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
-% 
-% % for each file
-% numFiles = length(allRawFiles);
-% for i=1:numFiles
-%     disp(i);
-%     imageFileName = allRawFiles(i).name;
-%     segmentationOut = doILP_w_dir(inputPath,imageFileName,i,...
-%         rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType);
-%     % save segmentation output
-%     writeFileName = fullfile(outputPath,imageFileName);
-%     imwrite(segmentationOut,writeFileName,'tif');
-%     pngFileName = sprintf('%d.png',(i-1));
-%     pngFileName = fullfile(outputPathPNG,pngFileName);
-%     imwrite(segmentationOut,pngFileName,'png');
-% end
-% 
-% %%%
-
-produceBMRMfiles = 1;
+produceBMRMfiles = 0;
+%labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
+labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
+% labelImageFileName = '/home/thanuja/projects/data/toyData/set8/groundtruth/00.tif';
 
 rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
 rawImageType = '*.tif';
@@ -36,7 +9,7 @@ membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160821_sbmrm';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160822';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
 checkAndCreateSubDir(outputRoot,'000');
@@ -53,14 +26,15 @@ saveIntermediateImagesPath = fullfile(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'intermediate');
 
 showIntermediateImages = 0;
-%labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
-% labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
-labelImageFileName = '/home/thanuja/projects/data/toyData/set8/groundtruth/00.tif';
+
 
 logFileName = 'log.txt';
 logFileFullPath = fullfile(outputPath,logFileName);
 
 dbstop if error
+
+barLength = 13; % should be odd
+barWidth = 4; % should be even?
 
 rawFilesDirList = dir(fullfile(rawImageDir,rawImageType));
 memProbMapDirList = dir(fullfile(membraneProbMapDir,membraneProbMapType));
@@ -83,6 +57,7 @@ for i=1:numFilesToProcess
     labelImage = imread(labelImageFileName);
     segmentationOut = doILP_w_dir(rawImg,rawImageID,...
         membraneProbMap,mitoProbMapFullFileName,...
+        barLength,barWidth,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
         outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);

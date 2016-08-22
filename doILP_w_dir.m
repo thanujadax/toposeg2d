@@ -106,7 +106,11 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % weights trained after region continuity constraint 20160528
 %linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -11.6639];
 % increasing reward for membranes w_off_r! (w(5))
-linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -20];
+% linearWeights = [-9.1695, -8.52036, 1.55449, 0.159125, -5.41935, -20];
+
+% 20160822: after removing input file handling and bug fixing in membrane
+% normalization. DATASET: drosophila larva ssTEM 
+linearWeights = [-3.85845, -4.22589, -0.092915, 0.595983, 0.549337, -0.40928];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1

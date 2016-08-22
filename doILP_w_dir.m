@@ -1,5 +1,6 @@
 function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
     membraneProbMap,mitoProbMapFullFileName,...
+    barLength,barWidth,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
     saveOutputFormat,logFilePath)
@@ -37,8 +38,7 @@ useMitochondriaDetection = 0;
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 % rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 
-% fprintf(logFileH,'Processsing image file: %s \n',rawImageFullFile);
-% fprintf(logFileH,'pre-trained RFC for edge scores: %s \n',forestEdgeProbFileName);
+fprintf(logFileH,'Processsing image file: %d \n',rawImageID);
 
 %% Parameters
 orientationStepSize = 10;
@@ -49,12 +49,11 @@ wsgsigma = 1.4;
 wsgmask = 9;
 
 gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
-barLength = 13; % should be odd
-barWidth = 4; % should be even?
+
 marginSize = ceil(barLength/2);
 marginPixValRaw = 0;
 marginPixValMem = 1;
-threshFrac = 0;   % threshold for OFR 0.1 for raw images %%
+threshFrac = 0;   % threshold for OFR 0.1 for raw images, 0 for membraneProbMaps
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image

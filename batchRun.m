@@ -1,19 +1,19 @@
-produceBMRMfiles = 0;
+produceBMRMfiles = 1;
 %labelImageFileName = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/contoursSBMRM/labels/00.tif';
 labelImageFileName = '/home/thanuja/projects/data/toyData/set12_sbmrm/groundtruth/00.tif';
 % labelImageFileName = '/home/thanuja/projects/data/toyData/set8/groundtruth/00.tif';
 
-rawImageDir = '/home/thanuja/projects/data/toyData/set8/raw';
+rawImageDir = '/home/thanuja/projects/data/toyData/set12_sbmrm/raw';
 rawImageType = '*.tif';
-membraneProbMapDir = '/home/thanuja/projects/data/toyData/set8/membranes_rfc';
+membraneProbMapDir = '/home/thanuja/projects/data/toyData/set12_sbmrm/membranes_rfc';
 membraneProbMapType = '*.tif';
 mitoProbMapFullFileName = '';
 
-outputRoot = '/home/thanuja/projects/RESULTS/contours/20160822';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160822_sbmrm';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'000');
-outputPath = fullfile(outputRoot,'000');
+checkAndCreateSubDir(outputRoot,'001');
+outputPath = fullfile(outputRoot,'001');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -25,7 +25,7 @@ saveIntermediateImages = 1;
 saveIntermediateImagesPath = fullfile(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'intermediate');
 
-showIntermediateImages = 0;
+showIntermediateImages = 1;
 
 
 logFileName = 'log.txt';

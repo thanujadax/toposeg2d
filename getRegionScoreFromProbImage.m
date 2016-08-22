@@ -46,14 +46,14 @@ if(useMitochondriaDetection)
 end
 
 % add border to be compatible with filtered image
-if(addMarginThickness>0)
-    probabilityMapWithMargin = addThickBorder...
-                (neuronProbabilityMap,addMarginThickness,addMarginValue);
-else
-    probabilityMapWithMargin = neuronProbabilityMap;
-end
+% if(addMarginThickness>0)
+%     probabilityMapWithMargin = addThickBorder...
+%                 (neuronProbabilityMap,addMarginThickness,addMarginValue);
+% else
+%     probabilityMapWithMargin = neuronProbabilityMap;
+% end
 
 
-regionUnary = getCellPriors_probability(probabilityMapWithMargin,setOfCells,...
+regionUnary = getCellPriors_probability(neuronProbabilityMap,setOfCells,...
     sizeR,sizeC,wsIndsForCells,ws,showImg,saveIntermediateImages,...
     saveIntermediateImagesPath,rawImageID,saveOutputFormat);

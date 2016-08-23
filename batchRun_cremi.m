@@ -18,16 +18,17 @@ h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membra
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160822';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160823';
 subDir = '000';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 1;
-showIntermediateImages = 0;
+showIntermediateImages = 1;
 
 % PARAMS:
 % Steerable edge filter bank - filter sizes
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
+threshFrac = 0.05; % edges with OFR below this will not be considered
 
 startImageID = 1;
 endImageID = 1;
@@ -80,11 +81,15 @@ for i=1:numFilesToProcess
     str1 = sprintf('Processing image %d ...',i);
     disp(str1)
     membraneProbMap = membraneProbMaps(:,:,i);
-    labelImage = labelImages(:,:,i);
+    if (produceBMRMfiles)
+        labelImage = labelImages(:,:,i);
+    else
+        labelImage = [];
+    end
     rawImage = rawImages(:,:,i);
     segmentationOut = doILP_w_dir(rawImage,rawImageID,...
         membraneProbMap,mitoProbMapFullFileName,...
-        barLength,barWidth,...
+        barLength,barWidth,threshFrac,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
         outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);

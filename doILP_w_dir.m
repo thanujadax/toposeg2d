@@ -1,6 +1,6 @@
 function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
     membraneProbMap,mitoProbMapFullFileName,...
-    barLength,barWidth,...
+    barLength,barWidth,threshFrac,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
     saveOutputFormat,logFilePath)
@@ -53,7 +53,7 @@ gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
 marginSize = ceil(barLength/2);
 marginPixValRaw = 0;
 marginPixValMem = 1;
-threshFrac = 0;   % threshold for OFR 0.1 for raw images, 0 for membraneProbMaps
+% threshFrac = 0;   % threshold for OFR 0.1 for raw images, 0 for membraneProbMaps
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
@@ -111,7 +111,7 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % 20160822: after removing input file handling and bug fixing in membrane
 % normalization. DATASET: drosophila larva ssTEM 
 % linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -10.4944];
-linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -19.4944];
+linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -21.4944];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1

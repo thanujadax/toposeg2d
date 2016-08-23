@@ -12,8 +12,8 @@ mitoProbMapFullFileName = '';
 outputRoot = '/home/thanuja/projects/RESULTS/contours/20160823';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 
-checkAndCreateSubDir(outputRoot,'003');
-outputPath = fullfile(outputRoot,'003');
+checkAndCreateSubDir(outputRoot,'004');
+outputPath = fullfile(outputRoot,'004');
 
 checkAndCreateSubDir(outputPath,'png');
 outputPathPNG = fullfile(outputPath,'png');
@@ -35,6 +35,7 @@ dbstop if error
 
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
+threshFrac = 0.001;
 
 rawFilesDirList = dir(fullfile(rawImageDir,rawImageType));
 memProbMapDirList = dir(fullfile(membraneProbMapDir,membraneProbMapType));
@@ -57,7 +58,7 @@ for i=1:numFilesToProcess
     labelImage = imread(labelImageFileName);
     segmentationOut = doILP_w_dir(rawImg,rawImageID,...
         membraneProbMap,mitoProbMapFullFileName,...
-        barLength,barWidth,...
+        barLength,barWidth,threshFrac,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
         outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);

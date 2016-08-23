@@ -110,7 +110,8 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 
 % 20160822: after removing input file handling and bug fixing in membrane
 % normalization. DATASET: drosophila larva ssTEM 
-linearWeights = [-3.85845, -4.22589, -0.092915, 0.595983, 0.549337, -0.40928];
+% linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -10.4944];
+linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -19.4944];
 
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1

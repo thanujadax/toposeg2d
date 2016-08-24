@@ -5,8 +5,10 @@
 
 %% Parameters, file paths etc
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
-toy = 1;
-
+toy = 1; % only work on 400x400 image size instead of the full image
+toyR = 400;
+toyC = 400;
+linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
 % INPUTS:
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
@@ -19,7 +21,7 @@ mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160823';
-subDir = '000';
+subDir = '001';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 1;
 showIntermediateImages = 1;
@@ -28,7 +30,7 @@ showIntermediateImages = 1;
 % Steerable edge filter bank - filter sizes
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
-threshFrac = 0.05; % edges with OFR below this will not be considered
+threshFrac = 0.005; % edges with OFR below this will not be considered
 
 startImageID = 1;
 endImageID = 1;
@@ -76,7 +78,7 @@ else
 end
 
 % main loop to process the images
-for i=1:numFilesToProcess
+for i=5:numFilesToProcess
     rawImageID = i;
     str1 = sprintf('Processing image %d ...',i);
     disp(str1)
@@ -87,8 +89,16 @@ for i=1:numFilesToProcess
         labelImage = [];
     end
     rawImage = rawImages(:,:,i);
+    if(toy)
+        membraneProbMap = membraneProbMap(1:toyR,1:toyC);
+        rawImage = rawImage(1:toyR,1:toyC);
+        if(~isempty(labelImage))
+            labelImage = labelImage(1:toyR,1:toyC);
+        end
+    end
     segmentationOut = doILP_w_dir(rawImage,rawImageID,...
         membraneProbMap,mitoProbMapFullFileName,...
+        linearWeights,...
         barLength,barWidth,threshFrac,...
         saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
         outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...

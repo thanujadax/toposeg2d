@@ -23,8 +23,8 @@ mitoProbMapFullFileName = '';
 outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160823';
 subDir = '001';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
-saveIntermediateImages = 1;
-showIntermediateImages = 1;
+saveIntermediateImages = 0;
+showIntermediateImages = 0;
 
 % PARAMS:
 % Steerable edge filter bank - filter sizes
@@ -78,7 +78,7 @@ else
 end
 
 % main loop to process the images
-for i=5:numFilesToProcess
+for i=6:numFilesToProcess
     rawImageID = i;
     str1 = sprintf('Processing image %d ...',i);
     disp(str1)
@@ -104,7 +104,8 @@ for i=5:numFilesToProcess
         outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
         logFileFullPath);
 
-    writeFileName = fullfile(outputPathPNG,strcat(rawImageID,'.',saveOutputFormat));
+    writeFileName = fullfile(outputPathPNG,...
+        strcat(num2str(rawImageID),'.',saveOutputFormat));
     imwrite(segmentationOut,writeFileName,saveOutputFormat);
 
 end

@@ -1,4 +1,4 @@
-function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
+function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
     membraneProbMap,mitoProbMapFullFileName,...
     linearWeights,...
     barLength,barWidth,threshFrac,...
@@ -39,7 +39,7 @@ useMitochondriaDetection = 0;
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 % rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 
-fprintf(logFileH,'Processsing image file: %d \n',rawImageID);
+fprintf(logFileH,'Processsing image file: %s \n',rawImageIDstr);
 
 %% Parameters
 orientationStepSize = 10;
@@ -182,7 +182,7 @@ if(b_imWithBorder)
     if(saveIntermediateImages)
         intermediateImgDescription = 'rawImage';
         imgInNormal = rawImg./max(max(rawImg));
-        saveIntermediateImage(imgInNormal,rawImageID,intermediateImgDescription,...
+        saveIntermediateImage(imgInNormal,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
     end
     if(produceBMRMfiles)
@@ -211,7 +211,7 @@ end
 if(saveIntermediateImages)
     intermediateImgDescription = 'orientationFiltering';
 %     rgbimg = rgbimg./(max(max(max(rgbimg))));
-    saveIntermediateImage(rgbimg,rawImageID,intermediateImgDescription,...
+    saveIntermediateImage(rgbimg,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 end
 
@@ -234,7 +234,7 @@ figure()
 watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws);
 % figure;imagesc(ws);colormap('jet')
 set(gca,'position',[0 0 1 1],'units','normalized')
-outputFileName = sprintf('%s_%s.png',rawImageID,intermediateImgDescription);
+outputFileName = sprintf('%s_%s.png',rawImageIDstr,intermediateImgDescription);
 outputFileName = fullfile(saveIntermediateImagesPath,outputFileName);
 % print(outputFileName)
 saveas(gcf,outputFileName,saveOutputFormat)
@@ -246,7 +246,7 @@ disp('creating graph from watershed boundaries...');
     ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes,...
     selfEdgeIDs,nodelessEdgeIDs] ...
     = getGraphFromWS(ws,output,showIntermediateImages,saveIntermediateImages,...
-      saveIntermediateImagesPath,rawImageID,saveOutputFormat);
+      saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
 
 % edges2nodes is already appended with psuedoEdges2nodes
 % edges2pixels is already appended with psuedoEdgeIDs, with zeros as
@@ -280,7 +280,7 @@ if(showIntermediateImages)
 end
 if(saveIntermediateImages)
     intermediateImgDescription = 'wsRegions2';
-    saveIntermediateImage(wsRegionBoundariesFromGraph,rawImageID,intermediateImgDescription,...
+    saveIntermediateImage(wsRegionBoundariesFromGraph,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 end
 
@@ -337,7 +337,7 @@ if(showIntermediateImages)
 end
 if(saveIntermediateImages)
     intermediateImgDescription = 'edgeUnary';
-    saveIntermediateImage(edgeUnaryMat,rawImageID,intermediateImgDescription,...
+    saveIntermediateImage(edgeUnaryMat,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 % h = overlayLabelOnImage(imgInNormal,edgeUnaryMat);
 % set(gca,'position',[0 0 1 1],'units','normalized');
@@ -399,7 +399,7 @@ if(usePrecomputedProbabilityMaps)
     useMitochondriaDetection,marginSize,marginPixValRaw,...
     setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
     saveIntermediateImages,...
-    saveIntermediateImagesPath,rawImageID,saveOutputFormat);
+    saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
     
 else
     
@@ -415,7 +415,7 @@ else
     end
     regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
         nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediateImages,...
-        saveIntermediateImages,saveIntermediateImagesPath,rawImageID,saveOutputFormat);   
+        saveIntermediateImages,saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);   
     
 end
 
@@ -695,7 +695,7 @@ segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             marginSize,showIntermediateImages,fillSpaces);
 if(saveIntermediateImages)
     intermediateImgDescription = 'segmentationOutput';
-    saveIntermediateImage(segmentationOut,rawImageID,intermediateImgDescription,...
+    saveIntermediateImage(segmentationOut,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 end
 fprintf(logFileH,'ILP is done! \n');

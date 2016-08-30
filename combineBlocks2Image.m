@@ -20,6 +20,3 @@ for i=1:numel(blockFilesDirList)
     canvas = maxFillCanvas(canvas,im_i,rStart,rStop,cStart,cStop);
     
 end
-
-
-    

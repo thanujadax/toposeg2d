@@ -15,7 +15,9 @@ for i=1:numel(blockFilesDirList)
     im_i = imread(fullfile(blockDir,blockFilesDirList(i).name));
     im_i = im2bw(im_i, 0); % any value above zero is replaced by 1
     % get the corner coordinates of the block wrt canvas
-    [rStart,rStop,cStart,cStop] = getBlockPositionForCanvas();
+    [blockSizeR,blockSizeC] = size(im_i);
+    [rStart,rStop,cStart,cStop] = getBlockPositionForCanvas...
+        (blockFilesDirList(i).name,blockSizeR,blockSizeC,sizeR,sizeC);
     % max fill
     canvas = maxFillCanvas(canvas,im_i,rStart,rStop,cStart,cStop);
     

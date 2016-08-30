@@ -5,7 +5,7 @@
 
 %% Parameters, file paths etc
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
-toy = 1; % only work on 400x400 image size instead of the full image
+toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 400;
 toyC = 400;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
@@ -20,8 +20,8 @@ h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membra
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160823';
-subDir = '001';
+outputRoot = '/home/thanuja/projects/RESULTS/cremi/20160830';
+subDir = '002';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
@@ -35,10 +35,12 @@ threshFrac = 0.005; % edges with OFR below this will not be considered
 startImageID = 1;
 endImageID = 1;
 
-rStep = 440;
-cStep = 440;
+rStep = 330;
+cStep = 330;
 rOverlap = 30;
 cOverlap = 30;
+numBlocksR = 4;
+numBlocksC = 4;
 
 dbstop if error
 
@@ -56,7 +58,6 @@ dataSet = '/volumes/raw';
 rawImages = h5read(h5FileName_raw,dataSet);
 rawImages = shiftdim(rawImages,3);
 % rawImage has dimensions X,Y,Z
-rawFilesDirList = dir(fullfile(rawImageDir,rawImageType));
 %% read labels if inputs for structured learning are to be generated
 if(produceBMRMfiles)
     dataSet = '/volumes/labels/neuron_ids';
@@ -83,7 +84,8 @@ else
 end
 
 % main loop to process the images
-for i=1:numFilesToProcess
+%for i=1:numFilesToProcess
+for i=1:1
     rawImageID = i;
     rawImageIDstr = num2str(rawImageID);
     str1 = sprintf('Processing image %d ...',i);
@@ -99,18 +101,20 @@ for i=1:numFilesToProcess
     % break image into 9 chunks of size ~440x440
     blockDirName = num2str(rawImageID);
     checkAndCreateSubDir(saveIntermediateImagesPath,blockDirName);
-    outputBlockDir = fullfile(saveIntermediateImagesPath,blockDirName);
+    outputBlockDirFull = fullfile(saveIntermediateImagesPath,blockDirName);
     
-    for r=1:3
-        rStart = (r-1)*rStep + 1;
+    for r=1:numBlocksR
+        rStart = (r-1)*rStep + 1 - rOverlap;
+        rStart = max(1,rStart);
         rStop = rStart + rStep - 1;
-        rStop = min(rSize,rStop);
-        for c = 1:3
-            cStart = (c-1)*cStep + 1;
+        rStop = min(sizeR,rStop);
+        for c = 1:numBlocksC
+            cStart = (c-1)*cStep + 1 - cOverlap;
+            cStart = max(1,cStart);
             cStop = cStart + cStep - 1;
-            cStop = min(cSize,cStop);
+            cStop = min(sizeC,cStop);
             
-            blockFileName = sprintf('r%d_c%d',r,c);
+            blockFileName = sprintf('r%dc%d',r,c);
             
             membraneProbMap_block = membraneProbMap(rStart:rStop,cStart:cStop);
             rawImage_block = rawImage(rStart:rStop,cStart:cStop);
@@ -128,12 +132,12 @@ for i=1:numFilesToProcess
                 logFileFullPath);
             
             
-            writeFileName = fullfile(outputBlockDir,...
+            writeFileName = fullfile(outputBlockDirFull,...
                 strcat(blockFileName,'.',saveOutputFormat));
             imwrite(segmentationOut,writeFileName,saveOutputFormat);
         end
     end
     % combine the 9 blocks into one image
-    combineBlocks2Image(outputBlockDir,outputPathPNG,blockDirName,rawImageIDstr,...
-        rOverlap,cOverlap,,sizeR,sizeC,saveOutputFormat);
+    combineBlocks2Image(outputBlockDirFull,outputPathPNG,rawImageIDstr,...
+        rStep,cStep,rOverlap,cOverlap,sizeR,sizeC,saveOutputFormat);
 end

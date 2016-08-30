@@ -1,17 +1,19 @@
 function [rStart,rStop,cStart,cStop] = getBlockPositionForCanvas...
-    (blockFileName,blockSizeR,blockSizeC,sizeR,sizeC)
+    (blockFileName,rStep,cStep,rOverlap,cOverlap,sizeR,sizeC)
 
 blockName = strtok(blockFileName,'.');
 cc = strsplit(blockName,'c');
-blockColID = cc{2};
+blockColID = str2double(cc{2});
 dd = strsplit(cc{1},'r');
-blockRowID = dd{2};
+blockRowID = str2double(dd{2});
 
-rStart = (blockRowID-1)*blockSizeR + 1;
-rStop = rStart + blockSizeR - 1;
+rStart = (blockRowID-1)*rStep + 1 - rOverlap;
+rStart = max(1,rStart);
+rStop = rStart + rStep- 1;
 rStop = min(rStop,sizeR);
 
-cStart = (blockColID-1)*blockSizeC + 1;
-cStop = cStart + blockSizeC -1;
+cStart = (blockColID-1)*cStep + 1 - cOverlap;
+cStart = max(1,cStart);
+cStop = cStart + cStep -1;
 cStop = min(cStop,sizeC);
 

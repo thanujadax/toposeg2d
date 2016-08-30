@@ -148,12 +148,14 @@ for i=1:numCs
     visualizeCells(:,:,1) = rMat;
     visualizeCells(:,:,2) = gMat;
     visualizeCells(:,:,3) = bMat;
-            
+     
+    
     
 end
 
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
+segmentationOut = adjustBorderLine(segmentationOut);
 % fill holes
 if(fillSpaces)
     segmentationOut = fillHoles(segmentationOut);

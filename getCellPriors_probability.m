@@ -1,6 +1,6 @@
 function regionPriors = getCellPriors_probability(pixelProbabilities,setOfCells,...
     sizeR,sizeC,wsIndsForRegion,ws,displayImg,saveIntermediateImages,...
-    saveIntermediateImagesPath,rawImageID,saveOutputFormat)
+    saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat)
 % Inputs:
 %   imgIn(pixelProbabilities) - normalized image. 1 -> bright
 %   K - positive scalar factor for the costs 
@@ -52,6 +52,6 @@ if(displayImg)
 end
 if(saveIntermediateImages)
     intermediateImgDescription = 'regionUnary';
-    saveIntermediateImage(regionScoreSpace,rawImageID,intermediateImgDescription,...
+    saveIntermediateImage(regionScoreSpace,rawImageIDstr,intermediateImgDescription,...
 saveIntermediateImagesPath,saveOutputFormat);
 end

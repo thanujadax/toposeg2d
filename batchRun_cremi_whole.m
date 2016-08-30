@@ -9,10 +9,14 @@ toy = 1; % only work on 400x400 image size instead of the full image
 toyR = 400;
 toyC = 400;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
+membraneDim = 3; % 2D or 3D trained probability map
+% 2D: 1250 x 1250 x 2 x 125
+% 3D: 1250 x 1250 x 125 x 2
 % INPUTS:
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
-h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/pygt_uvisual_cremi/sampla_A_20160501.h5';
+% h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
+h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A_20160501_3D.h5';
 h5FileName_raw = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501.hdf';
 % to be used only when generating sbmrm files
 h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membranes.hdf';
@@ -40,9 +44,15 @@ dbstop if error
 %%  read probability maps
 dataSet = '/main';
 membraneData = h5read(h5FileName_membranes,dataSet);
-membraneData = shiftdim(membraneData,3);
-membraneProbMaps = membraneData(:,:,:,1);
-membraneProbMaps = shiftdim(membraneProbMaps,1);
+if(membraneDim==2)
+    % 2D: 1250 x 1250 x 2 x 125
+    membraneData = shiftdim(membraneData,3);
+    membraneProbMaps = membraneData(:,:,:,1);
+    membraneProbMaps = shiftdim(membraneProbMaps,1);
+else
+    % 3D: 1250 x 1250 x 125 x 2
+    membraneProbMaps = membraneData(:,:,:,1);    
+end
 % membraneProbMaps has dimensions X,Y,Z
 clear membraneData
 

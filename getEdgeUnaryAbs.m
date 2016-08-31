@@ -15,6 +15,7 @@ for i=1:numEdges
         pEID = edgeListInds(i);
         edgepix_i = psuedoEdges2nodes(psuedoEdgeIDs==pEID,:);
     end
+    
     meanAbsOFR_i = mean(absOFR(edgepix_i));
     edgeUnary(i) = meanAbsOFR_i;
     

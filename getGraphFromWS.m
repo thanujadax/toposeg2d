@@ -143,8 +143,9 @@ numPsuedoEdges = size(psuedoEdges2nodeInds,1);
 maxEdgeID = size(edges2pixels,1);
 psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
 % append psuedoEdgeIDs to edges2pixels
-edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
-
+if(numPsuedoEdges>0)
+    edges2pixels = appendPsuedoEdgeIDs2edges2pixels(edges2pixels,psuedoEdgeIDs);
+end
 % NB. some of the psuedoEdges will be removed in the following step
 disp('get nodeEdges ..')
 [nodeEdges,nodeInds,psuedoEdgeIDs,psuedoEdges2nodeInds,removedPsEdgeIDs] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...

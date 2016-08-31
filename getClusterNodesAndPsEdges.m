@@ -96,7 +96,7 @@ end
 psuedoEdgeNodeInds = find(eightNH_J>0);
 numPsuedoEdgeNodes = numel(psuedoEdgeNodeInds);
 if(numPsuedoEdgeNodes==0)
-    pEdges2nodes = 0;
+    pEdges2nodes = [];
 else
     pEdges2nodes = zeros(1,2);
     k = 0;
@@ -129,6 +129,9 @@ else
                 end
             end
         end
+    end
+    if(k==0)
+        pEdges2nodes = [];
     end
 end
 

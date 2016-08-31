@@ -1,3 +1,4 @@
-bsub matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_A.m
-bsub matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_B.m
-bsub matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_C.m
+matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_A.m
+matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_B.m
+matlab -nodisplay -nojvm -singleCompThread -r batchRun_cremi_C.m
+

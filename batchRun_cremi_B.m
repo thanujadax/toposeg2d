@@ -27,7 +27,7 @@ h5FileName_raw = '/cluster/scratch/thanujaa/DATA/sample_B+_20160601.hdf';
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/cluster/scratch/thanujaa/RESULTS';
+outputRoot = '/cluster/home/thanujaa/RESULTS';
 subDir = 'B';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
@@ -88,7 +88,7 @@ else
 end
 
 % main loop to process the images
-for i=1:numFilesToProcess
+parfor i=1:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %d ...',i);

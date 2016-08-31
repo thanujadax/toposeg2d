@@ -4,6 +4,7 @@
 % output has to be processed with relevant python script
 
 %% Parameters, file paths etc
+updatePathCremi();
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 100;

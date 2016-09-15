@@ -5,7 +5,7 @@
 
 %% Parameters, file paths etc
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
-toy = 1; % only work on 400x400 image size instead of the full image
+toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 400;
 toyC = 400;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
@@ -16,16 +16,16 @@ membraneDim = 3; % 2D or 3D trained probability map
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
-h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A_20160501_3D.h5';
-h5FileName_raw = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501.hdf';
+h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A+_20160601_3D.h5';
+h5FileName_raw = '/home/thanuja/DATA/cremi/test/hdf/sample_A+_20160601.hdf';
 % to be used only when generating sbmrm files
 h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membranes.hdf';
 
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160823';
-subDir = '001';
+outputRoot = '/home/thanuja/projects/RESULTS/contours/cremi/20160831';
+subDir = 'A';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
@@ -34,12 +34,12 @@ showIntermediateImages = 0;
 % Steerable edge filter bank - filter sizes
 barLength = 13; % should be odd
 barWidth = 4; % should be even?
-threshFrac = 0.005; % edges with OFR below this will not be considered
+threshFrac = 0.003; % edges with OFR below this will not be considered
 
 startImageID = 1;
 endImageID = 1;
 
-dbstop if error
+% dbstop if error
 
 %%  read probability maps
 dataSet = '/main';
@@ -88,34 +88,40 @@ else
 end
 
 % main loop to process the images
-for i=6:numFilesToProcess
-    rawImageID = i;
-    str1 = sprintf('Processing image %d ...',i);
-    disp(str1)
-    membraneProbMap = membraneProbMaps(:,:,i);
-    if (produceBMRMfiles)
-        labelImage = labelImages(:,:,i);
-    else
+parfor i=1:numFilesToProcess
+    try
+        rawImageID = i;
+        str1 = sprintf('Processing image %d ...',i);
+        disp(str1)
+        membraneProbMap = membraneProbMaps(:,:,i);
+%         if (produceBMRMfiles)
+%             labelImage = labelImages(:,:,i);
+%         else
+%             labelImage = [];
+%         end
         labelImage = [];
-    end
-    rawImage = rawImages(:,:,i);
-    if(toy)
-        membraneProbMap = membraneProbMap(1:toyR,1:toyC);
-        rawImage = rawImage(1:toyR,1:toyC);
-        if(~isempty(labelImage))
-            labelImage = labelImage(1:toyR,1:toyC);
+        
+        rawImage = rawImages(:,:,i);
+        if(toy)
+            membraneProbMap = membraneProbMap(1:toyR,1:toyC);
+            rawImage = rawImage(1:toyR,1:toyC);
+%             if(~isempty(labelImage))
+%                 labelImage = labelImage(1:toyR,1:toyC);
+%             end
         end
+        segmentationOut = doILP_w_dir(rawImage,rawImageID,...
+            membraneProbMap,mitoProbMapFullFileName,...
+            linearWeights,...
+            barLength,barWidth,threshFrac,...
+            saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
+            outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
+            logFileFullPath);
+
+        writeFileName = fullfile(outputPathPNG,...
+            strcat(num2str(rawImageID),'.',saveOutputFormat));
+        imwrite(segmentationOut,writeFileName,saveOutputFormat);
+    catch
+        str1 = sprintf('Error occurred while processing image %d',i);
+        disp(str1)
     end
-    segmentationOut = doILP_w_dir(rawImage,rawImageID,...
-        membraneProbMap,mitoProbMapFullFileName,...
-        linearWeights,...
-        barLength,barWidth,threshFrac,...
-        saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-        outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
-        logFileFullPath);
-
-    writeFileName = fullfile(outputPathPNG,...
-        strcat(num2str(rawImageID),'.',saveOutputFormat));
-    imwrite(segmentationOut,writeFileName,saveOutputFormat);
-
 end

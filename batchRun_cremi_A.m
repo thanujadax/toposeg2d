@@ -44,8 +44,8 @@ threshFrac = 0.002; % edges with OFR below this will not be considered
 % dbstop if error
 
 % parallel pool set up
-poolobj = parpool('local',16);
-ms.UseParallel='always';
+% poolobj = parpool('local',16);
+% ms.UseParallel='always';
 
 %%  read probability maps
 dataSet = '/main';
@@ -126,11 +126,13 @@ parfor i=1:numFilesToProcess
             strcat(num2str(rawImageID),'.',saveOutputFormat));
         imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
-    catch
+    catch ME
         str1 = sprintf('Error occurred while processing image %d',i);
         disp(str1)
+	msgTxt = getReport(ME);
+	disp(msgTxt)
     end
 end
 % parallel pool stop
-delete(poolobj);
+% delete(poolobj);
 exit;

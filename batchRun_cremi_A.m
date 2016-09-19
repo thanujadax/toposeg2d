@@ -6,7 +6,8 @@ function batchRun_cremi_A()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-updatePathCremi(); % add external sub directories to matlab path
+% updatePathCremi(); % add external sub directories to matlab path
+noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 100;
@@ -20,11 +21,14 @@ membraneDim = 3; % 2D or 3D trained probability map
 % membrane i.e. membranes are visualized in white
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A+_20160601_3D.h5';
-h5FileName_membranes = '/scratch/thanujaa/DATA/sample_A+_20160601_3D_membranes.h5';
-h5FileName_raw = '/scratch/thanujaa/DATA/sample_A+_20160601.hdf';
+
+
 % h5FileName_raw = '/home/thanuja/DATA/cremi/test/hdf/sample_A+_20160601.hdf';
 % to be used only when generating sbmrm files
 % h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membranes.hdf';
+
+h5FileName_membranes = '/scratch/thanujaa/DATA/sample_A+_20160601_3D_membranes.h5';
+h5FileName_raw = '/scratch/thanujaa/DATA/sample_A+_20160601.hdf';
 
 mitoProbMapFullFileName = '';
 
@@ -120,7 +124,7 @@ for i=1:numFilesToProcess
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
-            logFileFullPath);
+            logFileFullPath,noDisplay);
 
         writeFileName = fullfile(outputPathPNG,...
             strcat(num2str(rawImageID),'.',saveOutputFormat));

@@ -94,7 +94,7 @@ else
 end
 
 % main loop to process the images
-parfor i=1:numFilesToProcess
+for i=1:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %d ...',i);

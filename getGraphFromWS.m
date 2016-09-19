@@ -60,17 +60,6 @@ disp('Junctions extracted!')
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
 
-% save image
-if(saveIntermediateImages)
-    wsVis = zeros(sizeR,sizeC,3);
-    wsVis(:,:,3) = wsBoundaries;
-    wsVis(:,:,1) = wsJ;
-    intermediateImgDescription = 'WSjunctions';
-    saveIntermediateImage(wsVis,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath,saveOutputFormat);
-    figure;imshow(wsVis);
-    % title('Junctions from WS')
-end
 % ws edges with OFR color code
 hsvOutput_V = hsvOutput(:,:,3);
 edgepix = zeros(sizeR,sizeC);
@@ -82,15 +71,8 @@ if(saveMatrices)
 end
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
-if(displayImg)
-    figure;imshow(RGBimg);
-end
 
-if(saveIntermediateImages)
-    intermediateImgDescription = 'orientationFiltering_WS';
-    saveIntermediateImage(RGBimg,rawImageID,intermediateImgDescription,...
-    saveIntermediateImagesPath,saveOutputFormat);
-end
+
 %% extracting edges connecting junctions
 % assign unique labels for edges
 % all the pixels in each edge should have the same label
@@ -244,23 +226,6 @@ if(saveMatrices)
     save('edges2pixels.mat','edges2pixels')
 end
 
-
-%% visualize graph
-if(0)
-    [r,c] = ind2sub([sizeR sizeC],nodeInds);
-    xy = [c r];
-    % figure;gplot(adjacencyMat,xy,'-*');
-    figure;gplotwl(adjacencyMat,xy);
-    set(gca,'YDir','reverse');
-    axis square
-end
-
-
-% n = size(adjacencyMat,1);
-% k = 1:n;
-% figure;gplot(adjacencyMat(k,k),xy(k,:),'-*')
-% set(gca,'YDir','reverse');
-% axis square
 
 function nodeEdges = removeSelfEdgesFromNodeEdges(nodeEdges,selfEdgeIDs)
 

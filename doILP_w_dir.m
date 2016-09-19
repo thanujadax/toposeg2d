@@ -205,9 +205,6 @@ OFR_hue = output(:,:,1);
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
 
-if(showIntermediateImages)
-    figure;imshow(rgbimg)
-end
 if(saveIntermediateImages)
     intermediateImgDescription = 'orientationFiltering';
 %     rgbimg = rgbimg./(max(max(max(rgbimg))));
@@ -225,20 +222,6 @@ ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 % randomize WS region IDs
 ws = assignRandomIndicesToWatershedTransform(ws);
-
-if(saveIntermediateImages)
-    intermediateImgDescription = 'regionsWS';
-%     saveIntermediateImage(ind2rgb(ws,'default'),rawImageID,intermediateImgDescription,...
-% saveIntermediateImagesPath);
-figure()
-watershedColoredEdges = overlayWatershedOnImage(imgInNormal,ws);
-% figure;imagesc(ws);colormap('jet')
-set(gca,'position',[0 0 1 1],'units','normalized')
-outputFileName = sprintf('%s_%s.png',rawImageIDstr,intermediateImgDescription);
-outputFileName = fullfile(saveIntermediateImagesPath,outputFileName);
-% print(outputFileName)
-saveas(gcf,outputFileName,saveOutputFormat)
-end
 
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
@@ -275,9 +258,7 @@ end
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
-if(showIntermediateImages)
-    figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
-end
+
 if(saveIntermediateImages)
     intermediateImgDescription = 'wsRegions2';
     saveIntermediateImage(wsRegionBoundariesFromGraph,rawImageIDstr,intermediateImgDescription,...
@@ -331,10 +312,6 @@ end
 
 % visualize edge unaries
 edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgeUnary,sizeR,sizeC);
-if(showIntermediateImages)
-    figure;imshow(edgeUnaryMat);
-    % title('edge unary score')
-end
 if(saveIntermediateImages)
     intermediateImgDescription = 'edgeUnary';
     saveIntermediateImage(edgeUnaryMat,rawImageIDstr,intermediateImgDescription,...
@@ -457,66 +434,7 @@ offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
 edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-if(showIntermediateImages)
-    figure;imshow(imgOffEdges); title('visualization of edges turned off')
-end
-%% Backbone
 
-% onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
-%                 lenThreshBB,priorThreshFracBB);
-% % removing boundary edges from the onEdgeListID list
-% onEdgeListIDs = setdiff(onEdgeListIDs,boundaryEdgeListInds);
-% 
-% bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
-% bbNodePixInds = nodeInds(bbNodeListInds);
-% bbnodesVis = wsRegionBoundariesFromGraph;
-% bbnodesVis(bbNodePixInds) = 0.2;
-% if(showIntermediateImages)
-%     figure;imagesc(bbnodesVis);
-% end
-% % visualize BB edges
-% imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-% if(showIntermediateImages)
-%     figure;imshow(imgBBEdges); title('visualization of backbone 1')
-% end
-% edgePriors(onEdgeListIDs) = bbEdgeReward;
-% % test - enforcing some edges to be picked
-% clear onEdgeListIDs
-% onEdgeListIDs = [];
-% 
-% % visualize BB edges
-% imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-% if(showIntermediateImages)
-%     figure;imshow(imgBBEdges); title('visualization of backbone 2')
-% end
-%     % onEdgeListIDs = 2024;
-% % % visualize BB edges
-% % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-% % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
-
-
-%% visualize training data
-% 
-% strDataVisualization = visualizeStrData...
-%         (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
-%         c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
-%         c_cells2WSregions,ws,numLabels,sizeR,sizeC);
-% 
-% labelVector = getLabelVector...
-%     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
-%     numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
-% 
-% visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-%             junctionTypeListInds,nodeInds,connectedJunctionIDs,...
-%             nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
-%             output,showIntermediate);
-%         
-
-% TODO:
-% labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-%             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
-%             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-%             marginSize);
 
 %% ILP
 % cost function to minimize

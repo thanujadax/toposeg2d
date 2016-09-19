@@ -47,9 +47,6 @@ end
 
 % visualize region scores
 regionScoreSpace = regionScoreSpace./(max(max(regionScoreSpace)));
-if(displayImg)
-    figure;imshow(regionScoreSpace);title('region scores')
-end
 if(saveIntermediateImages)
     intermediateImgDescription = 'regionUnary';
     saveIntermediateImage(regionScoreSpace,rawImageIDstr,intermediateImgDescription,...

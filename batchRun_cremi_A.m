@@ -6,7 +6,7 @@ function batchRun_cremi_A()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-% updatePathCremi(); % add external sub directories to matlab path
+updatePathCremi(); % add external sub directories to matlab path
 noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
@@ -139,4 +139,4 @@ parfor i=1:numFilesToProcess
 end
 % parallel pool stop
 % delete(poolobj);
-exit;
+% exit;

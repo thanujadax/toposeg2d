@@ -219,17 +219,9 @@ end
 
 % if there are edges separating adjoining mergedWsIDs, make them invisible
 % by assigning the same regionID to the edge
-if(showImg)
-    
-    figure;imagesc(newWS);title('ws after merging RE regions')
-end
-
 [newWS, invisibleEdgeLIDs] = fixEdgesBetweenMergedRegions(...
     newWS,cell_mergedWsIDs_original,ws,edges2pixels,expandedWsIDs);
 
-if(showImg)
-    figure;imagesc(newWS);title('ws after merging RE regions and fixing edges')
-end
 
 function oldWsID = getOldWsID(ws,newWS,regionID)
 % we already know that regionID is not an expandedRegion

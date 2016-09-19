@@ -160,5 +160,7 @@ segmentationOut = adjustBorderLine(segmentationOut);
 if(fillSpaces)
     segmentationOut = fillHoles(segmentationOut);
 end
-figure;imshow(segmentationOut);
+if(showIntermediate)
+    figure;imshow(segmentationOut);
+end
 end

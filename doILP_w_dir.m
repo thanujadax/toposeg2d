@@ -4,21 +4,13 @@ function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
     barLength,barWidth,threshFrac,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
-    saveOutputFormat,logFilePath,noDisplay)
+    saveOutputFormat,logFileH,noDisplay)
 
 % version 6. 20160821: removed input file handling
 % version 5. 20160509: 
 % version 4. 2014.01.06
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 % 20160321 - updated with new node angle cost function
-%% logging
-if exist(logFilePath)
-    % append
-    logFileH = fopen(logFilePath,'a');
-else
-    % open new file for writing
-    logFileH = fopen(logFilePath,'w');
-end
 
 %% Settings
 
@@ -241,7 +233,9 @@ saveas(gcf,outputFileName,saveOutputFormat)
 end
 
 %% generate graph from the watershed edges
-disp('creating graph from watershed boundaries...');
+str1 = 'Creating graph from watershed boundaries';
+disp(str1);
+fprintf(logFileH,str1);
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet,...
     ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes,...
     selfEdgeIDs,nodelessEdgeIDs] ...
@@ -266,7 +260,9 @@ if(size(connectedJunctionIDs,2)==2)
 else
     clusterNodeIDs = 0;
 end
-disp('graph created!')
+str1 = 'graph created!';
+disp(str1)
+fprintf(logFileH,str1);
 wsRegionBoundariesFromGraph = zeros(sizeR,sizeC);
 wsRegionBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
 if(size(connectedJunctionIDs,2)==2)
@@ -380,7 +376,9 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> region types (between pairs of regions)
-disp('calculating adjacency graph of regions ...')
+str1 = 'calculating adjacency graph of regions';
+disp(str1)
+fprintf(logFileH,str1);
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
 

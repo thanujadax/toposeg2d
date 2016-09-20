@@ -6,7 +6,7 @@ function batchRun_cremi_A()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-updatePathCremi(); % add external sub directories to matlab path
+% updatePathCremi(); % add external sub directories to matlab path
 noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
@@ -101,7 +101,7 @@ end
 parfor i=1:numFilesToProcess
     try
         rawImageID = i;
-        str1 = sprintf('Processing image %d ...',i);
+        str1 = sprintf('Processing image %s ...',num2str(i));
         disp(str1)
         membraneProbMap = membraneProbMaps(:,:,i);
     %     if(produceBMRMfiles)
@@ -118,7 +118,7 @@ parfor i=1:numFilesToProcess
     %             labelImage = labelImage(1:toyR,1:toyC);
     %         end
         end
-        segmentationOut = doILP_w_dir(rawImage,rawImageID,...
+        segmentationOut = doILP_w_dir(rawImage,num2str(rawImageID),...
             membraneProbMap,mitoProbMapFullFileName,...
             linearWeights,...
             barLength,barWidth,threshFrac,...

@@ -23,20 +23,20 @@ forestEdgeProbFileName = '/scratch/thanujaa/DATA/forestEdgeProbV7.mat';
 % membrane i.e. membranes are visualized in white
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
 
-h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A+_20160601_3D.h5';
-h5FileName_raw = '/home/thanuja/DATA/cremi/test/hdf/sample_A+_20160601.hdf';
+% h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi3D_A/sample_A+_20160601_3D.h5';
+% h5FileName_raw = '/home/thanuja/DATA/cremi/test/hdf/sample_A+_20160601.hdf';
 
 % to be used only when generating sbmrm files
 % h5FileName_labels = '/home/thanuja/DATA/cremi/train/hdf/sample_A_20160501_membranes.hdf';
 
-% h5FileName_membranes = '/scratch/thanujaa/DATA/sample_A+_20160601_3D_membranes.h5';
-% h5FileName_raw = '/scratch/thanujaa/DATA/sample_A+_20160601.hdf';
+h5FileName_membranes = '/scratch/thanujaa/DATA/sample_A+_20160601_3D_membranes.h5';
+h5FileName_raw = '/scratch/thanujaa/DATA/sample_A+_20160601.hdf';
 
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-% outputRoot = '/home/thanujaa/RESULTS';
-outputRoot = '/home/thanuja/RESULTS';
+outputRoot = '/home/thanujaa/RESULTS';
+% outputRoot = '/home/thanuja/RESULTS';
 
 subDir = 'A';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
@@ -107,7 +107,7 @@ else
 end
 
 % main loop to process the images
-for i=1:numFilesToProcess
+parfor i=1:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));

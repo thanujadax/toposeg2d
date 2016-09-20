@@ -230,8 +230,8 @@ fprintf(logFileH,str1);
 % edges2pixels is already appended with psuedoEdgeIDs, with zeros as
 % pixInds.
 
-clear adjacencyMat
-clear output
+% clear adjacencyMat
+% clear output
 % nodeEdges - contain edgeIDs for each node
 
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
@@ -365,7 +365,7 @@ fprintf(logFileH,str1);
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
 
 [~,edgeOrientationsInds] = getEdgePriors(OFR,edges2pixels);
-clear OFR
+% clear OFR
 edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 
 % normalize input image

@@ -91,6 +91,11 @@ checkAndCreateSubDir(outputPath,'intermediate');
 logFileName = 'log.txt';
 logFileFullPath = fullfile(outputPath,logFileName);
 
+
+% open new file for writing
+logFileH = fopen(logFileFullPath,'w');
+
+
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else
@@ -98,11 +103,12 @@ else
 end
 
 % main loop to process the images
-parfor i=1:numFilesToProcess
+for i=1:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));
         disp(str1)
+        fprintf(logFileH,str1);
         membraneProbMap = membraneProbMaps(:,:,i);
     %     if(produceBMRMfiles)
     %         labelImage = labelImages(:,:,i);
@@ -124,7 +130,7 @@ parfor i=1:numFilesToProcess
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
-            logFileFullPath,noDisplay);
+            logFileH,noDisplay);
 
         writeFileName = fullfile(outputPathPNG,...
             strcat(num2str(rawImageID),'.',saveOutputFormat));
@@ -133,8 +139,10 @@ parfor i=1:numFilesToProcess
     catch ME
         str1 = sprintf('Error occurred while processing image %d',i);
         disp(str1)
+        fprintf(logFileH,str1);
 	msgTxt = getReport(ME);
 	disp(msgTxt)
+    fprintf(logFileH,msgTxt);
     end
 end
 % parallel pool stop

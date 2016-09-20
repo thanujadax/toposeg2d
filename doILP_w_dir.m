@@ -17,6 +17,7 @@ function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
 % produceBMRMfiles = 1;  % set label file below if 1
 % labelImageFileName = '00.tiff'; % for sbmrm. TODO: parameterize
 % showIntermediateImages = 1;
+set(0,'RecursionLimit',5000);
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 useMembraneProbMapForOFR = 1;  %%%%%%%%% TODO %%%%%%%%%%%

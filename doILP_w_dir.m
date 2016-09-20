@@ -1,6 +1,6 @@
 function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
     membraneProbMap,mitoProbMapFullFileName,...
-    linearWeights,...
+    forestEdgeProbFileName,linearWeights,...
     barLength,barWidth,threshFrac,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
@@ -28,7 +28,7 @@ useMitochondriaDetection = 0;
 % name i.e 00.tif, 01.tif etc
 
 % trained RFC for edge probability
-forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
+% forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 % rawImageFullFile = fullfile(rawImageDir,rawImageFileName);
 
 fprintf(logFileH,'Processsing image file: %s \n',rawImageIDstr);
@@ -287,12 +287,16 @@ if(0) % not using precomputed probability maps for graph edges - doesn't make se
 else
     
     if ~exist(forestEdgeProbFileName,'file')
-        disp('RF for edge classification. Training new classifier...')
+        str1 = 'RF for edge classification. Training new classifier...';
+        disp(str1)
+        fprintf(logFileH,str1);
         forestEdgeProb = trainRF_edgeProb();
     else
         % load forestEdgeProb.mat
         forestEdgeProb = importdata(forestEdgeProbFileName);
-        disp('loaded pre-trained RF for edge activation probability inference.')
+        str1 = 'loaded pre-trained RF for edge activation probability inference.';
+        disp(str1)
+        fprintf(logFileH,str1);
     end
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
@@ -367,34 +371,14 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 % normalizedInputImage = imgIn./(max(max(imgIn)));
 
 %% get region unaries
-if(usePrecomputedProbabilityMaps)
-    
-    regionUnary = getRegionScoreFromProbImage(...
-    membraneProbMap,mitochondriaProbabilityImage,...
-    useMitochondriaDetection,marginSize,marginPixValRaw,...
-    setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
-    saveIntermediateImages,...
-    saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
-    
-else
-    
-    if ~exist('forest.mat','file')
-        disp('RF for membrane classification not found');
-        prompt = 'Enter file name to be used for training: ';
-        
-        disp('RF for membrane classification not found. Training new classifier...')
-        forest = trainRandomForest_pixelProb();
-    else
-        load forest.mat
-        disp('loaded pre-trained RF for membrane vs cell-interior classification')
-    end
-    regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
-        nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediateImages,...
-        saveIntermediateImages,saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);   
-    
-end
 
-
+regionUnary = getRegionScoreFromProbImage(...
+membraneProbMap,mitochondriaProbabilityImage,...
+useMitochondriaDetection,marginSize,marginPixValRaw,...
+setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
+saveIntermediateImages,...
+saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
+    
 numRegions = numel(regionUnary);
 %% Boundary edges
 % we have already obtained boundaryEdgeIDs above. The following is

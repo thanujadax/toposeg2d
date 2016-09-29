@@ -7,6 +7,13 @@ function batchRun_cremi_A()
 
 %% Parameters, file paths etc
 % updatePathCremi(); % add external sub directories to matlab path
+
+%%%%% SGE parallelization parameters
+poolobj = parpool('SGEMatlab',4);
+ms.UseParallel='always';
+%%%%%%%%%%
+
+
 noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
@@ -150,6 +157,7 @@ parfor i=1:numFilesToProcess
     end
 end
 fclose(logFileH);
-% parallel pool stop
-% delete(poolobj);
-% exit;
+% SGE parallelization close
+pause(20)
+delete(poolobj);
+exit;

@@ -294,7 +294,7 @@ else
         forestEdgeProb = trainRF_edgeProb();
     else
         % load forestEdgeProb.mat
-        forestEdgeProb = importdata(forestEdgeProbFileName);
+        forestEdgeProb = load(forestEdgeProbFileName);
         str1 = 'loaded pre-trained RF for edge activation probability inference.';
         disp(str1)
         fprintf(logFileH,str1);

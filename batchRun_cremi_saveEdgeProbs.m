@@ -20,7 +20,9 @@ membraneDim = 3; % 2D or 3D trained probability map
 % 3D: 1250 x 1250 x 125 x 2
 
 % INPUTS:
+
 forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
+% forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
@@ -112,7 +114,7 @@ else
 end
 
 % main loop to process the images
-parfor i=1:numFilesToProcess
+for i=73:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));
@@ -141,9 +143,6 @@ parfor i=1:numFilesToProcess
             outputPathEdgeProbs,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
             logFileH,noDisplay);
 
-        writeFileName = fullfile(outputPathPNG,...
-            strcat(num2str(rawImageID),'.',saveOutputFormat));
-        imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
     catch ME
         str1 = sprintf('Error occurred while processing image %d',i);

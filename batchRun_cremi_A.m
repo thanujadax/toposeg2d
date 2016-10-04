@@ -9,10 +9,10 @@ function batchRun_cremi_A()
 % updatePathCremi(); % add external sub directories to matlab path
 
 %%%%% SGE parallelization parameters
-poolobj = parpool('SGEMatlab',4);
-ms.UseParallel='always';
+% poolobj = parpool('local',5);
+% ms.UseParallel='always';
 %%%%%%%%%%
-
+parallelImages = 5;
 
 noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
@@ -26,6 +26,7 @@ membraneDim = 3; % 2D or 3D trained probability map
 
 % INPUTS:
 forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
+edgeProbsDir = '/home/thanujaa/RESULTS/A/edgeProbs'; % edgeUnary
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
@@ -112,9 +113,9 @@ if(produceBMRMfiles)
 else
     numFilesToProcess = size(membraneProbMaps,3);
 end
-
+edgeUnaryFileList = dir(fullfile(edgeProbsDir,'*.mat'));
 % main loop to process the images
-parfor i=1:numFilesToProcess
+parfor (i=1:numFilesToProcess,parallelImages)
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));
@@ -135,9 +136,11 @@ parfor i=1:numFilesToProcess
     %             labelImage = labelImage(1:toyR,1:toyC);
     %         end
         end
+        % load precomputed edge probabilities (edgeUnary)
+        edgeUnaryS = load(fullfile(edgeProbsDir,edgeUnaryFileList(i).name));
         segmentationOut = doILP_w_dir(rawImage,num2str(rawImageID),...
             membraneProbMap,mitoProbMapFullFileName,...
-            forestEdgeProbFileName,linearWeights,...
+            edgeUnaryS.edgeUnary,linearWeights,...
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...

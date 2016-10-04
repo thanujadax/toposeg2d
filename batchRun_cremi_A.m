@@ -6,7 +6,7 @@ function batchRun_cremi_A()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-% updatePathCremi(); % add external sub directories to matlab path
+updatePathCremi(); % add external sub directories to matlab path
 
 %%%%% SGE parallelization parameters
 % poolobj = parpool('local',5);

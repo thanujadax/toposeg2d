@@ -100,12 +100,9 @@ sbmrmOutputDir = fullfile(outputPath,'sbmrmRun');
 checkAndCreateSubDir(outputPath,'sbmrmRun');
 saveIntermediateImagesPath = fullfile(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'intermediate');
-logFileName = 'log.txt';
-logFileFullPath = fullfile(outputPath,logFileName);
+checkAndCreateSubDir(outputPath,'log');
+outputPathLog = fullfile(outputPath,'log');
 
-
-% open new file for writing
-logFileH = fopen(logFileFullPath,'w');
 
 
 if(produceBMRMfiles)
@@ -116,6 +113,11 @@ end
 edgeUnaryFileList = dir(fullfile(edgeProbsDir,'*.mat'));
 % main loop to process the images
 parfor (i=1:numFilesToProcess,parallelImages)
+    logFileName = sprintf('logImage%03d.txt',i);
+    logFileFullPath = fullfile(outputPathLog,logFileName);
+    % open new file for writing
+    logFileH = fopen(logFileFullPath,'w');
+
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));
@@ -158,8 +160,9 @@ parfor (i=1:numFilesToProcess,parallelImages)
 	disp(msgTxt)
     fprintf(logFileH,msgTxt);
     end
+    fclose(logFileH);
 end
-fclose(logFileH);
+
 % SGE parallelization close
 pause(20)
 delete(poolobj);

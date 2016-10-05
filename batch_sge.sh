@@ -30,7 +30,7 @@ source /home/sgeadmin/ITETCELL/common/settings.sh
 # Gurobi license
 GRB_LICENSE_FILE=/usr/sepp/var-svn/licenses/gurobi/gurobi.lic ;
 export GRB_LICENSE_FILE ;
-echo LD_LIBRARY_PATH is ${LD_LIBRARY_PATH};
+echo GRB_LICENSE_FILE is ${GRB_LICENSE_FILE};
 
 # binary to execute
 # /usr/sepp/bin/matlab -nodisplay -r parfor_sge 

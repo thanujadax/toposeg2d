@@ -103,16 +103,21 @@ checkAndCreateSubDir(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'log');
 outputPathLog = fullfile(outputPath,'log');
 
-
+avoidFiles = [11:17,31:34,45:51,60:66,72:78];
 
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else
     numFilesToProcess = size(membraneProbMaps,3);
+    allFiles = 1:numFilesToProcess;
+    filesListToProcess = setdiff(allFiles,avoidFiles);
+    
 end
 edgeUnaryFileList = dir(fullfile(edgeProbsDir,'*.mat'));
 % main loop to process the images
-parfor (i=1:numFilesToProcess,parallelImages)
+% parfor (i=1:numFilesToProcess,parallelImages)
+parfor (j=1:numel(filesListToProcess),parallelImages)
+    i = filesListToProcess(j);
     logFileName = sprintf('logImage%03d.txt',i);
     logFileFullPath = fullfile(outputPathLog,logFileName);
     % open new file for writing

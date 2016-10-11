@@ -103,8 +103,8 @@ checkAndCreateSubDir(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'log');
 outputPathLog = fullfile(outputPath,'log');
 
-avoidFiles = [11:17,31:34,45:51,60:66,72:78];
-
+% avoidFiles = [11:17,31:34,45:51,60:66,72:78];
+avoidFiles = [8:20,28:37,44:57,60:66,69:82,86:91];
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else

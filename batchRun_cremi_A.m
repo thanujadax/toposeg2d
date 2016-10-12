@@ -104,13 +104,14 @@ checkAndCreateSubDir(outputPath,'log');
 outputPathLog = fullfile(outputPath,'log');
 
 % avoidFiles = [11:17,31:34,45:51,60:66,72:78];
-avoidFiles = [8:20,28:37,44:57,60:66,69:82,86:91];
+% avoidFiles = [8:20,28:37,44:57,60:66,69:82,86:91];
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else
     numFilesToProcess = size(membraneProbMaps,3);
-    allFiles = 1:numFilesToProcess;
-    filesListToProcess = setdiff(allFiles,avoidFiles);
+    % allFiles = 1:numFilesToProcess;
+    % filesListToProcess = setdiff(allFiles,avoidFiles);
+    filesListToProcess = [1,105,106,110,111,114,115,117:125];
     
 end
 edgeUnaryFileList = dir(fullfile(edgeProbsDir,'*.mat'));

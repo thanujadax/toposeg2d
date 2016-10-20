@@ -18,7 +18,7 @@ membraneDim = 2; % 2D or 3D trained probability map
 % 3D: 1250 x 1250 x 125 x 2
 
 % INPUTS:
-forestEdgeProbFileName = '/home/thanuja/DATA/forestEdgeProbV7.mat'; 
+forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
 % forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
 % membranesDir = '/home/thanuja/DATA/ISBI2012/testvolume_membranes_rfc';

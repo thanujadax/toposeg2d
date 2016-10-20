@@ -21,14 +21,14 @@ membraneDim = 2; % 2D or 3D trained probability map
 % forestEdgeProbFileName = '/home/thanuja/DATA/forestEdgeProbV7.mat'; 
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
-membranesDir = '/home/thanuja/DATA/ISBI2012/testvolume_membranes_rfc';
+% membranesDir = '/home/thanuja/DATA/ISBI2012/testvolume_membranes_rfc';
 rawDir = '/home/thanuja/DATA/ISBI2012/test-volume';
 h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/isbi12_s2/isbi_20161018-test.h5';
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/RESULTS/isbi2012';
-subDir = 'test_20161017';
+subDir = 'test_20161020';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
@@ -46,7 +46,7 @@ dbstop if error
 % ms.UseParallel='always';
 
 %%  read probability maps (tif)
-membraneFileList = dir(fullfile(membranesDir,strcat('*.tif')));
+% membraneFileList = dir(fullfile(membranesDir,strcat('*.tif')));
 
 %%  read probability maps (hdf5)
 dataSet = '/main';
@@ -92,7 +92,7 @@ checkAndCreateSubDir(outputPath,'sbmrmRun');
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else
-    numFilesToProcess = numel(membraneFileList);
+    numFilesToProcess = numel(rawFileList);
 end
 
 % main loop to process the images

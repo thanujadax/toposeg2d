@@ -1,4 +1,4 @@
-function batchRun_cremi_A()
+function batchRun_cremi_saveEdgeProbs()
 % script to process CREMI 2016 data
 % reads hdf5 raw data and probability maps
 % saves output to png/tif
@@ -6,13 +6,8 @@ function batchRun_cremi_A()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-updatePathCremi(); % add external sub directories to matlab path
+% updatePathCremi(); % add external sub directories to matlab path
 
-%%%%% SGE parallelization parameters
-% poolobj = parpool('local',5);
-% ms.UseParallel='always';
-%%%%%%%%%%
-parallelImages = 5;
 
 noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
@@ -25,8 +20,10 @@ membraneDim = 3; % 2D or 3D trained probability map
 % 3D: 1250 x 1250 x 125 x 2
 
 % INPUTS:
+
 forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
-edgeProbsDir = '/home/thanujaa/RESULTS/A/edgeProbs'; % edgeUnary
+% forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
+
 % probability map should contain the pixelwise probability of being
 % membrane i.e. membranes are visualized in white
 % h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/cremi2D_xy_A/sampla_A_20160501.h5';
@@ -100,30 +97,24 @@ sbmrmOutputDir = fullfile(outputPath,'sbmrmRun');
 checkAndCreateSubDir(outputPath,'sbmrmRun');
 saveIntermediateImagesPath = fullfile(outputPath,'intermediate');
 checkAndCreateSubDir(outputPath,'intermediate');
-checkAndCreateSubDir(outputPath,'log');
-outputPathLog = fullfile(outputPath,'log');
+checkAndCreateSubDir(outputPath,'edgeProbs');
+outputPathEdgeProbs = fullfile(outputPath,'edgeProbs');
+logFileName = 'log.txt';
+logFileFullPath = fullfile(outputPath,logFileName);
 
-% avoidFiles = [11:17,31:34,45:51,60:66,72:78];
-% avoidFiles = [8:20,28:37,44:57,60:66,69:82,86:91];
+
+% open new file for writing
+logFileH = fopen(logFileFullPath,'w');
+
+
 if(produceBMRMfiles)
     numFilesToProcess = 1;
 else
     numFilesToProcess = size(membraneProbMaps,3);
-    % allFiles = 1:numFilesToProcess;
-    % filesListToProcess = setdiff(allFiles,avoidFiles);
-    filesListToProcess = [1,105,106,110,111,114,115,117:125];
-    
 end
-edgeUnaryFileList = dir(fullfile(edgeProbsDir,'*.mat'));
-% main loop to process the images
-% parfor (i=1:numFilesToProcess,parallelImages)
-parfor (j=1:numel(filesListToProcess),parallelImages)
-    i = filesListToProcess(j);
-    logFileName = sprintf('logImage%03d.txt',i);
-    logFileFullPath = fullfile(outputPathLog,logFileName);
-    % open new file for writing
-    logFileH = fopen(logFileFullPath,'w');
 
+% main loop to process the images
+for i=73:numFilesToProcess
     try
         rawImageID = i;
         str1 = sprintf('Processing image %s ...',num2str(i));
@@ -144,19 +135,14 @@ parfor (j=1:numel(filesListToProcess),parallelImages)
     %             labelImage = labelImage(1:toyR,1:toyC);
     %         end
         end
-        % load precomputed edge probabilities (edgeUnary)
-        edgeUnaryS = load(fullfile(edgeProbsDir,edgeUnaryFileList(i).name));
-        segmentationOut = doILP_w_dir(rawImage,num2str(rawImageID),...
+        saveEdgeProbs(rawImage,rawImageID,...
             membraneProbMap,mitoProbMapFullFileName,...
-            edgeUnaryS.edgeUnary,linearWeights,...
+            forestEdgeProbFileName,linearWeights,...
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
-            outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
+            outputPathEdgeProbs,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
             logFileH,noDisplay);
 
-        writeFileName = fullfile(outputPathPNG,...
-            strcat(num2str(rawImageID),'.',saveOutputFormat));
-        imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
     catch ME
         str1 = sprintf('Error occurred while processing image %d',i);
@@ -166,10 +152,5 @@ parfor (j=1:numel(filesListToProcess),parallelImages)
 	disp(msgTxt)
     fprintf(logFileH,msgTxt);
     end
-    fclose(logFileH);
 end
-
-% SGE parallelization close
-pause(20)
-delete(poolobj);
-exit;
+fclose(logFileH);

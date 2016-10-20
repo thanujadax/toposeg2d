@@ -15,10 +15,10 @@ fm = zeros(numEdges,numOFRdim);
 for i=1:numEdges
     % get all edge pixels
     % get OFR for each pixel (all dimensions)
-    clear edgePixInds_i
+    % clear edgePixInds_i
     edgePixInds_i = edgepixels(i,:);
     edgePixInds_i = edgePixInds_i(edgePixInds_i>0);
-    clear edgePixInd_r edgePixInd_c 
+    % clear edgePixInd_r edgePixInd_c 
     [edgePixInd_r,edgePixInd_c] = ind2sub([sizeR sizeC],edgePixInds_i);
     numEdgePix_i = numel(edgePixInds_i);
     

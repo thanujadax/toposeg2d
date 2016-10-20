@@ -22,11 +22,11 @@ numCells = size(cells2edges,1);
 cellStates = zeros(numCells,1);
 
 for i=1:numCells
-    clear edgeSet_cell 
+    % clear edgeSet_cell 
     edgeSet_cell = cells2edges(i,:);
     edgeSet_cell = edgeSet_cell(edgeSet_cell>0);
     numEdges_cell = numel(edgeSet_cell);
-    clear cellStateVector_i
+    % clear cellStateVector_i
     cellStateVector_i = zeros(numEdges_cell,1);
     
     numEdges_toConsider = min(numEdges_cell,MAX_NUM_EDGES_TO_CONSIDER);
@@ -38,7 +38,7 @@ for i=1:numCells
     
     for j=1:numEdges_toConsider
         edgeListInd_j = find(edgeIDs==edgeSet_cell(j));
-        clear edgePixels
+        % clear edgePixels
         edgePixels = edges2pixels(edgeListInd_j,:);
         edgePixels = edgePixels(edgePixels>0); 
                

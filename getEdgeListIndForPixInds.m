@@ -8,7 +8,7 @@ numPix = numel(pixInds);
 k=0;    % iterator for the identified edges list
 for i=1:numPix
     % get the corresponding edgeListInd for the pixels
-    clear edgeListInd_i;
+    % clear edgeListInd_i;
     [edgeListInd_i,~] = find(edgePixels==pixInds(i));
     if(~isempty(edgeListInd_i))
         k = k+1;

@@ -97,9 +97,6 @@ cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
         
 visualizeCellBorders = zeros(sizeR,sizeC);
 visualizeCellBorders(cellBorderPixels) = 1;
-if(showIntermediate)
-    figure;imshow(visualizeCellBorders)
-end
 % regions aggregating to form cells
 % offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeListInd)); 
 offEdgeIDList = edgeListInds(offEdgeListInd);
@@ -160,7 +157,5 @@ segmentationOut = adjustBorderLine(segmentationOut);
 if(fillSpaces)
     segmentationOut = fillHoles(segmentationOut);
 end
-if(showIntermediate)
-    figure;imshow(segmentationOut);
-end
+
 end

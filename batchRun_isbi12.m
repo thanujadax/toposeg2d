@@ -13,7 +13,7 @@ toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 100;
 toyC = 100;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
-membraneDim = 3; % 2D or 3D trained probability map
+membraneDim = 2; % 2D or 3D trained probability map
 % 2D: 1250 x 1250 x 2 x 125
 % 3D: 1250 x 1250 x 125 x 2
 
@@ -21,14 +21,14 @@ membraneDim = 3; % 2D or 3D trained probability map
 % forestEdgeProbFileName = '/home/thanuja/DATA/forestEdgeProbV7.mat'; 
 forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
-membranesDir = '/home/thanuja/DATA/ISBI2012/trainvolume_membranes_rfc';
-rawDir = '/home/thanuja/DATA/ISBI2012/train-volume';
-
+membranesDir = '/home/thanuja/DATA/ISBI2012/testvolume_membranes_rfc';
+rawDir = '/home/thanuja/DATA/ISBI2012/test-volume';
+h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/isbi12_s2/isbi_20161018-test.h5';
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/RESULTS/isbi2012';
-subDir = '001';
+subDir = 'test_20161017';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
@@ -45,9 +45,23 @@ dbstop if error
 % poolobj = parpool('local',16);
 % ms.UseParallel='always';
 
-%%  read probability maps
+%%  read probability maps (tif)
 membraneFileList = dir(fullfile(membranesDir,strcat('*.tif')));
 
+%%  read probability maps (hdf5)
+dataSet = '/main';
+membraneData = h5read(h5FileName_membranes,dataSet);
+if(membraneDim==2)
+    % 2D: 512 x 512 x 2 x 30
+    membraneData = shiftdim(membraneData,3);
+    membraneProbMaps = membraneData(:,:,:,1);
+    membraneProbMaps = shiftdim(membraneProbMaps,1);
+else
+    % 3D: 1250 x 1250 x 125 x 2
+    membraneProbMaps = membraneData(:,:,:,1);    
+end
+% membraneProbMaps has dimensions X,Y,Z
+clear membraneData
 
 %%  read raw images
 rawFileList = dir(fullfile(rawDir,strcat('*.tif')));
@@ -92,8 +106,9 @@ for i=1:numFilesToProcess
         str1 = sprintf('Processing image %d ...',i);
         disp(str1)
         fprintf(logFileH,str1);
-        membraneFileName = fullfile(membranesDir,membraneFileList(i).name);
-        membraneProbMap = double(imread(membraneFileName));
+        % membraneFileName = fullfile(membranesDir,membraneFileList(i).name);
+        % membraneProbMap = double(imread(membraneFileName));
+        membraneProbMap = membraneProbMaps(:,:,i)';
         rawFileName = fullfile(rawDir,rawFileList(i).name);
         rawImage = double(imread(rawFileName));
     %     if(produceBMRMfiles)

@@ -6,7 +6,7 @@ function batchRun_isbi12()
 % paths changed to suit ARTON grid 20160909
 
 %% Parameters, file paths etc
-% updatePathCremi(); % add external sub directories to matlab path
+updatePathCremi(); % add external sub directories to matlab path
 noDisplay = 0;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image
@@ -18,17 +18,21 @@ membraneDim = 2; % 2D or 3D trained probability map
 % 3D: 1250 x 1250 x 125 x 2
 
 % INPUTS:
-% forestEdgeProbFileName = '/home/thanuja/DATA/forestEdgeProbV7.mat'; 
-forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
+forestEdgeProbFileName = '/home/thanuja/DATA/forestEdgeProbV7.mat'; 
+% forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
 
 % membranesDir = '/home/thanuja/DATA/ISBI2012/testvolume_membranes_rfc';
-rawDir = '/home/thanuja/DATA/ISBI2012/test-volume';
-h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/isbi12_s2/isbi_20161018-test.h5';
+% rawDir = '/home/thanuja/DATA/ISBI2012/test-volume';
+% h5FileName_membranes = '/home/thanuja/projects/classifiers/greentea/caffe_neural_models/isbi12_s2/isbi_20161018-test.h5';
+rawDir = '/home/thanujaa/DATA/isbi/train/raw';
+h5FileName_membranes = '/home/thanujaa/DATA/isbi/train/isbi_20161018.h5';
+
+
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/home/thanuja/RESULTS/isbi2012';
-subDir = 'test_20161020';
+outputRoot = '/home/thanujaa/RESULTS/isbi2012';
+subDir = 'train';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
@@ -39,7 +43,7 @@ barLength = 13; % should be odd
 barWidth = 4; % should be even?
 threshFrac = 0.002; % edges with OFR below this will not be considered
 
-dbstop if error
+% dbstop if error
 
 % parallel pool set up
 % poolobj = parpool('local',16);

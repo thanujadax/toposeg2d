@@ -7,6 +7,7 @@ function batchRun_isbi12()
 
 %% Parameters, file paths etc
 % updatePathCremi(); % add external sub directories to matlab path
+updatePathISBI();
 noDisplay = 0;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 toy = 0; % only work on 400x400 image size instead of the full image

@@ -294,14 +294,14 @@ else
         forestEdgeProb = trainRF_edgeProb();
     else
         % load forestEdgeProb.mat
-        forestEdgeProb = importdata(forestEdgeProbFileName);
+        forestStruct = load(forestEdgeProbFileName);
         str1 = 'loaded pre-trained RF for edge activation probability inference.';
         disp(str1)
         fprintf(logFileH,str1);
     end
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
-                (forestEdgeProb,rawImg,OFR,edgepixels,edgePriors,...
+                (forestStruct.forestEdgeProb,rawImg,OFR,edgepixels,edgePriors,...
                 boundaryEdgeIDs,edgeListInds,numTrees,...
                 psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds,...
                  membraneProbMap,edgeListInds);

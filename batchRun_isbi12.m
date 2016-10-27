@@ -7,13 +7,14 @@ function batchRun_isbi12()
 
 %% Parameters, file paths etc
 % updatePathCremi(); % add external sub directories to matlab path
-noDisplay = 0;
+noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
-toy = 0; % only work on 400x400 image size instead of the full image
-toyR = 100;
-toyC = 100;
+g = 2; % grow the final neuron segmentation by g pixels
+toy = 1; % only work on 400x400 image size instead of the full image
+toyR = 260;
+toyC = 260;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
-membraneDim = 3; % 2D or 3D trained probability map
+membraneDim = 2; % 2D or 3D trained probability map
 % 2D: 1250 x 1250 x 2 x 125
 % 3D: 1250 x 1250 x 125 x 2
 
@@ -28,10 +29,10 @@ mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/RESULTS/isbi2012';
-subDir = '001';
+subDir = '20161027_rfc_im11_small';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
-saveIntermediateImages = 0;
-showIntermediateImages = 0;
+saveIntermediateImages = 1;
+showIntermediateImages = 1;
 
 % PARAMS:
 % Steerable edge filter bank - filter sizes
@@ -80,10 +81,10 @@ if(produceBMRMfiles)
 else
     numFilesToProcess = numel(membraneFileList);
 end
-
+i = 11;
 % main loop to process the images
-for i=1:numFilesToProcess
-    try
+% for i=11:numFilesToProcess
+    % try
         % open new file for writing
         logFileName = sprintf('log%03d.txt',i);
         logFileFullPath = fullfile(outputPathLog,logFileName);
@@ -116,21 +117,21 @@ for i=1:numFilesToProcess
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
-            logFileH,noDisplay);
+            logFileH,noDisplay,g);
 
         writeFileName = fullfile(outputPathPNG,...
             strcat(num2str(rawImageID),'.',saveOutputFormat));
         imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
-    catch ME
-        str1 = sprintf('Error occurred while processing image %d',i);
-        disp(str1)
-        fprintf(logFileH,str1);
-	msgTxt = getReport(ME);
-	disp(msgTxt)
-    fprintf(logFileH,msgTxt);
-    end
-end
+    % catch ME
+%         str1 = sprintf('Error occurred while processing image %d',i);
+%         disp(str1)
+%         fprintf(logFileH,str1);
+% 	msgTxt = getReport(ME);
+% 	disp(msgTxt)
+%     fprintf(logFileH,msgTxt);
+    % end
+% end
 % parallel pool stop
 % delete(poolobj);
-exit;
+% exit;

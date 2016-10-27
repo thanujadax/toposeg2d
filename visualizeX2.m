@@ -1,9 +1,9 @@
 function segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize,showIntermediate,fillSpaces)
-% version 2. with directed edges. 2013.12.03
-        
+            marginSize,showIntermediate,fillSpaces,g,imgIn)
+% version 1.1. with directed edges. 2013.12.03
+% version 1.2. with region grow         
         
 ilpSegmentation = zeros(sizeR,sizeC);
 % active edges
@@ -109,7 +109,7 @@ offEdgeIDList = edgeListInds(offEdgeListInd);
             offNodeIndList,edges2nodes,edgeListInds);
                 
 % visualize each cell in different colors
-visualizeCells = zeros(sizeR,sizeC,3);
+segmentationOut = zeros(sizeR,sizeC,3);
 numCs = numel(c_cells2regions);
 rMat = zeros(sizeR,sizeC);
 gMat = zeros(sizeR,sizeC);
@@ -121,6 +121,10 @@ for i=1:numCs
     % get regions for this cell and the internal pixels. set RGB
     cellRegionList_i = c_cells2regions{i};
     regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
+    % grow by g pixels
+    for j=1:g
+        regionPixels = get4nhpixels(regionPixels,sizeR,sizeC);
+    end
     rMat(regionPixels) = R;
     gMat(regionPixels) = G;
     bMat(regionPixels) = B;
@@ -145,22 +149,27 @@ for i=1:numCs
     gMat(regionIntNodePixInds) = G;
     bMat(regionIntNodePixInds) = B;
     
-    visualizeCells(:,:,1) = rMat;
-    visualizeCells(:,:,2) = gMat;
-    visualizeCells(:,:,3) = bMat;
+    segmentationOut(:,:,1) = rMat;
+    segmentationOut(:,:,2) = gMat;
+    segmentationOut(:,:,3) = bMat;
      
     
     
 end
 
-% figure;imshow(visualizeCells);
-segmentationOut = removeThickBorder(visualizeCells,marginSize);
-segmentationOut = adjustBorderLine(segmentationOut);
+% figure;imshow(segmentationOut);
+% segmentationOut = removeThickBorder(segmentationOut,marginSize);
+% segmentationOut = adjustBorderLine(segmentationOut);
 % fill holes
 if(fillSpaces)
     segmentationOut = fillHoles(segmentationOut);
 end
 if(showIntermediate)
-    figure;imshow(segmentationOut);
+    alpha = ones(sizeR,sizeC) .* 0.7;
+    figure; imshow(segmentationOut);
+    hold on
+    h = imshow(imgIn);
+    hold off
+    set(h, 'AlphaData', alpha);
 end
 end

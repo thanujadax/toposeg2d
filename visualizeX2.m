@@ -166,7 +166,8 @@ if(fillSpaces)
 end
 if(showIntermediate)
     alpha = ones(sizeR,sizeC) .* 0.7;
-    figure; imshow(segmentationOut);
+    figure(102); imshow(segmentationOut);
+    set(0,'CurrentFigure',102)
     hold on
     h = imshow(imgIn);
     hold off

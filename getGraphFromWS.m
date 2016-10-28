@@ -2,7 +2,7 @@ function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,.
     selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,...
     psuedoEdgeIDs,psuedoEdges2nodeInds,selfEdgeIDs,nodelessEdgeIDs]...
     = getGraphFromWS(ws,hsvOutput,displayImg,saveIntermediateImages,...
-      saveIntermediateImagesPath,rawImageID,saveOutputFormat)
+      saveIntermediateImagesPath,rawImageID,saveOutputFormat,imIn)
 
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd
@@ -72,7 +72,8 @@ if(saveIntermediateImages)
     % title('Junctions from WS')
 end
 % ws edges with OFR color code
-hsvOutput_V = hsvOutput(:,:,3);
+% hsvOutput_V = hsvOutput(:,:,3);
+hsvOutput_V = ones(sizeR,sizeC);
 edgepix = zeros(sizeR,sizeC);
 edgepix(wsBoundaries>0) = hsvOutput_V(wsBoundaries>0);
 edgepix(wsJ>0) = 1;
@@ -83,7 +84,13 @@ end
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
 if(displayImg)
-    figure;imshow(RGBimg);
+    figure(103);imshow(RGBimg);
+    set(0,'CurrentFigure',103)
+    alpha = ones(sizeR,sizeC) .* 0.5;
+    hold on
+    h = imshow(imIn);
+    hold off
+    set(h, 'AlphaData', alpha);
 end
 
 if(saveIntermediateImages)

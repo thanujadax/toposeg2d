@@ -11,7 +11,7 @@ noDisplay = 1;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 g = 2; % grow the final neuron segmentation by g pixels
 toy = 1; % only work on 400x400 image size instead of the full image
-toyR = 260;
+toyR = 190;
 toyC = 260;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
 membraneDim = 2; % 2D or 3D trained probability map
@@ -29,7 +29,7 @@ mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/RESULTS/isbi2012';
-subDir = '20161027_rfc_im11_small';
+subDir = '20161031_rfc_im11_smaller';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 1;
 showIntermediateImages = 1;

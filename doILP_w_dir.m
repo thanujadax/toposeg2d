@@ -44,7 +44,8 @@ wsgmask = 9;
 
 gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
 
-marginSize = ceil(barLength/2);
+% marginSize = ceil(barLength/2);
+marginSize = 5;
 marginPixValRaw = 0;
 marginPixValMem = 1;
 % threshFrac = 0;   % threshold for OFR 0.1 for raw images, 0 for membraneProbMaps

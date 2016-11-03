@@ -1,10 +1,10 @@
 function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
-    membraneProbMap,mitoProbMapFullFileName,...
+    membraneProbMap,mitoProbMapFullFileName,forestEdgeProbFileName,...
     edgeUnary,linearWeights,...
     barLength,barWidth,threshFrac,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
-    saveOutputFormat,logFileH,noDisplay)
+    saveOutputFormat,logFileH,noDisplay,precomputedEdgeUnary)
 
 % version 6. 20160821: removed input file handling
 % version 5. 20160509: 
@@ -281,15 +281,25 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag,...
 
 % get edge activation probabilities from RFC
 
-if(0) % not using precomputed probability maps for graph edges - doesn't make sense!
-    % calculate edgeUnary from probability map image
-    edgeUnary = getEdgeProbabilityFromMap(...
-        membraneProbMap,edgepixels,marginSize,(1-marginPixVal));
-else
+if(precomputedEdgeUnary)
     
     str1 = 'using precomputed edge probabilities';
     disp(str1)
     fprintf(logFileH,str1);
+    
+else
+        % load forestEdgeProb.mat
+    forestEdgeProb = importdata(forestEdgeProbFileName);
+    str1 = 'loaded pre-trained RF for edge activation probability inference.';
+    disp(str1)
+    fprintf(logFileH,str1);
+
+
+    edgeUnary = getEdgeProbabilitiesFromRFC...
+                (forestEdgeProb,rawImg,OFR,edgepixels,edgePriors,...
+                boundaryEdgeIDs,edgeListInds,numTrees,...
+                psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds,...
+                 membraneProbMap,edgeListInds);
 
 end
 

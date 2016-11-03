@@ -27,5 +27,5 @@ ymax = 1.05;
 lims = [xmin xmax ymin ymax];
 axis(lims);
 
-set(gca,'XTickLabel',{'CNN:Rand', 'CNN:V\_info','RFC:Rand', 'RFC:V\_info'})
-legend('Best threshold', 'After ILP')
+set(gca,'XTickLabel',{'Rand:CNN', 'VoI:CNN','Rand:RFC', 'VoI:RFC'})
+legend('Best threshold', 'STC with same input')

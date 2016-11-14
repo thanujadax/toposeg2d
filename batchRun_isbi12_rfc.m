@@ -18,20 +18,21 @@ membraneDim = 3; % 2D or 3D trained probability map
 % 3D: 1250 x 1250 x 125 x 2
 
 % INPUTS:
-% forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
-forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
+forestEdgeProbFileName = '/home/thanujaa/DATA/forestEdgeProbV7.mat'; 
+% forestEdgeProbFileName = 'forestEdgeProbV7.mat'; 
+precomputedEdgeUnary = 0; % 1 if precomputed edgeUnary is to be used
 
-membranesDir = '/home/thanuja/RESULTS/isbi2012/CNN/train/probMaps_rfcilp_20161102';
-rawDir = '/home/thanuja/DATA/ISBI2012/train-volume';
+% membranesDir = '/home/thanuja/RESULTS/isbi2012/CNN/train/probMaps_rfcilp_inv_20161102';
+% rawDir = '/home/thanuja/DATA/ISBI2012/train-volume';
 
-% membranesDir = '/home/thanujaa/DATA/isbi/train/rfc_ilp_cnn';
-% rawDir = '/home/thanujaa/DATA/isbi/train/raw';
+membranesDir = '/home/thanujaa/DATA/isbi/train/rfc_ilp_cnn';
+rawDir = '/home/thanujaa/DATA/isbi/train/raw';
 
 
 mitoProbMapFullFileName = '';
 
 % OUTPUTS:
-outputRoot = '/home/thanuja/RESULTS/isbi2012';
+outputRoot = '/home/thanujaa/RESULTS/isbi2012';
 subDir = 'rfc_ilp_cnn';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
@@ -43,7 +44,7 @@ barLength = 13; % should be odd
 barWidth = 4; % should be even?
 threshFrac = 0.000; % edges with OFR below this will not be considered
 
-dbstop if error
+% dbstop if error
 
 % parallel pool set up
 % poolobj = parpool('local',16);
@@ -87,7 +88,7 @@ end
 
 % main loop to process the images
 for i=1:numFilesToProcess
-   %  try
+    try
         % open new file for writing
         logFileName = sprintf('log%03d.txt',i);
         logFileFullPath = fullfile(outputPathLog,logFileName);
@@ -114,26 +115,27 @@ for i=1:numFilesToProcess
     %             labelImage = labelImage(1:toyR,1:toyC);
     %         end
         end
+        edgeUnary = []; % read from precomputed files
         segmentationOut = doILP_w_dir(rawImage,rawImageID,...
             membraneProbMap,mitoProbMapFullFileName,...
-            forestEdgeProbFileName,linearWeights,...
+            forestEdgeProbFileName,edgeUnary,linearWeights,...
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
-            logFileH,noDisplay);
+            logFileH,noDisplay,precomputedEdgeUnary);
 
         writeFileName = fullfile(outputPathPNG,...
             strcat(num2str(rawImageID),'.',saveOutputFormat));
         imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
-%     catch ME
-%         str1 = sprintf('Error occurred while processing image %d',i);
-%         disp(str1)
-%         fprintf(logFileH,str1);
-% 	msgTxt = getReport(ME);
-% 	disp(msgTxt)
-%     fprintf(logFileH,msgTxt);
-%     end
+    catch ME
+        str1 = sprintf('Error occurred while processing image %d',i);
+        disp(str1)
+        fprintf(logFileH,str1);
+	msgTxt = getReport(ME);
+	disp(msgTxt)
+    fprintf(logFileH,msgTxt);
+    end
 end
 % parallel pool stop
 % delete(poolobj);

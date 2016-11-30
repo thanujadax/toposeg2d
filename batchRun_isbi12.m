@@ -7,14 +7,14 @@ function batchRun_isbi12()
 
 %% Parameters, file paths etc
 % updatePathCremi(); % add external sub directories to matlab path
-noDisplay = 1;
+noDisplay = 0;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
 g = 2; % grow the final neuron segmentation by g pixels
 toy = 1; % only work on 400x400 image size instead of the full image
 toyRstart = 81;
-toyRstop = 270;
+toyRstop = 381;
 toyCstart = 100;
-toyCstop = 370;
+toyCstop = 400;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
 membraneDim = 2; % 2D or 3D trained probability map
 % 2D: 1250 x 1250 x 2 x 125

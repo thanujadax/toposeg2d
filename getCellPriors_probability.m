@@ -1,4 +1,4 @@
-function regionPriors = getCellPriors_probability(pixelProbabilities,setOfCells,...
+function [regionPriors,regionScoreImg] = getCellPriors_probability(pixelProbabilities,setOfCells,...
     sizeR,sizeC,wsIndsForRegion,ws,displayImg,saveIntermediateImages,...
     saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat)
 % Inputs:
@@ -12,7 +12,7 @@ function regionPriors = getCellPriors_probability(pixelProbabilities,setOfCells,
 
 numCells = size(setOfCells,1);
 regionPriors = zeros(numCells,1);
-regionScoreSpace = zeros(sizeR,sizeC);
+regionScoreImg = zeros(sizeR,sizeC);
 
 for i=1:numCells
     
@@ -42,16 +42,22 @@ for i=1:numCells
     else
         regionPriors(i) = 0;
     end
-    regionScoreSpace(intPixInds) = regionPriors(i);
+    regionScoreImg(intPixInds) = regionPriors(i);
 end
+% % test code
+% increaseFactor_prob = 0.2;
+% pickRegions_fraction = 0.2;
+% regionPriorsOut = increaseMembraneProb...
+%     (regionPriors,increaseFactor_prob,pickRegions_fraction);
+% % end of test code
 
 % visualize region scores
-regionScoreSpace = regionScoreSpace./(max(max(regionScoreSpace)));
+regionScoreImg = regionScoreImg./(max(max(regionScoreImg)));
 if(displayImg)
-    figure;imshow(regionScoreSpace);title('region scores')
+    figure;imshow(regionScoreImg);title('region scores')
 end
 if(saveIntermediateImages)
     intermediateImgDescription = 'regionUnary';
-    saveIntermediateImage(regionScoreSpace,rawImageIDstr,intermediateImgDescription,...
+    saveIntermediateImage(regionScoreImg,rawImageIDstr,intermediateImgDescription,...
 saveIntermediateImagesPath,saveOutputFormat);
 end

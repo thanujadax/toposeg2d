@@ -73,8 +73,8 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % to +1*w_off_r in the objective
                             
 %%  learned parameters
-%   1. w_off_e
-%   2. w_on_e
+%   1. w_on_e
+%   2. w_off_e
 %   3. w_off_n
 %   4. w_on_n
 %   5. w_on_r
@@ -408,6 +408,7 @@ saveIntermediateImages,...
 saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
     
 numRegions = numel(regionUnary);
+
 %% Boundary edges
 % we have already obtained boundaryEdgeIDs above. The following is
 % obsolete?

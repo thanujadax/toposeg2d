@@ -409,6 +409,16 @@ saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
     
 numRegions = numel(regionUnary);
 
+% % test code
+increaseFactor_prob = 0.2;
+pickRegions_fraction = 0.2;
+regionPriorsOut = increaseMembraneProb...
+    (regionUnary,increaseFactor_prob,pickRegions_fraction);
+regionScoreImg = visualizeRegionScores(regionPriorsOut,ws,wsIDsForRegions);
+regionScoreImg = regionScoreImg./max(max(regionScoreImg));
+figure;imshow(regionScoreImg)
+% % end of test code
+
 %% Boundary edges
 % we have already obtained boundaryEdgeIDs above. The following is
 % obsolete?

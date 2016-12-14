@@ -1,4 +1,4 @@
-function [regionPriors,regionScoreImg] = getCellPriors_probability(pixelProbabilities,setOfCells,...
+function [regionPriors,regionScoreImg,regionSizes] = getCellPriors_probability(pixelProbabilities,setOfCells,...
     sizeR,sizeC,wsIndsForRegion,ws,displayImg,saveIntermediateImages,...
     saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat)
 % Inputs:
@@ -12,6 +12,7 @@ function [regionPriors,regionScoreImg] = getCellPriors_probability(pixelProbabil
 
 numCells = size(setOfCells,1);
 regionPriors = zeros(numCells,1);
+regionSizes = zeros(numCells,1);
 regionScoreImg = zeros(sizeR,sizeC);
 
 for i=1:numCells
@@ -28,7 +29,7 @@ for i=1:numCells
 %     intPixInds = sub2ind([sizeR sizeC],internaly,internalx);
     
     intPixInds = getInternalPixForCell(ws,wsIndsForRegion(i));
-    
+    regionSizes(i) = numel(intPixInds);
     
     if(~isempty(intPixInds))
         pixelValues = pixelProbabilities(intPixInds);

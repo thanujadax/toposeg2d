@@ -9,11 +9,22 @@ function batchRun_isbi12()
 % updatePathCremi(); % add external sub directories to matlab path
 noDisplay = 0;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
+<<<<<<< HEAD
 toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 100;
 toyC = 100;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
 membraneDim = 3; % 2D or 3D trained probability map
+=======
+g = 2; % grow the final neuron segmentation by g pixels
+toy = 1; % only work on 400x400 image size instead of the full image
+toyRstart = 81;
+toyRstop = 381;
+toyCstart = 100;
+toyCstop = 400;
+linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
+membraneDim = 2; % 2D or 3D trained probability map
+>>>>>>> master
 % 2D: 1250 x 1250 x 2 x 125
 % 3D: 1250 x 1250 x 125 x 2
 
@@ -28,10 +39,17 @@ mitoProbMapFullFileName = '';
 
 % OUTPUTS:
 outputRoot = '/home/thanuja/RESULTS/isbi2012';
+<<<<<<< HEAD
 subDir = '001';
 saveOutputFormat = 'png'; % allowed: 'png', 'tif'
 saveIntermediateImages = 0;
 showIntermediateImages = 0;
+=======
+subDir = '20161031_rfc_im11_smaller_thinborder';
+saveOutputFormat = 'png'; % allowed: 'png', 'tif'
+saveIntermediateImages = 1;
+showIntermediateImages = 1;
+>>>>>>> master
 
 % PARAMS:
 % Steerable edge filter bank - filter sizes
@@ -80,10 +98,17 @@ if(produceBMRMfiles)
 else
     numFilesToProcess = numel(membraneFileList);
 end
+<<<<<<< HEAD
 
 % main loop to process the images
 for i=1:numFilesToProcess
     try
+=======
+i = 11;
+% main loop to process the images
+% for i=11:numFilesToProcess
+    % try
+>>>>>>> master
         % open new file for writing
         logFileName = sprintf('log%03d.txt',i);
         logFileFullPath = fullfile(outputPathLog,logFileName);
@@ -104,8 +129,13 @@ for i=1:numFilesToProcess
         labelImage = [];
 
         if(toy)
+<<<<<<< HEAD
             membraneProbMap = membraneProbMap(1:toyR,1:toyC);
             rawImage = rawImage(1:toyR,1:toyC);
+=======
+            membraneProbMap = membraneProbMap(toyRstart:toyRstop,toyCstart:toyCstop);
+            rawImage = rawImage(toyRstart:toyRstop,toyCstart:toyCstop);
+>>>>>>> master
     %         if(~isempty(labelImage))
     %             labelImage = labelImage(1:toyR,1:toyC);
     %         end
@@ -116,12 +146,17 @@ for i=1:numFilesToProcess
             barLength,barWidth,threshFrac,...
             saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
             outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,saveOutputFormat,...
+<<<<<<< HEAD
             logFileH,noDisplay);
+=======
+            logFileH,noDisplay,g);
+>>>>>>> master
 
         writeFileName = fullfile(outputPathPNG,...
             strcat(num2str(rawImageID),'.',saveOutputFormat));
         imwrite(segmentationOut,writeFileName,saveOutputFormat);
         
+<<<<<<< HEAD
     catch ME
         str1 = sprintf('Error occurred while processing image %d',i);
         disp(str1)
@@ -134,3 +169,17 @@ end
 % parallel pool stop
 % delete(poolobj);
 exit;
+=======
+    % catch ME
+%         str1 = sprintf('Error occurred while processing image %d',i);
+%         disp(str1)
+%         fprintf(logFileH,str1);
+% 	msgTxt = getReport(ME);
+% 	disp(msgTxt)
+%     fprintf(logFileH,msgTxt);
+    % end
+% end
+% parallel pool stop
+% delete(poolobj);
+% exit;
+>>>>>>> master

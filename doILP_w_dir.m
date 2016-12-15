@@ -1,16 +1,11 @@
-<<<<<<< HEAD
-function segmentationOut = doILP_w_dir(rawImg,rawImageIDstr,...
+function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
     membraneProbMap,mitoProbMapFullFileName,forestEdgeProbFileName,...
     edgeUnary,linearWeights,...
-=======
-function segmentationOut = doILP_w_dir(rawImg,rawImageID,...
-    membraneProbMap,mitoProbMapFullFileName,...
-    forestEdgeProbFileName,linearWeights,...
->>>>>>> 40ba55a3a8b5f930cc72ec1734a4c9c678168b01
     barLength,barWidth,threshFrac,...
     saveIntermediateImages,saveIntermediateImagesPath,showIntermediateImages,...
     outputPath,produceBMRMfiles,labelImage,sbmrmOutputDir,...
-    saveOutputFormat,logFileH,noDisplay,precomputedEdgeUnary)
+    saveOutputFormat,logFileH,noDisplay,g,mLevels,threshRsize,newRscore)
+
 
 % version 6. 20160821: removed input file handling
 % version 5. 20160509: 
@@ -50,7 +45,8 @@ wsgmask = 9;
 
 gsigma = 55; % spread for the smoothness cost of nodes (gaussian sigma)
 
-marginSize = ceil(barLength/2);
+% marginSize = ceil(barLength/2);
+marginSize = 5;
 marginPixValRaw = 0;
 marginPixValMem = 1;
 % threshFrac = 0;   % threshold for OFR 0.1 for raw images, 0 for membraneProbMaps
@@ -78,8 +74,8 @@ regionOffThreshold = 0.21;  % ** NOT USED **threshold to pick likely off regions
 % to +1*w_off_r in the objective
                             
 %%  learned parameters
-%   1. w_off_e
-%   2. w_on_e
+%   1. w_on_e
+%   2. w_off_e
 %   3. w_off_n
 %   4. w_on_n
 %   5. w_on_r
@@ -183,6 +179,9 @@ if(b_imWithBorder)
         imgInNormal = rawImg./max(max(rawImg));
         saveIntermediateImage(imgInNormal,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
+        if(showIntermediateImages)
+            figure;imshow(imgInNormal)
+        end
     end
     if(produceBMRMfiles)
         labelImage = addThickBorder(labelImage,marginSize,marginPixValRaw);
@@ -230,7 +229,7 @@ fprintf(logFileH,str1);
     ws,ws_original,removedWsIDs,newRemovedEdgeLIDs,psuedoEdgeIDs,psuedoEdges2nodes,...
     selfEdgeIDs,nodelessEdgeIDs] ...
     = getGraphFromWS(ws,output,showIntermediateImages,saveIntermediateImages,...
-      saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
+      saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat,imgInNormal);
 
 % edges2nodes is already appended with psuedoEdges2nodes
 % edges2pixels is already appended with psuedoEdgeIDs, with zeros as
@@ -287,9 +286,9 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag,...
 
 % get edge activation probabilities from RFC
 
-if(precomputedEdgeUnary)
+if(~isempty(edgeUnary))
     
-    str1 = 'using precomputed edge probabilities';
+    str1 = 'using precomputed edge probabilities (passed on)...';
     disp(str1)
     fprintf(logFileH,str1);
     
@@ -299,7 +298,6 @@ else
     str1 = 'loaded pre-trained RF for edge activation probability inference.';
     disp(str1)
     fprintf(logFileH,str1);
-
 
     edgeUnary = getEdgeProbabilitiesFromRFC...
                 (forestEdgeProb,rawImg,OFR,edgepixels,edgePriors,...
@@ -375,7 +373,7 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 
 %% get region unaries
 
-regionUnary = getRegionScoreFromProbImage(...
+[regionUnary,regionSizes] = getRegionScoreFromProbImage(...
 membraneProbMap,mitochondriaProbabilityImage,...
 useMitochondriaDetection,marginSize,marginPixValRaw,...
 setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediateImages,...
@@ -383,6 +381,7 @@ saveIntermediateImages,...
 saveIntermediateImagesPath,rawImageIDstr,saveOutputFormat);
     
 numRegions = numel(regionUnary);
+
 %% Boundary edges
 % we have already obtained boundaryEdgeIDs above. The following is
 % obsolete?
@@ -421,7 +420,7 @@ edgePriors(offEdgeListIDs) = offEdgeReward;
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 
 
-%% ILP
+%% ILP constraints
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
 
@@ -500,105 +499,142 @@ end
 % f = getILPObjectiveVectorParametric2(edgeUnary_directed,nodeAngleCosts,...
 %             regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
 %             nodeTypeStats);
-        
-if(produceBMRMfiles)
-    f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
-                setOfRegions,edges2nodes,numEdges,numNodeConf,numRegions,...
-                edgeUnary);
-else            
-    f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
-            nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf);
-end
 
-% senseArray(1:numEq) = '=';
-% if(numLt>0)
-%     senseArray((numEq+1):(numEq+numLt)) = '<';
-% end
-% if(numel(gt_rowID)>0)
-%    senseArray(gt_rowID) = '>'; 
-% end
-% variable types
-% vtypeArray(1:numBinaryVar) = 'B'; % binary
-% vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % continuous
-% lower bounds
-% lbArray(1:(numBinaryVar+numParam)) = 0;
-% upper bounds
-% ubArray(1:(numBinaryVar+numParam)) = 1;
-%% log stats
-fprintf(logFileH,'********************************** \n');
-fprintf(logFileH,'Number of edges: %d \n',numel(edgeListInds));
-fprintf(logFileH,'Number of regions: %d \n',numel(regionUnary));
-fprintf(logFileH,'Number of nodes: %d \n',size(nodeEdges,1));
-fprintf(logFileH,'Total number of ILP variables: %d \n',numel(f));
-fprintf(logFileH,'Number of ILP constraints: %d \n',numel(b));
+%% objective: solve the ilp for different variants of the region scores
+% save the outputs for each input image in a separate subdirectory
 
+for rr = 1:numel(mLevels)
+    % % test code
+    threshRscore = mLevels(rr);
+    regionUnaryModified = increaseMembraneProb...
+        (regionUnary,regionSizes,threshRscore,threshRsize,newRscore);
+        %(regionUnary,regionSizes,increaseFactor_prob,pickRegions_fraction);
+    regionScoreImg = visualizeRegionScores(regionUnaryModified,ws,wsIDsForRegions);
+    regionScoreImg = regionScoreImg./max(max(regionScoreImg));
+    % figure;imshow(regionScoreImg)
+    % % end of test code
 
-%% solver
-if(useGurobi)
-    disp('using Gurobi ILP solver...');
-    % model.A = sparse(double(A));
-    model.rhs = b;
-    % TODO: check if f contains nan. replace with zero
-    fnan = isnan(f);
-    if(sum(fnan)>0)
-        f(fnan==1) = 0;
-        disp('Warning! : Nan found in objective function f.')
-        disp('Replacing Nan with zero for f(i), where i = ')
-        find(fnan==1)
+    if(produceBMRMfiles)
+        f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
+                    setOfRegions,edges2nodes,numEdges,numNodeConf,numRegions,...
+                    edgeUnary);
+    else            
+        f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
+                regionUnaryModified,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
+                nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf);
     end
-    model.obj = f';
-    model.sense = senseArray;
-    % model.vtype = vtypeArray;
-    model.vtype = 'B';
-    % model.lb = lbArray;
-    % model.ub = ubArray;
-    model.modelname = 'contourDetectionILP1';
-    % initial guess
-    % model.start = labelVector;
-        
-    params.LogFile = 'gurobi.log';
-    params.Presolve = 0;
-    params.ResultFile = 'modelfile.mps';
-    params.InfUnbdInfo = 1;
 
-    resultGurobi = gurobi(model,params);
-    x = resultGurobi.x;
-        
-else
-    % Matlab ILP solver
-    disp('using MATLAB ILP solver...');
-    Initial values for the state variables
-    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
-    numStates = size(f,1);
-    maxIterationsILP = numStates * 1000000;
-    options = optimset('MaxIter',maxIterationsILP,...
-                    'MaxTime',5000000);
-    options = struct('MaxTime', 5000000);
-    disp('running ILP...');
-    t1 = cputime;
-    [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
-    t2 = cputime;
-    timetaken = t2-t1
-end
-%% write BMRM files
-if (produceBMRMfiles)
-    f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
-            nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf); % w's are set to 1.
-    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,sbmrmOutputDir);
-    constraints = writeConstraintsFile(model.A,b,senseArray,sbmrmOutputDir);
-    labels = writeLabelsFile(x,sbmrmOutputDir);
-end
+    % senseArray(1:numEq) = '=';
+    % if(numLt>0)
+    %     senseArray((numEq+1):(numEq+numLt)) = '<';
+    % end
+    % if(numel(gt_rowID)>0)
+    %    senseArray(gt_rowID) = '>'; 
+    % end
+    % variable types
+    % vtypeArray(1:numBinaryVar) = 'B'; % binary
+    % vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % continuous
+    % lower bounds
+    % lbArray(1:(numBinaryVar+numParam)) = 0;
+    % upper bounds
+    % ubArray(1:(numBinaryVar+numParam)) = 1;
+    %% log stats
+    fprintf(logFileH,'********************************** \n');
+    fprintf(logFileH,'Number of edges: %d \n',numel(edgeListInds));
+    fprintf(logFileH,'Number of regions: %d \n',numel(regionUnary));
+    fprintf(logFileH,'Number of nodes: %d \n',size(nodeEdges,1));
+    fprintf(logFileH,'Total number of ILP variables: %d \n',numel(f));
+    fprintf(logFileH,'Number of ILP constraints: %d \n',numel(b));
+
+
+    %% solver
+    if(useGurobi)
+        disp('using Gurobi ILP solver...');
+        % model.A = sparse(double(A));
+        model.rhs = b;
+        % TODO: check if f contains nan. replace with zero
+        fnan = isnan(f);
+        if(sum(fnan)>0)
+            f(fnan==1) = 0;
+            disp('Warning! : Nan found in objective function f.')
+            disp('Replacing Nan with zero for f(i), where i = ')
+            find(fnan==1)
+        end
+        model.obj = f';
+        model.sense = senseArray;
+        % model.vtype = vtypeArray;
+        model.vtype = 'B';
+        % model.lb = lbArray;
+        % model.ub = ubArray;
+        model.modelname = 'contourDetectionILP1';
+        % initial guess
+        % model.start = labelVector;
+
+        params.LogFile = 'gurobi.log';
+        params.Presolve = 0;
+        params.ResultFile = 'modelfile.mps';
+        params.InfUnbdInfo = 1;
+
+        resultGurobi = gurobi(model,params);
+        x = resultGurobi.x;
 
 %% visualize
 segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize,showIntermediateImages,fillSpaces);
+            marginSize,showIntermediateImages,fillSpaces,g,imgInNormal);
 if(saveIntermediateImages)
     intermediateImgDescription = 'segmentationOutput';
     saveIntermediateImage(segmentationOut,rawImageIDstr,intermediateImgDescription,...
     saveIntermediateImagesPath,saveOutputFormat);
 end
 fprintf(logFileH,'ILP is done! \n');
+
+    else
+        % Matlab ILP solver
+        disp('using MATLAB ILP solver...');
+        Initial values for the state variables
+        x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
+        numStates = size(f,1);
+        maxIterationsILP = numStates * 1000000;
+        options = optimset('MaxIter',maxIterationsILP,...
+                        'MaxTime',5000000);
+        options = struct('MaxTime', 5000000);
+        disp('running ILP...');
+        t1 = cputime;
+        [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
+        t2 = cputime;
+        timetaken = t2-t1
+    end
+    %% write BMRM files
+    if (produceBMRMfiles)
+        f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
+                regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
+                nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf); % w's are set to 1.
+        featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,sbmrmOutputDir);
+        constraints = writeConstraintsFile(model.A,b,senseArray,sbmrmOutputDir);
+        labels = writeLabelsFile(x,sbmrmOutputDir);
+    end
+
+    %% visualize
+    segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+                junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+                nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+                marginSize,showIntermediateImages,fillSpaces,g,imgInNormal);
+    if(saveIntermediateImages)
+        intermediateImgDescription = 'segmentationOutput';
+        saveIntermediateImage(segmentationOut,rawImageIDstr,intermediateImgDescription,...
+        saveIntermediateImagesPath,saveOutputFormat);
+    end
+    % save output segmentation
+    if (numel(mLevels)>1)
+        % save using threshold as file name
+        writeFileName = fullfile(outputPath,...
+            sprintf('%s.%s',num2str(mLevels(rr)),saveOutputFormat));
+    else
+        % save using input image as file name
+        writeFileName = fullfile(outputPath,sprintf('%03d.%s',rawImageID),saveOutputFormat);
+    end
+    imwrite(segmentationOut,writeFileName,saveOutputFormat);
+    fprintf(logFileH,'ILP is done! \n');
+end

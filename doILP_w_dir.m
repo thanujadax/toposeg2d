@@ -706,7 +706,7 @@ for rr = 1:numel(mLevels)
             sprintf('%s.%s',num2str(mLevels(rr)),saveOutputFormat));
     else
         % save using input image as file name
-        writeFileName = fullfile(outputPath,sprintf('%03d.%s',rawImageID),saveOutputFormat);
+        writeFileName = fullfile(outputPath,sprintf('%03d.%s',rawImageID,saveOutputFormat));
     end
     imwrite(segmentationOut,writeFileName,saveOutputFormat);
     fprintf(logFileH,'ILP is done! \n');

@@ -123,7 +123,8 @@ for i=1:numCs
     regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
     % grow by g pixels
     for j=1:g
-        regionPixels = get4nhpixels(regionPixels,sizeR,sizeC);
+        % regionPixels = get4nhpixels(regionPixels,sizeR,sizeC);
+        regionPixels = get4nhAll(regionPixels,sizeR,sizeC);
     end
     rMat(regionPixels) = R;
     gMat(regionPixels) = G;

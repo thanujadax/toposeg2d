@@ -6,7 +6,7 @@ dbstop if error
 % updatePathISBI(); % add external sub directories to matlab path
 noDisplay = 0;
 produceBMRMfiles = 0; % set to 1 to generate gold standard solution, features and constraints for structured learning
-toy = 1; % only work on 400x400 image size instead of the full image
+toy = 0; % only work on 400x400 image size instead of the full image
 toyR = 250;
 toyC = 250;
 linearWeights = [-6.64336, -6.34538, 0.917042, 0.732313, -4.85328, -13.4944];
@@ -29,7 +29,7 @@ precomputedEdgeUnary = 0; % 1 if precomputed edgeUnary is to be used
 % membranesDir = '/home/thanuja/RESULTS/isbi2012/CNN/train/probMaps_rfcilp_inv_20161102';
 % rawDir = '/home/thanuja/DATA/ISBI2012/train-volume';
 
-membranesDir = '/home/thanuja/DATA/ISBI2012/train_rfc_probmaps_inv';
+membranesDir = '/home/thanuja/DATA/ISBI2012/trainvolume_membranes_rfc';
 rawDir = '/home/thanuja/DATA/ISBI2012/train-volume';
 
 mitoProbMapFullFileName = '';
@@ -95,7 +95,7 @@ end
 % for i=1:numFilesToProcess
 
 i = 11;
-    try
+     try
         % open new file for writing
         logFileName = sprintf('log%03d.txt',i);
         logFileFullPath = fullfile(outputPathLog,logFileName);
@@ -147,10 +147,11 @@ i = 11;
         str1 = sprintf('Error occurred while processing image %d',i);
         disp(str1)
         fprintf(logFileH,str1);
-	msgTxt = getReport(ME);
-	disp(msgTxt)
-    fprintf(logFileH,msgTxt);
+    	  msgTxt = getReport(ME);
+    	  disp(msgTxt)
+        fprintf(logFileH,msgTxt);
     end
+
 % end
 % parallel pool stop
 % delete(poolobj);
